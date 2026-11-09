@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-title" content="Caderno">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1f47b8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Caderno de Português</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one narrow phone column; azulejo cobalt as the single accent, tram yellow only for "next up" */
+:root {
+  --bg: #f3f5f9;
+  --surface: #ffffff;
+  --fg: #16203a;
+  --muted: #5a6582;
+  --line: #d9dfeb;
+  --accent: #1f47b8;
+  --accent-soft: #e3eafb;
+  --tram: #f2c230;
+  --good: #1d7a4a;
+  --good-soft: #e1f3e8;
+  --bad: #b3322a;
+  --bad-soft: #fbe6e3;
+  --gram: #5d7f24;
+  --gram-soft: #eef4e2;
+  --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", -apple-system, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1422; --surface: #182036; --fg: #e8ecf6; --muted: #9aa5c2; --line: #2a3452;
+    --accent: #7d9bff; --accent-soft: #22305a; --tram: #f2c230;
+    --good: #5fd09a; --good-soft: #173a2b; --bad: #ff8a80; --bad-soft: #43201e;
+    --gram: #a9cf6a; --gram-soft: #24301a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --gram: #a9cf6a; --gram-soft: #24301a;
+  --bg: #0f1422; --surface: #182036; --fg: #e8ecf6; --muted: #9aa5c2; --line: #2a3452;
+  --accent: #7d9bff; --accent-soft: #22305a; --tram: #f2c230;
+  --good: #5fd09a; --good-soft: #173a2b; --bad: #ff8a80; --bad-soft: #43201e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 48px; display: flex; flex-direction: column; gap: 18px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 23px; font-weight: 800; }
+h3 { font-size: 18px; font-weight: 600; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent); }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; }
+.back { background: none; border: 0; padding: 6px 0; color: var(--accent); font-weight: 700; }
+.voice { font-size: 12px; color: var(--muted); text-align: right; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 0; padding: 14px 18px; font-weight: 700; background: var(--accent); color: var(--surface); width: 100%; }
+.btn.ghost { background: var(--accent-soft); color: var(--accent); }
+.btn[disabled] { opacity: .45; cursor: default; }
+
+.path { display: flex; flex-direction: column; gap: 10px; }
+.stop { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: left; width: 100%; }
+.stop .num { flex: none; width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 18px; background: var(--accent-soft); color: var(--accent); }
+.stop .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.stop.locked { opacity: .55; }
+.stop.next .num { background: var(--tram); color: #16203a; }
+.stop.exam { border-style: dashed; }
+.stop.exam .num { background: transparent; border: 2px dashed var(--muted); color: var(--muted); }
+.bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.bar > i { display: block; height: 100%; background: var(--accent); }
+
+.review { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--bad-soft); border-radius: 14px; padding: 14px; }
+.review .btn { width: auto; padding: 10px 14px; }
+
+.chunks { display: flex; flex-direction: column; gap: 8px; }
+.chunk { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; width: 100%; text-align: left; }
+.chunk .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 14px; font-weight: 700; }
+.chunk.done .tick { background: var(--good); border-color: var(--good); color: var(--surface); }
+.chunk .body { flex: 1; min-width: 0; }
+.chunk .body > span.small { display: block; }
+
+.explain { display: flex; flex-direction: column; gap: 12px; }
+.explain p, .explain li { max-width: 65ch; }
+.explain ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.explain b { color: var(--accent); }
+.hook { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; }
+.hook .eyebrow { color: var(--accent); margin-bottom: 4px; }
+.pt { font-weight: 700; }
+.say { font-style: italic; color: var(--muted); }
+
+.words { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.word { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; }
+.word:last-child { border-bottom: 0; }
+.word .play { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+.word .body { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; column-gap: 10px; align-items: baseline; }
+.word .en { color: var(--muted); font-size: 15px; }
+
+.conj { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.conj-row { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 12px; padding: 9px 14px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; }
+.conj-row:last-child { border-bottom: 0; }
+.conj-row .en { color: var(--muted); font-size: 15px; }
+.letters { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
+.letter { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.letter .L { font-family: var(--font-display); font-size: 26px; font-weight: 800; line-height: 1.1; }
+.letter .n { font-size: 14px; font-weight: 700; }
+.letter .h { font-size: 12px; color: var(--muted); }
+
+.links { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+
+.quiz { display: flex; flex-direction: column; gap: 16px; }
+.progress { display: flex; gap: 4px; }
+.progress i { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+.progress i.ok { background: var(--good); }
+.progress i.no { background: var(--bad); }
+.progress i.cur { background: var(--accent); }
+.tag { align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; background: var(--tram); color: #16203a; }
+.qtext { font-size: 21px; font-family: var(--font-display); font-weight: 600; line-height: 1.25; }
+.bigplay { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--accent-soft); color: var(--accent); border: 0; border-radius: 14px; padding: 18px; font-weight: 700; width: 100%; }
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.opt { background: var(--surface); border: 2px solid var(--line); border-radius: 12px; padding: 14px; text-align: left; font-size: 18px; width: 100%; }
+.opt.ok { border-color: var(--good); background: var(--good-soft); }
+.opt.no { border-color: var(--bad); background: var(--bad-soft); }
+.opt[disabled] { cursor: default; }
+.why { border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.why.ok { background: var(--good-soft); }
+.why.no { background: var(--bad-soft); }
+.why strong { font-family: var(--font-display); }
+.reveal { background: none; border: 0; color: var(--muted); text-decoration: underline; font-size: 14px; padding: 0; align-self: center; }
+
+.gram-banner { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: var(--gram); color: var(--surface); font-weight: 800; letter-spacing: .06em; font-size: 13px; padding: 5px 10px; border-radius: 6px; }
+.gram-banner span { font-weight: 400; letter-spacing: 0; opacity: .95; }
+.explain.gram { background: var(--gram-soft); border-left: 4px solid var(--gram); border-radius: 12px; padding: 14px; }
+.explain.gram b { color: var(--gram); }
+.gram-chip { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .06em; color: var(--surface); background: var(--gram); border-radius: 4px; padding: 1px 6px; margin-right: 6px; vertical-align: 2px; }
+.winput { width: 100%; font: inherit; font-size: 20px; padding: 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--fg); }
+.winput.ok { border-color: var(--good); background: var(--good-soft); }
+.winput.no { border-color: var(--bad); background: var(--bad-soft); }
+.accents { display: flex; flex-wrap: wrap; gap: 6px; }
+.accents button { min-width: 40px; padding: 8px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 18px; }
+.task { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0; }
+.gw { border-bottom: 2px dotted var(--accent); cursor: pointer; }
+.gltip { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 528px; margin: 0 auto; background: var(--fg); color: var(--bg); border-radius: 12px; padding: 12px 16px; font-size: 17px; z-index: 10; }
+.gltip b { font-weight: 700; }
+.hintbtn { align-self: flex-start; background: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 14px; color: var(--accent); font-weight: 700; }
+.hintbox { background: var(--accent-soft); border-radius: 12px; padding: 10px 14px; font-size: 15px; }
+.built { min-height: 56px; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 2px dashed var(--line); border-radius: 12px; }
+.pool { display: flex; flex-wrap: wrap; gap: 8px; }
+.tile { background: var(--surface); border: 2px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 18px; }
+.tile.used { visibility: hidden; }
+.built.ok { border-style: solid; border-color: var(--good); background: var(--good-soft); }
+.built.no { border-style: solid; border-color: var(--bad); background: var(--bad-soft); }
+.levels { display: flex; flex-direction: column; gap: 8px; }
+.lvl-note { font-size: 13px; font-weight: 400; opacity: .85; }
+.score { font-family: var(--font-display); font-size: 56px; font-weight: 800; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.row { display: flex; flex-direction: column; gap: 8px; }
+@media (prefers-reduced-motion: no-preference) {
+  .opt, .stop, .chunk { transition: transform .08s ease; }
+  .opt:active, .stop:active, .chunk:active { transform: scale(.985); }
+}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="gltip" id="gl" hidden></div>
+<script src="extras.js"></script>
+<script src="translations.js"></script>
+<script src="extras2.js"></script>
+
+<script>
+/* ---------- content ---------- */
+// Verb table: every person with its English. forms = [eu, tu, ele, nós, eles]; en = the English verb for each row.
+const PERSONS = ["eu", "tu", "você / ele / ela", "nós", "vocês / eles / elas"];
+const PERSONS_EN = ["I", "you", "you (formal) / he / she", "we", "you all / they"];
+function conj(forms, en) {
+  return `<div class="conj">${forms.map((f, i) => f ? `<button class="conj-row" data-say="${PERSONS[i].split(" / ").pop()} ${f}">
+    <span class="pt">${PERSONS[i]} ${f}</span><span class="en">${PERSONS_EN[i]} ${en[i]}</span></button>` : "").join("")}</div>`;
+}
+// Each lesson = chunks. Each chunk: explain (rule + analogy), words (tap to hear), quiz.
+// Quiz items: opts[0] is always the right answer (shuffled on screen). `say` = played aloud.
+const W = (pt, en, hint) => ({ pt, en, hint });
+
+const LESSONS = [
+{
+  id: "alfabeto",
+  num: "0",
+  title: "O Alfabeto",
+  sub: "Letters and sounds of European Portuguese",
+  source: "Teacher's handout “O alfabeto e a fonética do português europeu”",
+  chunks: [
+  {
+    id: "letras",
+    title: "Letter names",
+    sub: "Como se escreve? — spelling your name",
+    explain: `
+      <p>In class, at the exam and at any front desk you'll hear <span class="pt">Como se escreve?</span> <span class="say">“How do you spell it?”</span> To answer, you need the names of the letters.</p>
+      <p>Tap a letter to hear it. Most names are like English, just with Portuguese vowels.</p>
+      <div class="letters">${[
+        ["A","á","ah"],["B","bê","bay"],["C","cê","say"],["D","dê","day"],["E","é","eh"],["F","éfe","EF-uh"],
+        ["G","gê","zhay"],["H","agá","a-GAH"],["I","i","ee"],["J","jota","ZHO-tuh"],["K","capa","KA-puh"],["L","éle","EL-uh"],
+        ["M","éme","EM-uh"],["N","éne","EN-uh"],["O","ó","aw"],["P","pê","pay"],["Q","quê","kay"],["R","erre","ER-uh"],
+        ["S","esse","ES-uh"],["T","tê","tay"],["U","u","oo"],["V","vê","vay"],["W","dâblio","DAB-lee-oo"],["X","xis","sheesh"],
+        ["Y","ípsilon","EEP-see-lon"],["Z","zê","zay"]
+      ].map(([L,n,h]) => `<button class="letter" data-say="${n}"><span class="L">${L}</span><span class="n">${n}</span><span class="h">${h}</span></button>`).join("")}</div>
+      <div class="hook"><div class="eyebrow">Traps for English speakers</div>
+        <ul>
+          <li><b>E</b> is “eh” and <b>I</b> is “ee”. English has them the other way round.</li>
+          <li><b>G</b> is “zhay” and <b>J</b> is “ZHO-tuh”. Both start with the “s” sound of <i>measure</i>.</li>
+          <li><b>H</b> is “a-GAH”, and <b>Q</b> is “kay”, which sounds like English K.</li>
+        </ul>
+      </div>`,
+    words: [
+      W("Como se escreve?", "How do you spell it?", "KO-moo suh shKREV"),
+      W("Como se chama?", "What's your name?", "KO-moo suh SHA-muh"),
+      W("Chamo-me Maria.", "My name is Maria.", "SHA-moo-muh ma-REE-uh"),
+    ],
+    links: [
+      ["Portuguese alphabet song and pronunciation (YouTube)", "https://www.youtube.com/results?search_query=alfabeto+portugu%C3%AAs+europeu+pron%C3%BAncia"],
+    ],
+    quiz: [
+      { q: "Listen. Which letter is it?", say: "gê", opts: ["G", "J", "Q"], why: "gê = G. J is “jota”." },
+      { q: "Listen. Which letter is it?", say: "jota", opts: ["J", "G", "Y"], why: "jota = J." },
+      { q: "Listen. Which letter is it?", say: "é", opts: ["E", "I", "A"], why: "é = E. In Portuguese, E sounds like “eh”." },
+      { q: "Listen. Which letter is it?", say: "i", opts: ["I", "E", "Y"], why: "i = I, pronounced “ee”." },
+      { q: "Listen. Which letter is it?", say: "agá", opts: ["H", "A", "G"], why: "agá = H." },
+      { q: "Listen. Which letter is it?", say: "quê", opts: ["Q", "K", "C"], why: "quê = Q. K is “capa”." },
+      { q: "Listen to the spelling. Which name is it?", say: "éme, á, erre, i, á", opts: ["Maria", "Marta", "Mário"], why: "M – A – R – I – A." },
+      { q: "“Como se escreve?” means…", opts: ["How do you spell it?", "What's your name?", "How are you?"], why: "escrever = to write. Literally, “How is it written?”" },
+    ]
+  },
+  {
+    id: "cg",
+    title: "C, Ç, G, QU, GU",
+    sub: "Hard or soft? Same rule as English",
+    explain: `
+      <p>Good news: you already know this rule from English. Compare <i>cat</i> and <i>city</i>, or <i>go</i> and <i>gem</i>. Before <b>E</b> or <b>I</b>, the letters C and G go soft.</p>
+      <ul>
+        <li><b>C + a, o, u</b> = K: carro, comida, curto</li>
+        <li><b>C + e, i</b> = S: cem, cinto</li>
+        <li><b>G + a, o, u</b> = G as in <i>go</i>: gato, gordo</li>
+        <li><b>G + e, i</b> = ZH as in <i>measure</i>: gelo, ginásio</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Two tricks to swap hard and soft</div>
+        <ul>
+          <li>Want a soft S before a, o, u? Add a tail: <b>Ç</b>. The cedilla means “stay soft”: braço, peça.</li>
+          <li>Want a hard K or G before e, i? Put a silent <b>U</b> in between: <b>QU</b>ente, <b>QU</b>into, <b>GU</b>erra, <b>GU</b>itarra.</li>
+        </ul>
+      </div>
+      <p>Before a and o, the U is pronounced: <span class="pt">quarto</span> <span class="say">“KWAR-too”</span>, <span class="pt">guarda</span> <span class="say">“GWAR-duh”</span>.</p>`,
+    words: [
+      W("carro", "car", "KA-rroo"), W("cem", "one hundred", "sayng"), W("cinto", "belt", "SEEN-too"),
+      W("braço", "arm", "BRA-soo"), W("gato", "cat", "GA-too"), W("gelo", "ice", "ZHAY-loo"),
+      W("guerra", "war", "GEH-rruh"), W("quente", "hot", "KENT"), W("quarto", "room", "KWAR-too"),
+    ],
+    links: [
+      ["Hear native speakers say words on Forvo", "https://forvo.com/languages/pt/"],
+    ],
+    quiz: [
+      { q: "How does C sound in “cinto”?", opts: ["S", "K"], why: "C + i is soft, like in <i>city</i>." },
+      { q: "How does C sound in “comida”?", opts: ["K", "S"], why: "C + o is hard, like in <i>cat</i>." },
+      { q: "Why does “braço” need Ç?", opts: ["Without the tail, “braco” would be read with a K", "It marks the stressed syllable", "It makes the word plural"], why: "C + o = K. The cedilla keeps it soft: “BRA-soo”." },
+      { q: "How does G sound in “gelo” (ice)?", opts: ["ZH as in “measure”", "G as in “go”"], why: "G + e is soft: “ZHAY-loo”." },
+      { q: "How does G sound in “gato” (cat)?", opts: ["G as in “go”", "ZH as in “measure”"], why: "G + a is hard." },
+      { q: "In “guerra” (war), the U is…", opts: ["silent. It only keeps G hard", "pronounced, like W"], why: "GU + e: the U is a silent helper. “GEH-rruh”." },
+      { q: "Which is closer to “quente” (hot)?", opts: ["KENT", "KWENT-ee"], why: "QU + e = K. The final e almost disappears." },
+      { q: "Listen. Which word is it?", say: "cinto", opts: ["cinto", "quinto"], why: "cinto (belt) starts with S. quinto (fifth) starts with K." },
+      { q: "“gelo” means…", opts: ["ice", "gel", "jelly"], why: "gelo = ice." },
+    ]
+  },
+  {
+    id: "h",
+    title: "H, CH, LH, NH",
+    sub: "The shy letter H",
+    explain: `
+      <p><b>H alone is silent</b>, like in English <i>hour</i> or <i>honest</i>: <span class="pt">hora</span> <span class="say">“OR-uh”</span>, <span class="pt">hoje</span> <span class="say">“OH-zhuh”</span>.</p>
+      <p>After C, L or N, the H changes the letter before it:</p>
+      <ul>
+        <li><b>CH</b> = SH as in <i>shoe</i>: chave, chá. It is never the CH of <i>church</i>.</li>
+        <li><b>LH</b> = LY as in <i>million</i>: alho, filho</li>
+        <li><b>NH</b> = NY as in <i>canyon</i>, or Spanish ñ: tenho, vinho, Espanha</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Memory hook</div>
+        H is shy. On its own it says nothing. Next to a friend, it changes the friend's voice.
+      </div>`,
+    words: [
+      W("hora", "hour", "OR-uh"), W("hoje", "today", "OH-zhuh"), W("chave", "key", "SHAHV"),
+      W("chá", "tea", "SHAH"), W("alho", "garlic", "AL-yoo"), W("filho", "son", "FEEL-yoo"),
+      W("eu tenho", "I have", "EH-oo TEN-yoo"), W("vinho", "wine", "VEEN-yoo"),
+    ],
+    links: [],
+    quiz: [
+      { q: "How do you say the H in “hora”?", opts: ["You don't. H is silent", "Like the English H in “hot”"], why: "H at the start is silent: “OR-uh”." },
+      { q: "CH in “chave” (key) sounds like…", opts: ["SH as in “shoe”", "CH as in “church”", "K"], why: "CH is always SH: “SHAHV”." },
+      { q: "LH in “alho” (garlic) sounds like…", opts: ["LY as in “million”", "L + H", "just L"], why: "“AL-yoo”." },
+      { q: "Which spelling makes the “ny” sound?", opts: ["NH", "LH", "CH"], why: "NH = ñ: vinho, tenho." },
+      { q: "Listen. Which word is it?", say: "vinho", opts: ["vinho", "vino", "vilho"], why: "vinho (wine), “VEEN-yoo”." },
+      { q: "“Eu tenho” means…", opts: ["I have", "I hold", "I'm tired"], why: "ter = to have. eu tenho = I have." },
+      { q: "“hoje” sounds like…", opts: ["OH-zhuh", "HO-jee", "HO-hay"], why: "H is silent, J = ZH, and the final E is swallowed." },
+    ]
+  },
+  {
+    id: "s",
+    title: "S, Z, X",
+    sub: "Why Lisbon sounds “shushy”",
+    explain: `
+      <p>S has three sounds, depending on its neighbours:</p>
+      <ul>
+        <li><b>S</b> at the start, or <b>SS</b> = S: sol, passo</li>
+        <li><b>S between two vowels</b> = Z, like English <i>rose</i>: mesa, casa</li>
+        <li><b>S at the end of a word, or before p, t, c, f, q</b> = SH: escola “shKO-luh”, dois “doysh”</li>
+        <li><b>S before b, d, g, m, n, l, r, v</b> = ZH as in <i>measure</i>: Lisboa “leezh-BO-uh”, mesmo “MEZH-moo”</li>
+      </ul>
+      <p><b>Z</b> is Z at the start and in the middle (zero, azeite). At the end of a word it becomes SH: luz “loosh”, capaz.</p>
+      <div class="hook"><div class="eyebrow">Why it sounds “shushy”</div>
+        In Portugal, an S or Z at the end of a syllable turns into SH or ZH. That's the #1 difference from Brazilian Portuguese you'll hear.
+      </div>
+      <p><b>X</b> has four sounds. When in doubt, guess SH, the most common one:</p>
+      <ul>
+        <li>SH at the start of a word: xaile</li>
+        <li>Z in “ex + vowel”: exame</li>
+        <li>KS in some words: táxi</li>
+        <li>SS in a few words: máximo</li>
+      </ul>`,
+    words: [
+      W("sol", "sun", "sol"), W("mesa", "table", "MAY-zuh"), W("casa", "house", "KA-zuh"),
+      W("caça", "hunting", "KA-suh"), W("escola", "school", "shKO-luh"), W("dois", "two", "doysh"),
+      W("Lisboa", "Lisbon", "leezh-BO-uh"), W("luz", "light", "loosh"), W("xaile", "shawl", "SHY-luh"),
+      W("exame", "exam", "ee-ZAHM"), W("táxi", "taxi", "TAK-see"),
+    ],
+    links: [],
+    quiz: [
+      { q: "S in “mesa” (table) sounds like…", opts: ["Z", "S", "SH"], why: "S between two vowels = Z: “MAY-zuh”." },
+      { q: "S in “sol” (sun) sounds like…", opts: ["S", "Z", "SH"], why: "S at the start of a word = S." },
+      { q: "S in “escola” sounds like…", opts: ["SH", "S", "Z"], why: "S before C = SH: “shKO-luh”." },
+      { q: "S in “Lisboa” sounds like…", opts: ["ZH as in “measure”", "S", "Z"], why: "S before B = ZH: “leezh-BO-uh”." },
+      { q: "Z at the end of “luz” (light) sounds like…", opts: ["SH", "Z", "TS"], why: "Final Z = SH: “loosh”." },
+      { q: "X in “xaile” (shawl) sounds like…", opts: ["SH", "KS", "Z"], why: "X at the start of a word = SH." },
+      { q: "X in “exame” sounds like…", opts: ["Z", "KS", "SH"], why: "“ex + vowel” is usually Z: “ee-ZAHM”." },
+      { q: "Listen. Which word is it?", say: "caça", opts: ["caça", "casa"], why: "caça (hunting) has an S sound. casa (house) has a Z sound." },
+      { q: "Why does European Portuguese sound “shushy”?", opts: ["S and Z at the end of a syllable turn into SH or ZH", "There are many CH letters", "People speak fast"], why: "dois = “doysh”, luz = “loosh”, escola = “shKO-luh”." },
+    ]
+  },
+  {
+    id: "r",
+    title: "R and RR",
+    sub: "caro or carro?",
+    explain: `
+      <p>Portuguese has two R sounds, and swapping them changes the word.</p>
+      <ul>
+        <li><b>Soft R</b>: a single R between vowels, after a consonant, or at the end. It's a quick tap of the tongue, like the “tt” in American <i>butter</i>: caro “KA-roo”, parar, parte.</li>
+        <li><b>Strong R</b>: R at the start of a word, or double RR. It comes from the throat, like a French R or a light gargle: rua, carro.</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Remember one sentence</div>
+        <span class="pt">O carro é caro.</span> The car is expensive. The strong R is in the car, the soft R is in the price.
+      </div>`,
+    words: [
+      W("caro", "expensive", "KA-roo (tap)"), W("carro", "car", "KA-rroo (throat)"), W("rua", "street", "RROO-uh"),
+      W("parar", "to stop", "puh-RAR"), W("O carro é caro.", "The car is expensive.", ""),
+    ],
+    links: [
+      ["European Portuguese R sound explained (YouTube)", "https://www.youtube.com/results?search_query=european+portuguese+r+sound+pronunciation"],
+    ],
+    quiz: [
+      { q: "R in “rua” (street) is…", opts: ["strong, from the throat", "a soft tap"], why: "R at the start of a word is always strong." },
+      { q: "R in “caro” is…", opts: ["a soft tap, like “butter”", "strong, from the throat"], why: "A single R between vowels = tap." },
+      { q: "RR in “carro” is…", opts: ["strong, from the throat", "a soft tap"], why: "Double RR = strong." },
+      { q: "Listen. Which word is it?", say: "carro", opts: ["carro", "caro"], why: "carro (car) has the throat R." },
+      { q: "Listen. Which word is it?", say: "caro", opts: ["caro", "carro"], why: "caro (expensive) has the soft tap." },
+      { q: "“O carro é caro” means…", opts: ["The car is expensive", "The expensive car", "The car is fast"], why: "é = is, caro = expensive." },
+    ]
+  },
+  {
+    id: "vogais",
+    title: "Vowels, accents, nasals",
+    sub: "ã, ão, ãe and the swallowed vowels",
+    explain: `
+      <p><b>Accents</b> show the stressed syllable and how open the vowel is:</p>
+      <ul>
+        <li><b>á é ó</b> are open: fácil, médico, após</li>
+        <li><b>â ê ô</b> are closed: dinâmico, porquê, pôr</li>
+      </ul>
+      <p><b>Swallowed vowels.</b> Brazilians sing their vowels, and people in Portugal swallow them. An unstressed O becomes “oo” (tudo “TOO-doo”). An unstressed E almost disappears (ele “EL”, quente “KENT”).</p>
+      <p><b>Nasal vowels</b> are said through the nose, like the French <i>bon</i>. Think of saying <i>sing</i> but stopping before the G. You get a nasal vowel with:</p>
+      <ul>
+        <li>a tilde: <b>ã, õ</b> (maçã)</li>
+        <li><b>M or N</b> after a vowel in the same syllable: campo, empresa, importante, ontem, pergunta</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">The three famous nasal sounds</div>
+        <ul>
+          <li><b>ão</b> ≈ “own” through the nose: não (no), pão (bread), cão (dog)</li>
+          <li><b>ãe</b> ≈ “my” through the nose: mãe (mother)</li>
+          <li><b>õe</b> ≈ “oy” through the nose: limões (lemons)</li>
+        </ul>
+      </div>`,
+    words: [
+      W("fácil", "easy", "FA-seel"), W("tudo", "everything", "TOO-doo"), W("maçã", "apple", "muh-SAHN"),
+      W("campo", "field", "KAHM-poo"), W("não", "no", "nowng"), W("cão", "dog", "kowng"),
+      W("mãe", "mother", "mayng"), W("limões", "lemons", "lee-MOYNSH"), W("andam", "they walk", "AN-downg"),
+    ],
+    links: [
+      ["How to pronounce “ão” (YouTube)", "https://www.youtube.com/results?search_query=how+to+pronounce+%C3%A3o+european+portuguese"],
+    ],
+    quiz: [
+      { q: "Which word has a nasal sound?", opts: ["cão", "casa", "carro"], why: "The tilde ~ = nasal. cão (dog) ≈ “kowng”." },
+      { q: "The final O in “tudo” sounds like…", opts: ["oo", "oh", "aw"], why: "An unstressed O = “oo”: “TOO-doo”." },
+      { q: "“mãe” (mother) sounds close to…", opts: ["“my” through the nose", "“may”", "“ma”"], why: "ãe ≈ nasal “my”." },
+      { q: "What does the accent in “fácil” tell you?", opts: ["Stress here, and the A is open", "The word is a question", "The A is nasal"], why: "á é ó = stressed and open." },
+      { q: "What makes the A in “campo” nasal?", opts: ["The M after it", "The O at the end", "Nothing, it's not nasal"], why: "A vowel + M or N in the same syllable = nasal." },
+      { q: "“não” means…", opts: ["no", "now", "name"], why: "não = no / not." },
+      { q: "“maçã” means…", opts: ["apple", "table", "morning"], why: "maçã = apple. Note the nasal ã at the end." },
+    ]
+  }]
+},
+{
+  id: "u1",
+  num: "1",
+  label: "Unidade 1 · pages 10–13",
+  title: "Olá, bom dia!",
+  sub: "Greet, introduce yourself, numbers 0–20, days, say goodbye",
+  source: "Passaporte para Português 1, Unidade 1 (pp. 10–13), exercises A–K and Pronúncia A–E",
+  chunks: [
+  {
+    id: "cumprimentar",
+    title: "Greetings: formal or informal?",
+    sub: "Exercises A, D · Bom dia, Tudo bem?, obrigado/obrigada",
+    explain: `
+      <p><b>Say hello by the clock</b> (exercise D):</p>
+      <ul>
+        <li><span class="pt">Bom dia</span> from morning until lunch, about 12–13h</li>
+        <li><span class="pt">Boa tarde</span> from lunch until it gets dark, about 19–20h</li>
+        <li><span class="pt">Boa noite</span> in the evening and at night. It means both “good evening” and “good night”.</li>
+        <li><span class="pt">Olá</span> works any time</li>
+      </ul>
+      <p><b>Formal or informal?</b> (exercise A) Portuguese has two ways to say “you”:</p>
+      <ul>
+        <li><b>tu</b> for friends, family and kids: <span class="pt">Olá, Joana! Tudo bem?</span> <span class="say">Hi Joana, all good?</span></li>
+        <li><b>o senhor / a senhora</b> for strangers, older people, at work: <span class="pt">Bom dia! Como está?</span> <span class="say">Good morning, how are you?</span></li>
+      </ul>
+      <p>Formal “you” uses the same verb form as “he/she”: <span class="pt">(o senhor) está</span> is literally “the gentleman is”. It's like saying “How is sir today?”</p>
+      <div class="hook"><div class="eyebrow">Important box, p. 11</div>
+        <ul>
+          <li><b>obrigado / obrigada</b> depends on <b>who speaks</b>, not on who you thank. A woman always says <span class="pt">obrigada</span>. It literally means “obliged”, as in “much obliged”.</li>
+          <li><b>bem-vindo / bem-vinda</b> depends on <b>who arrives</b>: to a woman you say <span class="pt">Bem-vinda!</span></li>
+          <li><span class="pt">Muito prazer!</span> = <span class="pt">Muito gosto!</span> = Nice to meet you.</li>
+        </ul>
+      </div>`,
+    words: [
+      W("Bom dia!", "Good morning!", "bong DEE-uh"), W("Boa tarde!", "Good afternoon!", "BO-uh TARD"),
+      W("Boa noite!", "Good evening / night!", "BO-uh NOYT"), W("Tudo bem?", "All good?", "TOO-doo bayng"),
+      W("Como está?", "How are you? (formal)", "KO-moo shTAH"), W("Bem, obrigada. E a senhora?", "Fine, thanks. And you, madam?", ""),
+      W("Muito prazer!", "Nice to meet you!", "MOOYNG-too pruh-ZER"),
+    ],
+    links: [],
+    quiz: [
+      { q: "It's 21:00. You say…", opts: ["Boa noite!", "Boa tarde!", "Bom dia!"], why: "Evening and night = Boa noite." },
+      { q: "It's 7:00. You say…", opts: ["Bom dia!", "Boa noite!", "Boa tarde!"], why: "Morning = Bom dia." },
+      { q: "It's 14:00. You say…", opts: ["Boa tarde!", "Bom dia!", "Boa noite!"], why: "After lunch = Boa tarde." },
+      { q: "Which greeting is informal?", opts: ["Olá, Joana! Tudo bem?", "Bom dia! Como está?", "Boa tarde, Dr. Amaral."], why: "First name + Tudo bem? = friends (tu)." },
+      { q: "You (a woman) thank the waiter. You say…", opts: ["Obrigada!", "Obrigado!"], why: "It depends on the speaker. Women say obrigada." },
+      { q: "Your friend Ana arrives in Lisbon. You say…", opts: ["Bem-vinda a Lisboa!", "Bem-vindo a Lisboa!"], why: "It depends on who arrives. Ana is a woman → bem-vinda." },
+      { q: "Muito gosto! means the same as…", opts: ["Muito prazer!", "Muito obrigado!", "Tudo bem!"], why: "Both mean “Nice to meet you!”" },
+      { q: "“Olá! Como está?” — best answer:", opts: ["Bem, obrigada.", "Sou.", "Muito prazer!"], why: "Exercise E: Como está? → Bem, obrigada." },
+      { q: "Fill in (exercise F): “Olá! Como ___?” — “Bem, obrigado.”", opts: ["está", "é", "te"], why: "Como está? = How are you?" },
+    ]
+  },
+  {
+    id: "apresentar",
+    title: "Who are you? Ser and chamar-se",
+    sub: "Exercises B, C, E, F · Chamo-me…, Sou o…, Quem é?",
+    explain: `
+      <p><b>Asking a name.</b> Portuguese says “How do you call yourself?”, like French <i>Comment tu t'appelles</i>:</p>
+      <ul>
+        <li>informal: <span class="pt">Como te chamas?</span></li>
+        <li>formal: <span class="pt">Como se chama?</span></li>
+        <li>answer: <span class="pt">Chamo-me Maria.</span> <span class="say">I call myself Maria.</span></li>
+      </ul>
+      <p><b>ser = to be</b> (who you are):</p>
+      ${conj(["sou", "és", "é"], ["am", "are (informal)", "is / are"])}
+      <p class="small muted">o senhor / a senhora (formal “you”) also take <b>é</b>. The plural comes in Unit 2.</p>
+      <div class="hook"><div class="eyebrow">Important box, p. 10: the article trap</div>
+        In Portugal people put “the” before names: <span class="pt">Sou <b>o</b> Paulo</span> (a man), <span class="pt">É <b>a</b> Rita</span> (a woman). Literally “I am the Paulo”. But after chamo-me there is no article: <span class="pt">Chamo-me Paulo.</span>
+      </div>
+      <p><b>Asking who someone is</b> (exercise C):</p>
+      <ul>
+        <li><span class="pt">Quem é ele / ela?</span> Who is he / she?</li>
+        <li><span class="pt">É o Cristiano Ronaldo.</span> or <span class="pt">Não sei.</span> <span class="say">I don't know.</span></li>
+        <li><span class="pt">Desculpe, é o Rui Nunes?</span> Excuse me, are you Rui Nunes? <span class="pt">Sim, sou eu.</span> Yes, that's me.</li>
+        <li><span class="pt">Como?</span> Pardon? (said when you didn't hear)</li>
+      </ul>
+      <p><b>Answer yes without “sim”.</b> Portuguese often answers by repeating the verb: <span class="pt">És o Hugo? — Sou.</span> Are you Hugo? — (I) am.</p>`,
+    words: [
+      W("Como te chamas?", "What's your name? (informal)", "KO-moo tuh SHA-mush"),
+      W("Chamo-me Joana. E tu?", "My name is Joana. And you?", ""),
+      W("Sou o Tiago.", "I'm Tiago.", "so oo tee-A-goo"),
+      W("Quem é ela?", "Who is she?", "kayng eh EH-luh"),
+      W("Não sei.", "I don't know.", "nowng say"),
+      W("Desculpe, é o Rui Nunes?", "Excuse me, are you Rui Nunes?", ""),
+      W("Sim, sou eu.", "Yes, that's me.", "seeng so EH-oo"),
+    ],
+    links: [],
+    quiz: [
+      { q: "Which is correct?", opts: ["Chamo-me Paulo.", "Chamo-me o Paulo.", "Chamo-me é Paulo."], why: "No article after chamo-me." },
+      { q: "Which is correct?", opts: ["Sou o Paulo.", "Sou Paulo o.", "Sou a Paulo."], why: "ser + o (for a man) + name." },
+      { q: "Quem é ela? — É ___ Shakira.", opts: ["a", "o", "–"], why: "A woman → a." },
+      { q: "Informal: “Como ___ chamas?”", opts: ["te", "se", "me"], why: "tu → te chamas. Exercise F, dialogue 4." },
+      { q: "Formal: “Como ___ chama?”", opts: ["se", "te", "me"], why: "o senhor / a senhora → se chama." },
+      { q: "Tu ___ o David?", opts: ["és", "é", "sou"], why: "tu és." },
+      { q: "“És o Hugo?” — short yes:", opts: ["Sou.", "É.", "Está."], why: "Answer with the verb: Sou = I am." },
+      { q: "“Desculpe, é o Rui Nunes?” means…", opts: ["Excuse me, are you Rui Nunes?", "Sorry, he is Rui Nunes.", "Excuse me, who is Rui Nunes?"], why: "é is also the formal “you are”." },
+      { q: "“Quem é ele?” — you don't know. You say…", opts: ["Não sei.", "Não sou.", "Como?"], why: "Não sei = I don't know." },
+    ]
+  },
+  {
+    id: "numeros",
+    title: "Numbers 0–20 and phone numbers",
+    sub: "Exercises G, H · the numbers on page 12",
+    explain: `
+      <p>Exercise G: listen and repeat 0–20. Exercise H: read the <b>phone numbers</b> aloud. That's what all the digits on page 12 are.</p>
+      <ul>
+        <li><b>1 and 2 have a feminine form</b>: <span class="pt">um / uma</span>, <span class="pt">dois / duas</span>. For counting and phone numbers, use um and dois.</li>
+        <li><b>11–15 are one-offs</b>, like English <i>eleven, twelve</i>: onze, doze, treze, catorze, quinze.</li>
+        <li><b>16–19 are “ten-and-X”</b>: <span class="pt">dez-a-sseis</span> = ten and six. English puts the ten last (six<i>teen</i>), Portuguese puts it first.</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Link to the alphabet</div>
+        Final S = SH, so <span class="pt">dois</span> = “doysh”, <span class="pt">três</span> = “traysh”, <span class="pt">seis</span> = “saysh”. And the final E is swallowed: <span class="pt">sete</span> = “SET”, <span class="pt">doze</span> = “DOZ”.
+      </div>
+      <p><b>Phone numbers in Portugal</b> have 9 digits. <b>9…</b> is a mobile, <b>21</b> is Lisbon, <b>22</b> is Porto. People read them in small groups, digit by digit: 21 654 21 48 → <span class="pt">dois um, seis cinco quatro, dois um, quatro oito</span>.</p>
+      <div class="letters">${[
+        [0,"zero"],[1,"um"],[2,"dois"],[3,"três"],[4,"quatro"],[5,"cinco"],[6,"seis"],[7,"sete"],[8,"oito"],[9,"nove"],[10,"dez"],
+        [11,"onze"],[12,"doze"],[13,"treze"],[14,"catorze"],[15,"quinze"],[16,"dezasseis"],[17,"dezassete"],[18,"dezoito"],[19,"dezanove"],[20,"vinte"]
+      ].map(([n,w]) => `<button class="letter" data-say="${w}"><span class="L">${n}</span><span class="n">${w}</span></button>`).join("")}</div>`,
+    words: [
+      W("dois um, seis cinco quatro, dois um, quatro oito", "21 654 21 48", ""),
+      W("nove um, três zero dois, oito seis, zero nove", "91 302 86 09", ""),
+    ],
+    links: [],
+    quiz: [
+      { q: "Listen. Which number?", say: "catorze", opts: ["14", "4", "40"], why: "catorze = 14." },
+      { q: "Listen. Which number?", say: "seis", opts: ["6", "7", "16"], why: "seis = 6, “saysh”. sete = 7." },
+      { q: "Listen. Which number?", say: "dezassete", opts: ["17", "16", "7"], why: "dez + a + sete = 10 + 7." },
+      { q: "Listen. Which number?", say: "doze", opts: ["12", "2", "13"], why: "doze = 12. dois = 2." },
+      { q: "Listen. Which number?", say: "treze", opts: ["13", "3", "30"], why: "treze = 13. três = 3." },
+      { q: "“dezanove” is…", opts: ["19", "9", "29"], why: "dez + a + nove = 19." },
+      { q: "“quinze” is…", opts: ["15", "5", "50"], why: "quinze = 15. cinco = 5." },
+      { q: "Listen. Which phone number?", say: "nove um, três zero dois, oito seis, zero nove", opts: ["91 302 86 09", "91 302 68 09", "21 302 86 09"], why: "nove um (91), três zero dois (302), oito seis (86), zero nove (09)." },
+      { q: "A number starting with 9 in Portugal is…", opts: ["a mobile", "a Lisbon landline", "an emergency number"], why: "91, 92, 93, 96 are mobiles. 21 is Lisbon." },
+    ]
+  },
+  {
+    id: "dias",
+    title: "Days of the week",
+    sub: "Exercise I · segunda-feira, terça-feira…",
+    explain: `
+      <p>Portuguese counts the week <b>starting from Sunday</b>. Sunday is day 1, <span class="pt">domingo</span> (the Lord's day), so Monday is the “2nd day”:</p>
+      <ul>
+        <li><span class="pt">segunda-feira</span> Monday (2nd)</li>
+        <li><span class="pt">terça-feira</span> Tuesday (3rd)</li>
+        <li><span class="pt">quarta-feira</span> Wednesday (4th)</li>
+        <li><span class="pt">quinta-feira</span> Thursday (5th)</li>
+        <li><span class="pt">sexta-feira</span> Friday (6th)</li>
+        <li><span class="pt">sábado</span> Saturday (like Sabbath)</li>
+        <li><span class="pt">domingo</span> Sunday</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Trick</div>
+        Take the number in the name and subtract 1 to get the weekday: segunda (2) → 1st weekday, Monday. quinta (5) → 4th weekday, Thursday. sexta (6) → 5th weekday, Friday.
+      </div>
+      <p>In speech people drop <span class="pt">-feira</span>: <span class="pt">Até quinta!</span> See you Thursday! Calendars (like the one on p. 13) use <b>Seg, Ter, Qua, Qui, Sex, Sáb, Dom</b>, or 2.ª, 3.ª, 4.ª…</p>`,
+    words: [
+      W("segunda-feira", "Monday", "suh-GOON-duh FAY-ruh"), W("terça-feira", "Tuesday", "TER-suh"),
+      W("quarta-feira", "Wednesday", "KWAR-tuh"), W("quinta-feira", "Thursday", "KEEN-tuh"),
+      W("sexta-feira", "Friday", "SAYSH-tuh"), W("sábado", "Saturday", "SA-buh-doo"), W("domingo", "Sunday", "doo-MEEN-goo"),
+    ],
+    links: [],
+    quiz: [
+      { q: "quinta-feira is…", opts: ["Thursday", "Friday", "Wednesday"], why: "quinta = 5th day, counting from Sunday." },
+      { q: "sexta-feira is…", opts: ["Friday", "Saturday", "Thursday"], why: "sexta = 6th day." },
+      { q: "Monday is…", opts: ["segunda-feira", "domingo", "terça-feira"], why: "Monday is the 2nd day, after domingo." },
+      { q: "On a calendar, “Qua” means…", opts: ["Wednesday", "Thursday", "Tuesday"], why: "Qua = quarta-feira. Qui = quinta-feira." },
+      { q: "Listen. Which day?", say: "terça-feira", opts: ["terça-feira", "quarta-feira", "sexta-feira"], why: "terça = Tuesday." },
+      { q: "Which day starts the count?", opts: ["domingo (Sunday)", "segunda (Monday)", "sábado (Saturday)"], why: "Domingo is day 1, so Monday is segunda, the 2nd." },
+    ]
+  },
+  {
+    id: "despedir",
+    title: "Saying goodbye",
+    sub: "Exercises J, K · Até já!, Até logo!, Até amanhã!",
+    explain: `
+      <p><span class="pt">Até</span> = until. Almost every goodbye is “until…”:</p>
+      <ul>
+        <li><span class="pt">Até já!</span> See you in a minute (já = right now)</li>
+        <li><span class="pt">Até logo!</span> See you later today</li>
+        <li><span class="pt">Até amanhã!</span> See you tomorrow</li>
+        <li><span class="pt">Até quinta! / Até sábado!</span> See you on Thursday / Saturday</li>
+        <li><span class="pt">Até à próxima!</span> Until next time (in Portugal with <b>à</b>)</li>
+        <li><span class="pt">Adeus!</span> Goodbye. It sounds more final, for when you won't see someone soon.</li>
+        <li><span class="pt">Boa noite!</span> also works as goodbye in the evening.</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Exercise K: order by time</div>
+        Até já (minutes) → Até logo (hours) → Até amanhã (1 day) → Até + a weekday (days).
+      </div>`,
+    words: [
+      W("Adeus! Boa noite!", "Bye! Good night!", "uh-DEH-oosh"), W("Até à próxima!", "Until next time!", "uh-TEH ah PRO-see-muh"),
+      W("Até já!", "See you in a minute!", "uh-TEH zhah"), W("Até logo!", "See you later!", "uh-TEH LO-goo"),
+      W("Até amanhã!", "See you tomorrow!", "uh-TEH ah-muh-NYAHN"),
+    ],
+    links: [],
+    quiz: [
+      { q: "You go to get coffee for 2 minutes. You say…", opts: ["Até já!", "Até amanhã!", "Adeus!"], why: "já = right now → see you in a moment." },
+      { q: "You'll see your colleague tonight. You say…", opts: ["Até logo!", "Até já!", "Até à próxima!"], why: "logo = later today." },
+      { q: "Which goodbye is the soonest?", opts: ["Até já!", "Até logo!", "Até amanhã!"], why: "Exercise K: já < logo < amanhã." },
+      { q: "“Até sexta!” means…", opts: ["See you Friday!", "See you at six!", "See you Saturday!"], why: "sexta(-feira) = Friday." },
+      { q: "Which is the European Portuguese spelling?", opts: ["Até à próxima!", "Até a próxima!"], why: "In Portugal: até à (até + a + a)." },
+      { q: "Listen. What did you hear?", say: "Até amanhã!", opts: ["Até amanhã!", "Até à próxima!", "Até já!"], why: "amanhã = tomorrow." },
+    ]
+  },
+  {
+    id: "pronuncia",
+    title: "Pronunciation: vowels, syllables, stress",
+    sub: "Pronúncia A–E, p. 13 · the letter O",
+    explain: `
+      <p><b>A. The vowels</b> (the symbols in brackets are phonetic, from the table on p. 13):</p>
+      <ul>
+        <li>a [a] open, like <i>father</i> · a [ɐ] short “uh”, like <i>about</i></li>
+        <li>e [ɛ] open, like <i>bed</i> · e [e] closed, like <i>day</i> without the y · e [ɨ] almost silent</li>
+        <li>i [i] like <i>see</i></li>
+        <li>o [ɔ] open, like British <i>law</i> · o [o] closed, like <i>go</i> without the w</li>
+        <li>u [u] like <i>food</i></li>
+      </ul>
+      <p><b>B. Syllables.</b> Count the vowel groups: bem (1), co-mo (2), se-gun-da (3), o-bri-ga-do (4).</p>
+      <p><b>C. Stress.</b> Most words are stressed on the <b>second-to-last</b> syllable: TAR-de, do-MIN-go, se-GUN-da. An accent mark or a tilde overrides this: vo-<b>CÊ</b>, <b>SÁ</b>-ba-do, <b>PRÓ</b>-xi-ma, a-ma-<b>NHÃ</b>.</p>
+      <div class="hook"><div class="eyebrow">D–E. The letter O</div>
+        An unstressed O, especially at the end of a word, sounds like <b>[u] “oo”</b>: como “KO-moo”, tudo “TOO-doo”, logo “LO-goo”, sábado, cinco. The same “swallowed vowel” rule as in the alphabet lesson. But <span class="pt">oi</span> (noite, oito) is its own sound, “oy”.
+      </div>`,
+    words: [
+      W("como", "how / like", "KO-moo"), W("muito", "very / a lot", "MOOYNG-too"), W("tudo", "everything", "TOO-doo"),
+      W("domingo", "Sunday", "doo-MEEN-goo"), W("próxima", "next", "PRO-see-muh"), W("você", "you", "vo-SAY"),
+    ],
+    links: [],
+    quiz: [
+      { q: "How many syllables in “dezanove”?", opts: ["4", "3", "2"], why: "de-za-no-ve." },
+      { q: "How many syllables in “já”?", opts: ["1", "2"], why: "One vowel = one syllable." },
+      { q: "Stressed syllable in “domingo”:", opts: ["MIN", "DO", "GO"], why: "No accent mark → second-to-last: do-MIN-go." },
+      { q: "Stressed syllable in “sábado”:", opts: ["SÁ", "BA", "DO"], why: "The accent mark shows the stress." },
+      { q: "Stressed syllable in “amanhã”:", opts: ["NHÃ", "MA", "A"], why: "The tilde carries the stress: a-ma-NHÃ." },
+      { q: "The final O in “como” sounds like…", opts: ["oo [u]", "oh [o]", "aw [ɔ]"], why: "Unstressed final O = [u]." },
+      { q: "In which word is the O NOT an “oo” sound?", opts: ["noite", "quatro", "cinco"], why: "In noite the O is part of “oi” → “NOYT”." },
+    ]
+  }]
+},
+{
+  id: "u2", num: "2", label: "Unidade 2 · pages 14–17", title: "Sou de Lisboa",
+  sub: "Countries, where you're from, where cities are, numbers 21–100",
+  source: "Passaporte para Português 1, Unidade 2 (pp. 14–17) + Gramática p. 27",
+  chunks: [
+  {
+    id: "paises", title: "Countries and “the”", sub: "Exercises A, B · Gramática A",
+    explain: `
+      <p>In Portuguese, most countries take an article, like English says <i>the</i> USA or <i>the</i> UK. Portuguese just does it with almost every country:</p>
+      <ul>
+        <li><b>a</b> (feminine): a Alemanha, a China, a Rússia, a Grécia, a Índia, a Suécia</li>
+        <li><b>o</b> (masculine): o Brasil, o Japão, o México, o Canadá</li>
+        <li><b>os / as</b> (plural): <b>os</b> Estados Unidos, <b>as</b> Filipinas</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Exceptions to remember</div>
+        <ul>
+          <li><b>No article:</b> Portugal, Marrocos, Angola, Moçambique, Cuba, Israel</li>
+          <li><b>Optional:</b> (a) Espanha, (a) Itália, (a) França, (a) Inglaterra</li>
+          <li><b>Cities have no article</b>, except <span class="pt">o Porto</span> and <span class="pt">o Rio de Janeiro</span>.</li>
+        </ul>
+      </div>
+      <p>Tip: most countries ending in <b>-a</b> are feminine, most others are masculine.</p>`,
+    words: [W("a Alemanha", "Germany", "uh ah-luh-MAH-nyuh"), W("o Japão", "Japan", "oo zhuh-POWNG"), W("os Estados Unidos", "the USA", ""),
+      W("a Suécia", "Sweden", ""), W("a Polónia", "Poland", ""), W("a Ucrânia", "Ukraine", ""), W("Marrocos", "Morocco", "muh-RRO-koosh"), W("a Grécia", "Greece", "")],
+    links: [],
+    quiz: [
+      { q: "___ Japão", opts: ["o", "a", "–"], why: "o Japão (masculine)." },
+      { q: "___ China", opts: ["a", "o", "–"], why: "a China." },
+      { q: "___ Portugal", opts: ["– (no article)", "o", "a"], why: "Portugal never takes an article." },
+      { q: "___ Estados Unidos", opts: ["os", "o", "as"], why: "Plural name → os." },
+      { q: "___ Filipinas", opts: ["as", "a", "os"], why: "Feminine plural → as." },
+      { q: "Which city takes an article?", opts: ["o Porto", "a Lisboa", "a Madrid"], why: "Cities have no article, except o Porto and o Rio de Janeiro." },
+      { q: "“a Suécia” is…", opts: ["Sweden", "Switzerland", "Spain"], why: "a Suécia = Sweden. Spain is Espanha." },
+    ]
+  },
+  {
+    id: "deonde", title: "Where are you from? de + the", sub: "Exercises C, D, F · Gramática B, C, D",
+    explain: `
+      <p><b>de</b> = from. When the country has an article, <b>de</b> merges with it, the same way <i>de + le = du</i> in French:</p>
+      <ul>
+        <li>de + o = <b>do</b>: Sou <b>do</b> Brasil.</li>
+        <li>de + a = <b>da</b>: É <b>da</b> Grécia.</li>
+        <li>de + os = <b>dos</b>: És <b>dos</b> Estados Unidos?</li>
+        <li>de + as = <b>das</b>: É <b>das</b> Filipinas.</li>
+        <li>no article: Sou <b>de</b> Portugal, <b>de</b> Lisboa.</li>
+      </ul>
+      <p><b>ser</b> in the plural:</p>
+      ${conj(["sou", "és", "é", "somos", "são"], ["am", "are", "is / are", "are", "are"])}
+      <p><b>vocês</b> = “you guys”. It's the normal plural of <i>you</i>, both formal and informal.</p>
+      <div class="hook"><div class="eyebrow">Negative = just add não</div>
+        <span class="pt">Sou de Portugal → Não sou de Portugal.</span> Put <b>não</b> right before the verb. That's all.
+      </div>`,
+    words: [W("De onde é?", "Where are you from? (formal)", "duh ONd eh"), W("De onde são eles?", "Where are they from?", ""),
+      W("São do Brasil.", "They're from Brazil.", ""), W("Vocês são de Inglaterra?", "Are you from England?", ""),
+      W("Não. Somos da Alemanha.", "No. We're from Germany.", ""), W("Sou da Grécia.", "I'm from Greece.", "")],
+    links: [],
+    quiz: [
+      { q: "A Wilma é ___ Suécia.", opts: ["da", "do", "de"], why: "a Suécia → de + a = da." },
+      { q: "Ele é ___ Brasil.", opts: ["do", "da", "de"], why: "o Brasil → de + o = do." },
+      { q: "Sou ___ Portugal.", opts: ["de", "do", "da"], why: "Portugal has no article → just de." },
+      { q: "És ___ Estados Unidos?", opts: ["dos", "do", "das"], why: "os Estados Unidos → dos." },
+      { q: "Nós ___ de Itália.", opts: ["somos", "são", "sou"], why: "nós somos." },
+      { q: "Elas ___ de Espanha.", opts: ["são", "somos", "é"], why: "eles / elas / vocês são." },
+      { q: "Make it negative: “Ela é da China.”", opts: ["Ela não é da China.", "Ela é não da China.", "Não ela é da China."], why: "não goes right before the verb." },
+      { q: "“sushi” — de onde é?", opts: ["É do Japão.", "É da Japão.", "É de Japão."], why: "o Japão → do Japão. (Exercise D)" },
+    ]
+  },
+  {
+    id: "ondefica", title: "Where is Lisbon? em + the", sub: "Exercises G, H, I, J · Gramática E",
+    explain: `
+      <p><b>em</b> = in. It also merges with the article:</p>
+      <ul>
+        <li>em + o = <b>no</b>: no Japão</li>
+        <li>em + a = <b>na</b>: na Grécia</li>
+        <li>em + os = <b>nos</b>: nos Estados Unidos</li>
+        <li>em + as = <b>nas</b>: nas Filipinas</li>
+        <li>no article: <b>em</b> Portugal, <b>em</b> Lisboa</li>
+      </ul>
+      <p>For where a place is on the map, use <b>ser</b> or <b>ficar</b> (to be located). Both mean the same here:</p>
+      <ul>
+        <li><span class="pt">Lisboa é em Portugal.</span> = <span class="pt">Lisboa fica em Portugal.</span></li>
+        <li><span class="pt">Onde fica Veneza? — Em Itália.</span></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Same pattern as “de”</div>
+        de → do/da/dos/das, em → no/na/nos/nas. Learn one, you get the other free.
+      </div>`,
+    words: [W("Onde fica Lisboa?", "Where is Lisbon?", "ONd FEE-kuh"), W("Fica em Portugal.", "It's in Portugal.", ""),
+      W("Atenas é na Grécia.", "Athens is in Greece.", ""), W("Miami é nos Estados Unidos.", "Miami is in the USA.", ""), W("Pequim", "Beijing", "puh-KEENG")],
+    links: [],
+    quiz: [
+      { q: "Munique é ___ Alemanha.", opts: ["na", "no", "em"], why: "a Alemanha → em + a = na." },
+      { q: "Sintra é ___ Portugal.", opts: ["em", "no", "na"], why: "Portugal has no article → em." },
+      { q: "Chicago é ___ Estados Unidos.", opts: ["nos", "no", "nas"], why: "os Estados Unidos → nos." },
+      { q: "Manila é ___ Filipinas.", opts: ["nas", "nos", "na"], why: "as Filipinas → nas." },
+      { q: "Guadalajara é ___ México.", opts: ["no", "na", "em"], why: "o México → no." },
+      { q: "True or false: “Milão é em Espanha.”", opts: ["False. Milão é em Itália.", "True"], why: "Milão (Milan) fica em Itália." },
+      { q: "“Moscovo é na Rússia” with ficar:", opts: ["Moscovo fica na Rússia.", "Moscovo fica da Rússia.", "Moscovo ficam na Rússia."], why: "Exercise I: swap é for fica." },
+    ]
+  },
+  {
+    id: "num21", title: "Numbers 21–100", sub: "Exercises K, L",
+    explain: `
+      <p>Tens + <b>e</b> + units. The “e” (and) is always there: <span class="pt">vinte e três</span> = twenty-<b>and</b>-three, <span class="pt">oitenta e sete</span> = 87.</p>
+      <div class="letters">${[[20,"vinte"],[21,"vinte e um"],[30,"trinta"],[40,"quarenta"],[50,"cinquenta"],[60,"sessenta"],[70,"setenta"],[80,"oitenta"],[90,"noventa"],[100,"cem"]]
+        .map(([n,w]) => `<button class="letter" data-say="${w}"><span class="L">${n}</span><span class="n">${w}</span></button>`).join("")}</div>
+      <div class="hook"><div class="eyebrow">The 60 / 70 trap</div>
+        <b>sessenta</b> (60) comes from <b>seis</b>, <b>setenta</b> (70) comes from <b>sete</b>. Listen for “ss” vs “t”.
+      </div>
+      <p>Plus = <span class="pt">mais</span>, equals = <span class="pt">são</span>: <span class="pt">vinte e três mais cinquenta e dois são setenta e cinco.</span></p>`,
+    words: [W("vinte e três", "23", ""), W("oitenta e sete", "87", ""), W("quarenta e cinco", "45", ""), W("noventa e nove", "99", "")],
+    links: [],
+    quiz: [
+      { q: "Listen. Which number?", say: "sessenta", opts: ["60", "70", "16"], why: "sessenta (60) ← seis." },
+      { q: "Listen. Which number?", say: "setenta e dois", opts: ["72", "62", "27"], why: "setenta (70) + dois." },
+      { q: "Listen. Which number?", say: "quarenta e oito", opts: ["48", "84", "14"], why: "quarenta = 40." },
+      { q: "31 + 67 = ?", opts: ["noventa e oito", "oitenta e nove", "noventa e sete"], why: "98 = noventa e oito." },
+      { q: "44 + 45 = ?", opts: ["oitenta e nove", "noventa e nove", "oitenta e oito"], why: "89 = oitenta e nove." },
+      { q: "100 is…", opts: ["cem", "cento", "mil"], why: "Exactly 100 = cem." },
+      { q: "How do you say 35?", opts: ["trinta e cinco", "trinta cinco", "trinta-cinco"], why: "Always tens + e + units." },
+    ]
+  },
+  {
+    id: "pron2", title: "Pronunciation: stress, es-, S", sub: "Pronúncia A–D, p. 17",
+    explain: `
+      <p><b>Stress (A).</b> Words ending in -l, -r, -z or a nasal are stressed on the <b>last</b> syllable: espa<b>nhol</b>, Portu<b>gal</b>, Bra<b>sil</b>. Others are stressed on the second-to-last, unless there's an accent: <b>Lon</b>dres, A<b>te</b>nas.</p>
+      <p><b>es- at the start (B).</b> The E is nearly silent and the S is “sh”: <span class="pt">estás</span> “shTASH”, <span class="pt">Espanha</span> “shPAH-nyuh”, <span class="pt">estados</span>.</p>
+      <p><b>S = [ʃ] “sh” (C, D)</b> at the end of a word or before p, t, c, f: seis, dois, desculpe, três, isto, estados. Before b, d, g, m, n, l, r, v it's “zh”: Lisboa.</p>`,
+    words: [W("espanhol", "Spanish", "shpuh-NYOL"), W("estás", "you are", "shTASH"), W("desculpe", "excuse me", "dush-KOOLP"), W("Varsóvia", "Warsaw", "")],
+    links: [],
+    quiz: [
+      { q: "Stressed syllable in “espanhol”:", opts: ["NHOL", "ES", "PA"], why: "Ends in -l → last syllable." },
+      { q: "Stressed syllable in “Brasil”:", opts: ["SIL", "BRA"], why: "Ends in -l → last syllable." },
+      { q: "How does “estás” start?", opts: ["shTASH", "es-TASS", "ess-tash"], why: "Initial es- = “sh”." },
+      { q: "The S in “isto” sounds like…", opts: ["sh", "s", "z"], why: "S before T = “sh”: EESH-too." },
+      { q: "In which word is the final S “sh”?", opts: ["dois", "casa", "sol"], why: "Final S = sh: “doysh”." },
+    ]
+  }]
+},
+{
+  id: "u3", num: "3", label: "Unidade 3 · pages 18–21", title: "Falo português",
+  sub: "Nationalities, languages, -ar verbs, ser vs estar, numbers to 1000",
+  source: "Passaporte para Português 1, Unidade 3 (pp. 18–21) + Gramática p. 28",
+  chunks: [
+  {
+    id: "nac", title: "Nationalities: he, she, they", sub: "Exercises A, B · Gramática A",
+    explain: `
+      <p>Nationalities change for gender and number, like adjectives. And in Portuguese they're written in <b>lowercase</b>: <span class="pt">inglês</span>, not “Inglês”.</p>
+      <ul>
+        <li><b>-o → -a</b>: italiano / italiana / italianos / italianas</li>
+        <li><b>-ês → -esa</b>: inglês / inglesa / ingleses / inglesas (the accent drops!)</li>
+        <li><b>-ol → -ola</b>: espanhol / espanhola / <b>espanhóis</b> / espanholas</li>
+        <li><b>-ão → -ã</b>: alemão / alemã / alemães / alemãs</li>
+        <li><b>-a stays</b>: belga / belga / belgas</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Mixed group = masculine</div>
+        <span class="pt">O Hiroto e a Misaki são japoneses.</span> One man in the group → masculine plural.
+      </div>
+      <p>The masculine form is also the language: <span class="pt">Ele é francês. Fala francês.</span></p>`,
+    words: [W("português / portuguesa", "Portuguese (m/f)", ""), W("inglês / inglesa", "English (m/f)", "een-GLAYSH / een-GLAY-zuh"),
+      W("alemão / alemã", "German (m/f)", "uh-luh-MOWNG / uh-luh-MAHN"), W("espanhol / espanhola", "Spanish (m/f)", ""),
+      W("norte-americano", "American (US)", ""), W("russo / russa", "Russian", ""), W("sueco / sueca", "Swedish", "")],
+    links: [],
+    quiz: [
+      { q: "O Hiroto é japonês. A Misaki é…", opts: ["japonesa", "japonês", "japona"], why: "-ês → -esa." },
+      { q: "O Maxim e a Olga são…", opts: ["russos", "russas", "russo"], why: "Mixed group → masculine plural." },
+      { q: "A Maria é…  (Greece)", opts: ["grega", "grego", "gregesa"], why: "-o → -a: grego / grega." },
+      { q: "O Jules e a Louise são…", opts: ["franceses", "francesas", "francêses"], why: "francês → franceses (no accent in plural)." },
+      { q: "Plural of “espanhol”:", opts: ["espanhóis", "espanhols", "espanholes"], why: "-ol → -óis." },
+      { q: "She is German:", opts: ["Ela é alemã.", "Ela é alemão.", "Ela é Alemã."], why: "alemão → alemã, lowercase." },
+      { q: "Country → nationality: Marrocos →", opts: ["marroquino", "marrocano", "marrocês"], why: "Marrocos → marroquino." },
+    ]
+  },
+  {
+    id: "linguas", title: "Languages and -ar verbs", sub: "Exercises D–H · Gramática B",
+    explain: `
+      <p><b>falar</b> (to speak) is a regular <b>-ar</b> verb. Learn this pattern once and you get hundreds of verbs:</p>
+      ${conj(["falo", "falas", "fala", "falamos", "falam"], ["speak", "speak", "speaks", "speak", "speak"])}
+      <p><b>morar</b> (to live) and <b>ficar</b> follow the same pattern:</p>
+      ${conj(["moro", "moras", "mora", "moramos", "moram"], ["live", "live", "lives", "live", "live"])}
+      <div class="hook"><div class="eyebrow">Useful words (G)</div>
+        <ul>
+          <li><span class="pt">Falo um pouco de italiano.</span> I speak a little Italian. (pouco needs <b>de</b>)</li>
+          <li><span class="pt">Falo inglês muito bem.</span> very well</li>
+          <li><span class="pt">Só falo português.</span> I only speak Portuguese.</li>
+          <li><span class="pt">Também falo russo.</span> I also speak Russian.</li>
+        </ul>
+      </div>`,
+    words: [W("Que línguas falas?", "What languages do you speak?", ""), W("Falo árabe, francês e um pouco de português.", "I speak Arabic, French and a little Portuguese.", ""),
+      W("Só falo português.", "I only speak Portuguese.", ""), W("Onde moras?", "Where do you live?", "ONd MO-rush"), W("Moro em Lisboa.", "I live in Lisbon.", "")],
+    links: [],
+    quiz: [
+      { q: "Eu ___ francês.", opts: ["falo", "fala", "falas"], why: "eu → -o." },
+      { q: "Nós não ___ italiano.", opts: ["falamos", "falam", "falo"], why: "nós → -amos." },
+      { q: "Vocês ___ alemão?", opts: ["falam", "falamos", "falas"], why: "vocês → -am." },
+      { q: "Onde ___ o Uwe e a Anke?", opts: ["moram", "mora", "moramos"], why: "Two people → moram." },
+      { q: "“Falo um pouco ___ português.”", opts: ["de", "do", "–"], why: "um pouco de + language." },
+      { q: "Que língua falam os brasileiros?", opts: ["Os brasileiros falam português.", "Os brasileiros falam brasileiro.", "Os brasileiros falam espanhol."], why: "Brazil → português (exercise F)." },
+      { q: "Que língua falam os mexicanos?", opts: ["Falam espanhol.", "Falam mexicano.", "Falam inglês."], why: "Exercise F, 4." },
+      { q: "“só” means…", opts: ["only", "also", "a little"], why: "também = also, pouco = a little." },
+    ]
+  },
+  {
+    id: "estar", title: "Ser or estar? Where are you now?", sub: "Exercises I, J, K · Gramática C, D",
+    explain: `
+      <p>Portuguese has two verbs for “to be”. The difference: <b>is it permanent or right now?</b></p>
+      <ul>
+        <li><b>ser</b> = who/what you are, where you're from, where a city is: <span class="pt">Sou de Londres.</span></li>
+        <li><b>estar</b> = where you are now, how you are now: <span class="pt">Estou em Londres.</span> (on a trip)</li>
+      </ul>
+      <p><b>estar</b> (to be, right now):</p>
+      ${conj(["estou", "estás", "está", "estamos", "estão"], ["am", "are", "is / are", "are", "are"])}
+      <div class="hook"><div class="eyebrow">One sentence with all three (exercise K)</div>
+        <span class="pt">A Ana <b>é</b> de Portugal, mas <b>mora</b> em Espanha. Agora <b>está</b> na China.</span><br>
+        born in (ser) · lives in (morar) · right now in (estar)
+      </div>
+      <p>Same logic as Unit 1: <span class="pt">Como está?</span> asks how you are <i>today</i>, so it's estar.</p>`,
+    words: [W("Onde estás agora?", "Where are you now?", ""), W("Sou de Londres.", "I'm from London.", ""), W("Estou em Londres.", "I'm in London (now).", "shTOH ayng"),
+      W("Onde está a Francesca?", "Where is Francesca?", ""), W("Está em Paris.", "She's in Paris.", "")],
+    links: [],
+    quiz: [
+      { q: "A Joana não ___ em Portugal. (now)", opts: ["está", "é", "estou"], why: "Location right now → estar." },
+      { q: "Como ___? (tu)", opts: ["estás", "és", "está"], why: "How you are now → estar, tu → estás." },
+      { q: "Onde ___? (vocês)", opts: ["estão", "são", "estamos"], why: "vocês → estão." },
+      { q: "Hamburgo ___ na Alemanha.", opts: ["é", "está", "estão"], why: "A city's location is permanent → ser (or fica)." },
+      { q: "O Christos e a Anna ___ gregos.", opts: ["são", "estão", "é"], why: "Nationality → ser." },
+      { q: "Eu ___ bem, obrigada.", opts: ["estou", "sou", "está"], why: "How you feel → estar." },
+      { q: "Zoi is Greek, lives in Mexico, now in Brazil:", opts: ["A Zoi é grega, mas mora no México. Agora está no Brasil.", "A Zoi está grega, mas mora no México. Agora é no Brasil.", "A Zoi é grega, mas está no México. Agora mora no Brasil."], why: "é (origin) · mora (lives) · está (now). Exercise K." },
+    ]
+  },
+  {
+    id: "num1000", title: "Numbers 101–1000", sub: "Exercises L, M",
+    explain: `
+      <div class="hook"><div class="eyebrow">Important box</div>
+        <b>100 = cem</b>, but 101–199 use <b>cento</b>: <span class="pt">cento e um</span>, <span class="pt">cento e vinte</span>.
+      </div>
+      <ul>
+        <li>200 <span class="pt">duzentos</span> · 300 <span class="pt">trezentos</span> · 400 <span class="pt">quatrocentos</span></li>
+        <li>500 <span class="pt">quinhentos</span> (irregular!)</li>
+        <li>600 <span class="pt">seiscentos</span> · 700 <span class="pt">setecentos</span> · 800 <span class="pt">oitocentos</span> · 900 <span class="pt">novecentos</span></li>
+        <li>1000 <span class="pt">mil</span></li>
+      </ul>
+      <p>Put <b>e</b> between every part: 234 = <span class="pt">duzentos <b>e</b> trinta <b>e</b> quatro</span>.</p>
+      <p>Hundreds agree with feminine nouns: <span class="pt">duzentas pessoas</span>, <span class="pt">quinhentas casas</span>.</p>`,
+    words: [W("cento e um", "101", ""), W("duzentos e trinta e quatro", "234", ""), W("quinhentos", "500", "kee-NYEN-toosh"), W("seiscentos e setenta e cinco", "675", ""), W("mil", "1000", "meel")],
+    links: [],
+    quiz: [
+      { q: "Listen. Which number?", say: "seiscentos e setenta e cinco", opts: ["675", "775", "765"], why: "seiscentos (600) + setenta (70) + cinco." },
+      { q: "Listen. Which number?", say: "mil e vinte", opts: ["1020", "1200", "120"], why: "mil e vinte = 1020. 1200 = mil e duzentos." },
+      { q: "Listen. Which number?", say: "quinhentos e vinte e dois", opts: ["522", "422", "252"], why: "quinhentos = 500." },
+      { q: "Listen. Which number?", say: "trezentos e oitenta e nove", opts: ["389", "398", "289"], why: "trezentos (300) + oitenta e nove (89)." },
+      { q: "100 vs 101:", opts: ["cem / cento e um", "cento / cento e um", "cem / cem e um"], why: "cem alone, cento + more." },
+      { q: "500 is…", opts: ["quinhentos", "cincocentos", "cinquentos"], why: "Irregular: quinhentos." },
+    ]
+  },
+  {
+    id: "pron3", title: "Pronunciation: nasal vowels, ão vs ã", sub: "Pronúncia A–E, p. 21",
+    explain: `
+      <p><b>Oral vs nasal (A):</b> a – ã/am/an, e – em/en, i – im/in, o – õ/om/on, u – um/un. Same vowel, but through the nose.</p>
+      <p><b>ão vs ã (C, D):</b> this is how you hear masculine vs feminine!</p>
+      <ul>
+        <li><span class="pt">alemão</span> (he) “uh-luh-MOWNG” · <span class="pt">alemã</span> (she) “uh-luh-MAHN”</li>
+        <li><span class="pt">irmão</span> brother · <span class="pt">irmã</span> sister</li>
+        <li><span class="pt">são</span> healthy / they are · <span class="pt">sã</span> healthy (f)</li>
+      </ul>
+      <p><b>S between vowels = Z (E):</b> chine<b>s</b>a, france<b>s</b>a, japone<b>s</b>a, ingle<b>s</b>a.</p>`,
+    words: [W("alemão", "German (m)", ""), W("alemã", "German (f)", ""), W("irmão", "brother", "eer-MOWNG"), W("irmã", "sister", "eer-MAHN"), W("francesa", "French (f)", "frun-SAY-zuh")],
+    links: [],
+    quiz: [
+      { q: "Listen. Which word?", say: "irmã", opts: ["irmã", "irmão"], why: "ã = a short nasal “ahn”. ão ends like “owng”." },
+      { q: "Listen. Which word?", say: "alemão", opts: ["alemão", "alemã"], why: "ão = “owng”." },
+      { q: "Stressed syllable in “português”:", opts: ["GUÊS", "POR", "TU"], why: "The accent marks the stress." },
+      { q: "S in “chinesa” sounds like…", opts: ["z", "s", "sh"], why: "S between vowels = z." },
+      { q: "Stressed syllable in “avião”:", opts: ["ÃO", "A", "VI"], why: "The tilde carries the stress: a-vi-ÃO." },
+    ]
+  }]
+},
+{
+  id: "u4", num: "4", label: "Unidade 4 · pages 22–25", title: "Como se diz isto em português?",
+  sub: "Classroom objects, isto/isso/aquilo, colours, classroom phrases",
+  source: "Passaporte para Português 1, Unidade 4 (pp. 22–25) + Gramática p. 29",
+  chunks: [
+  {
+    id: "objetos", title: "Classroom objects: um or uma?", sub: "Exercise A · Gramática A, B",
+    explain: `
+      <p><b>um</b> = a (masculine), <b>uma</b> = a (feminine). Guess the gender from the ending:</p>
+      <ul>
+        <li>masculine usually ends in <b>-o, -l, -s, -ão, -r, -e, -z, -m</b>: um livro, um jornal, um computador</li>
+        <li>feminine usually ends in <b>-a</b>: uma mesa, uma cadeira, uma janela</li>
+        <li>-e, -r, -ão, -z, -m can be either: <b>uma</b> parede, <b>um</b> relógio</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Important box: trick words</div>
+        <span class="pt"><b>o</b> dia</span> (day) and <span class="pt"><b>o</b> mapa</span> (map) end in -a but are masculine.
+      </div>
+      <p><b>Plural:</b></p>
+      <ul>
+        <li>vowel + <b>-s</b>: mesa → mesas, parede → paredes</li>
+        <li>-r, -z, -s + <b>-es</b>: computador → computadores, rapaz → rapazes, país → países</li>
+        <li>-l → <b>-is</b>: jornal → jornais</li>
+        <li>-m → <b>-ns</b>: viagem → viagens</li>
+        <li>-ão → -ões / -ães / -ãos: avião → aviões, cão → cães, mão → mãos</li>
+        <li>lápis → lápis (no change)</li>
+      </ul>`,
+    words: [W("o dicionário", "dictionary", ""), W("a cadeira", "chair", "kuh-DAY-ruh"), W("a secretária", "desk", ""), W("o quadro", "board", "KWA-droo"),
+      W("a janela", "window", "zhuh-NEH-luh"), W("a parede", "wall", "puh-RED"), W("o relógio", "clock / watch", "rruh-LO-zhyoo"), W("o jornal", "newspaper", "zhoor-NAL")],
+    links: [],
+    quiz: [
+      { q: "___ janela", opts: ["uma", "um"], why: "-a → feminine." },
+      { q: "___ mapa", opts: ["um", "uma"], why: "Trick word: o mapa is masculine." },
+      { q: "___ relógio", opts: ["um", "uma"], why: "-o → masculine." },
+      { q: "___ parede", opts: ["uma", "um"], why: "-e can be either. a parede is feminine." },
+      { q: "Plural of “um jornal”:", opts: ["jornais", "jornals", "jornales"], why: "-l → -is." },
+      { q: "Plural of “o computador”:", opts: ["os computadores", "os computadors", "as computadores"], why: "-r → -es." },
+      { q: "Plural of “o país”:", opts: ["os países", "os paíss", "os país"], why: "-s → -es." },
+      { q: "“a secretária” in the classroom is…", opts: ["the desk", "the secretary", "the chair"], why: "In exercise B: “Não, é uma secretária” (a desk). It can also mean a (female) secretary." },
+    ]
+  },
+  {
+    id: "isto", title: "isto, isso, aquilo", sub: "Exercises B–E · Gramática p. 29",
+    explain: `
+      <p>Three words for “this/that”, depending on distance:</p>
+      <ul>
+        <li><b>isto</b> = this, near <b>me</b> (the speaker)</li>
+        <li><b>isso</b> = that, near <b>you</b> (the listener)</li>
+        <li><b>aquilo</b> = that over there, far from both of us</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Memory hook</div>
+        is<b>t</b>o: <b>t</b>ouching it. is<b>s</b>o: <b>s</b>omeone else has it. a<b>qu</b>ilo: a<b>qu</b>ite far.
+      </div>
+      <p>They're used for things you don't name yet: <span class="pt">O que é isto?</span> What's this? <span class="pt">Como se diz aquilo em português?</span> How do you say that in Portuguese?</p>`,
+    words: [W("O que é isto?", "What's this?", "oo kee eh EESH-too"), W("É um dicionário chinês-português.", "It's a Chinese–Portuguese dictionary.", ""),
+      W("Isso é uma mesa?", "Is that a table?", ""), W("Não, é uma secretária.", "No, it's a desk.", ""), W("Como se diz aquilo em português?", "How do you say that in Portuguese?", "")],
+    links: [],
+    quiz: [
+      { q: "You hold a book: “O que é ___?”", opts: ["isto", "isso", "aquilo"], why: "Near me → isto." },
+      { q: "Your friend holds a phone: “O que é ___?”", opts: ["isso", "isto", "aquilo"], why: "Near the listener → isso." },
+      { q: "You point at a clock on the far wall:", opts: ["Como se diz aquilo em português?", "Como se diz isto em português?", "Como se diz isso em português?"], why: "Far from both → aquilo (dialogue 3)." },
+      { q: "A mother points at a broken pot near the kid:", opts: ["O que é isso?!", "O que é aquilo?!", "O que é isto?!"], why: "Near the listener (the kid) → isso. Exercise D, 2." },
+      { q: "“Como se diz window em português?”", opts: ["Janela.", "Jornal.", "Parede."], why: "window = janela." },
+    ]
+  },
+  {
+    id: "cores", title: "Colours", sub: "Exercises F, G · Gramática C, D",
+    explain: `
+      <p>Colours are adjectives: they go <b>after</b> the noun and agree with it.</p>
+      <ul>
+        <li><b>-o colours change:</b> branco / branca / brancos / brancas (also preto, amarelo, vermelho, castanho, cinzento)</li>
+        <li><b>-e colours only add -s:</b> verde / verdes</li>
+        <li><b>azul → azuis</b> (-l → -is)</li>
+        <li><b>never change:</b> cor-de-rosa (pink), cor de laranja (orange)</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Word order</div>
+        English: the <i>blue and white</i> flag. Portuguese: <span class="pt">a bandeira <b>azul e branca</b></span>. The colour comes after.
+      </div>
+      <p><span class="pt">De que cor é a bandeira da Ucrânia? — É azul e amarela.</span></p>
+      <p><b>de for possession:</b> <span class="pt">É o dicionário <b>do</b> João.</span> It's João's dictionary.</p>`,
+    words: [W("branco", "white", "BRUN-koo"), W("preto", "black", "PRAY-too"), W("vermelho", "red", "vur-MAY-lyoo"), W("amarelo", "yellow", ""), W("verde", "green", "VAIRD"),
+      W("azul", "blue", "uh-ZOOL"), W("castanho", "brown", "kush-TUH-nyoo"), W("cinzento", "grey", "seen-ZEN-too"), W("cor-de-rosa", "pink", ""), W("cor de laranja", "orange", "")],
+    links: [],
+    quiz: [
+      { q: "As cadeiras são ___ (green).", opts: ["verdes", "verdas", "verde"], why: "verde → verdes." },
+      { q: "A porta é ___ (black).", opts: ["preta", "preto", "pretas"], why: "a porta → preta." },
+      { q: "Os livros são ___ (blue).", opts: ["azuis", "azuls", "azul"], why: "azul → azuis." },
+      { q: "As mesas são ___ (white).", opts: ["brancas", "brancos", "branca"], why: "Feminine plural → brancas." },
+      { q: "De que cor é a bandeira da Ucrânia?", opts: ["É azul e amarela.", "É azul e branca.", "É verde e vermelha."], why: "Exercise G." },
+      { q: "“The blue and white flag”:", opts: ["a bandeira azul e branca", "a azul e branca bandeira", "a bandeira azul e branco"], why: "Colours after the noun, agreeing with it." },
+      { q: "O relógio ___ Ana é branco.", opts: ["da", "do", "de"], why: "de + a Ana = da Ana." },
+    ]
+  },
+  {
+    id: "aula", title: "Classroom survival phrases", sub: "Exercises H, I, J",
+    explain: `
+      <p><b>What students say (H)</b>, the most useful phrases in your first months:</p>
+      <ul>
+        <li><span class="pt">Não percebo.</span> = <span class="pt">Não compreendo.</span> I don't understand.</li>
+        <li><span class="pt">Pode repetir?</span> Can you repeat?</li>
+        <li><span class="pt">O que significa janela?</span> What does “janela” mean?</li>
+        <li><span class="pt">Como se escreve telemóvel?</span> How do you spell “telemóvel”?</li>
+        <li><span class="pt">Pode escrever no quadro?</span> Can you write it on the board?</li>
+        <li><span class="pt">Qual é a página?</span> Which page?</li>
+        <li><span class="pt">Não sei. / Não me lembro.</span> I don't know. / I don't remember.</li>
+      </ul>
+      <p><b>What the teacher says (I)</b> to the class uses the <b>-em/-am</b> form (a command to “you all”):</p>
+      <ul>
+        <li><span class="pt">Abram os livros na página 9.</span> Open your books at page 9.</li>
+        <li><span class="pt">Fechem os livros. Leiam o texto. Ouçam e repitam.</span></li>
+        <li><span class="pt">Trabalhem em pares. Falem em português. Não escrevam.</span></li>
+      </ul>`,
+    words: [W("Não percebo.", "I don't understand.", "nowng pur-SAY-boo"), W("Pode repetir?", "Can you repeat?", "POD rruh-puh-TEER"), W("O que significa janela?", "What does janela mean?", ""),
+      W("Não me lembro.", "I don't remember.", ""), W("Ouçam e repitam.", "Listen and repeat.", ""), W("Trabalhem em pares.", "Work in pairs.", "")],
+    links: [],
+    quiz: [
+      { q: "You didn't catch what the teacher said:", opts: ["Pode repetir?", "Pode escrever?", "Não sei."], why: "Pode repetir? = Can you repeat?" },
+      { q: "“Não percebo” means the same as…", opts: ["Não compreendo.", "Não sei.", "Não me lembro."], why: "Both = I don't understand." },
+      { q: "“Como se diz window ___ português?”", opts: ["em", "no", "de"], why: "em português = in Portuguese." },
+      { q: "The teacher says “Fechem os livros”. You…", opts: ["close your books", "open your books", "read the text"], why: "fechar = to close, abrir = to open." },
+      { q: "“Não ___ lembro.”", opts: ["me", "te", "se"], why: "lembrar-se: (eu) não me lembro." },
+      { q: "A student says “παρακαλώ” in Greek. The teacher says:", opts: ["Falem em português.", "Leiam o texto.", "Trabalhem em pares."], why: "Exercise J, picture B." },
+    ]
+  },
+  {
+    id: "pron4", title: "Pronunciation: questions and the E sound", sub: "Pronúncia A–E, p. 25",
+    explain: `
+      <p><b>Questions = statements + rising voice (A, B).</b> Portuguese doesn't change word order for yes/no questions:</p>
+      <ul>
+        <li><span class="pt">Ela é portuguesa.</span> ↘ She's Portuguese.</li>
+        <li><span class="pt">Ela é portuguesa?</span> ↗ Is she Portuguese?</li>
+      </ul>
+      <p>Only your voice changes. Like saying “She's Portuguese?” in surprise in English.</p>
+      <p><b>Unstressed E = [ɨ] (D, E).</b> An unstressed E almost disappears, especially at the end: gre<b>go</b> “GRAY-goo”, tar<b>de</b> “TARD”, ver<b>de</b> “VAIRD”, pare<b>de</b> “puh-RED”. Also noite, nome, sete, treze, telefone.</p>`,
+    words: [W("Isto é uma secretária.", "This is a desk.", ""), W("Isto é uma secretária?", "Is this a desk?", ""), W("tarde", "afternoon", "TARD"), W("parede", "wall", "puh-RED"), W("telefone", "phone", "tuh-luh-FON")],
+    links: [],
+    quiz: [
+      { q: "How do you turn “Ele é de Londres” into a question?", opts: ["Same words, rising voice: Ele é de Londres?", "É ele de Londres?", "Do ele é de Londres?"], why: "Word order stays. Only the intonation rises." },
+      { q: "The final E in “verde” sounds like…", opts: ["almost nothing", "ay", "ee"], why: "Unstressed final E nearly disappears: VAIRD." },
+      { q: "Stressed syllable in “parede”:", opts: ["RE", "PA", "DE"], why: "pa-RE-de → puh-RED." },
+      { q: "Listen. Statement or question?", say: "Isso é um relógio?", opts: ["Question", "Statement"], why: "The voice goes up at the end." },
+    ]
+  }]
+},
+{
+  id: "u5", num: "5", label: "Unidade 5 · pages 32–35", title: "Tenho carta de condução",
+  sub: "Ter, personal things, where things are, my/your/his, aqui/aí/ali",
+  source: "Passaporte para Português 1, Unidade 5 (pp. 32–35) + Gramática p. 48",
+  chunks: [
+  {
+    id: "ter", title: "Ter: have you got a pen?", sub: "Exercises A, B, C · Gramática A, B, D",
+    explain: `
+      <p><b>ter</b> = to have. It's irregular, so learn it by heart:</p>
+      ${conj(["tenho", "tens", "tem", "temos", "têm"], ["have", "have", "has", "have", "have"])}
+      <p><b>tem</b> (he has) and <b>têm</b> (they have) sound almost the same. Only the spelling differs.</p>
+      <div class="hook"><div class="eyebrow">Answer with the verb, not “sim”</div>
+        <span class="pt">Tens uma caneta? — Sim, tenho. / Não, não tenho.</span><br>
+        Same trick as “És o Hugo? — Sou.” in Unit 1.
+      </div>
+      <p><b>de for “type of”:</b> <span class="pt">garrafa <b>de</b> água</span> (water bottle), <span class="pt">óculos <b>de</b> sol</span> (sunglasses), <span class="pt">carta <b>de</b> condução</span> (driving licence). No article. But for an owner: <span class="pt">o carro <b>do</b> João</span>.</p>
+      <p><b>1 and 2 agree:</b> <span class="pt">um lápis, uma caneta, dois livros, duas mesas</span>.</p>`,
+    words: [W("Desculpe, tem uma caneta?", "Excuse me, do you have a pen?", ""), W("Sim, tenho. Faz favor.", "Yes, I do. Here you go.", ""),
+      W("o telemóvel", "mobile phone", "tuh-luh-MO-vel"), W("a carteira", "wallet", ""), W("as chaves", "keys", "SHAHVSH"), W("a mochila", "backpack", "moo-SHEE-luh"),
+      W("os óculos de sol", "sunglasses", ""), W("o dinheiro · moedas · notas", "money · coins · notes", ""), W("a carta de condução", "driving licence", "")],
+    links: [],
+    quiz: [
+      { q: "Ela não ___ passaporte.", opts: ["tem", "tens", "têm"], why: "ela → tem." },
+      { q: "Não ___ chaves. (nós)", opts: ["temos", "tenho", "têm"], why: "nós → temos." },
+      { q: "Vocês ___ dinheiro?", opts: ["têm", "tem", "temos"], why: "vocês → têm (with the hat)." },
+      { q: "“Tens uma caneta?” — short yes:", opts: ["Sim, tenho.", "Sim, tens.", "Sim, tem."], why: "Answer with the verb in the eu form." },
+      { q: "uma garrafa ___ água", opts: ["de", "da", "do"], why: "Type of bottle → de, no article." },
+      { q: "o passaporte ___ Raul", opts: ["do", "de", "da"], why: "Owner → do Raul." },
+      { q: "___ chaves", opts: ["duas", "dois"], why: "a chave is feminine → duas." },
+      { q: "“a carteira” is…", opts: ["wallet", "letter", "card"], why: "carteira = wallet. carta = letter / licence." },
+    ]
+  },
+  {
+    id: "ondeesta", title: "Where is it? Em casa, no carro", sub: "Exercises D–I · Gramática C",
+    explain: `
+      <p>For where things or people are <b>right now</b>, use <b>estar</b> + em:</p>
+      <ul>
+        <li><span class="pt">Ele está <b>no</b> carro / <b>no</b> escritório.</span></li>
+        <li><span class="pt">Ela está <b>na</b> rua / <b>na</b> escola.</span></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Important box</div>
+        <span class="pt">Estou <b>em</b> casa.</span> “At home” takes no article, just like English “at home”.
+      </div>
+      <p><b>é que</b> in questions sounds natural and is very common in speech. It changes nothing in meaning:</p>
+      <ul>
+        <li><span class="pt">Onde está o Pedro?</span> = <span class="pt">Onde <b>é que</b> está o Pedro?</span></li>
+        <li><span class="pt">Quem é que tem um problema?</span> Who has a problem?</li>
+      </ul>
+      <p>It works like “Where <i>is it that</i>…?”, but without sounding heavy.</p>`,
+    words: [W("Onde está a minha carteira?", "Where's my wallet?", ""), W("Estou em casa.", "I'm at home.", ""), W("Ele está no escritório.", "He's at the office.", ""),
+      W("Ela está na rua.", "She's in the street.", ""), W("Se calhar está no carro.", "Maybe it's in the car.", "suh kuh-LYAR")],
+    links: [],
+    quiz: [
+      { q: "I'm at home:", opts: ["Estou em casa.", "Estou na casa.", "Sou em casa."], why: "em casa, no article. estar for now." },
+      { q: "Ele está ___ carro.", opts: ["no", "na", "em"], why: "o carro → no." },
+      { q: "Ela está ___ escola.", opts: ["na", "no", "em"], why: "a escola → na." },
+      { q: "Rewrite with é que: “Onde está o Pedro?”", opts: ["Onde é que está o Pedro?", "É que onde está o Pedro?", "Onde está é que o Pedro?"], why: "Question word + é que + rest." },
+      { q: "“Se calhar” means…", opts: ["maybe", "of course", "never"], why: "Sara: “se calhar está no carro” = maybe it's in the car." },
+      { q: "Sara can't find her wallet. Where is she?", opts: ["Na rua.", "Em casa.", "No escritório."], why: "“Estou na rua e não tenho a minha carteira.” (dialogue I)" },
+    ]
+  },
+  {
+    id: "possessivos", title: "My, your, his: possessives", sub: "Exercises I, J, K · Gramática E",
+    explain: `
+      <p>The possessive agrees with the <b>thing</b>, not the owner. And it comes with the article:</p>
+      <ul>
+        <li>eu: <span class="pt">o meu carro · a minha casa</span></li>
+        <li>tu: <span class="pt">o teu · a tua</span></li>
+        <li>você: <span class="pt">o seu · a sua</span></li>
+        <li>nós: <span class="pt">o nosso · a nossa</span></li>
+        <li>vocês: <span class="pt">o vosso · a vossa</span></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">His / her / their go after the noun</div>
+        <span class="pt">o carro <b>dele</b></span> (his car), <span class="pt">a casa <b>dela</b></span> (her house), <span class="pt">a cidade <b>deles</b></span> (their city).<br>
+        Literally “the car of him”. That's why it never confuses his/her: <b>dele</b> = his, <b>dela</b> = her.
+      </div>
+      <p><b>Mine:</b> <span class="pt">Isto é meu.</span> This is mine. <span class="pt">É o meu carro.</span> It's my car.</p>
+      <p>A man says <span class="pt">a minha mulher</span> (feminine, because <i>mulher</i> is), a woman says <span class="pt">o meu marido</span>.</p>`,
+    words: [W("o meu carro", "my car", ""), W("a minha carteira", "my wallet", "uh MEE-nyuh"), W("a tua mala", "your bag", ""), W("o carro dele", "his car", ""),
+      W("De quem é o carro branco?", "Whose is the white car?", ""), W("É meu.", "It's mine.", "")],
+    links: [],
+    quiz: [
+      { q: "Sou alemã. ___ país é a Alemanha.", opts: ["O meu", "A minha", "Meu"], why: "o país is masculine → o meu." },
+      { q: "Tu és italiano. ___ cidade é Roma.", opts: ["A tua", "O teu", "Tua"], why: "a cidade → a tua." },
+      { q: "Ele é grego. A cidade ___ é Atenas.", opts: ["dele", "dela", "sua"], why: "His → dele, after the noun." },
+      { q: "Vocês são chineses. ___ país é a China.", opts: ["O vosso", "O nosso", "A vossa"], why: "vocês → vosso, o país → o vosso." },
+      { q: "Eles são suecos. ___ país ___ é a Suécia.", opts: ["O … deles", "O … dele", "A … deles"], why: "Their → deles, after the noun." },
+      { q: "Onde tens a ___ caneta? (tu)", opts: ["tua", "teu", "sua"], why: "a caneta → a tua." },
+      { q: "“De quem é o carro branco?” — “É ___.” (mine)", opts: ["meu", "minha", "o meu"], why: "Isto é meu. o carro → meu." },
+    ]
+  },
+  {
+    id: "aqui", title: "Here, there: aqui, aí, ali", sub: "Exercises L, M · Gramática F",
+    explain: `
+      <p>Same three distances as <b>isto / isso / aquilo</b>:</p>
+      <ul>
+        <li><b>aqui</b> = here, near me (↔ isto)</li>
+        <li><b>aí</b> = there, near you (↔ isso)</li>
+        <li><b>ali</b> = over there, far from both (↔ aquilo)</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Pairs</div>
+        <span class="pt">O que é isso aí?</span> What's that (there by you)?<br>
+        <span class="pt">Isto aqui é uma moeda de 2 euros.</span><br>
+        <span class="pt">Aquilo ali são óculos Ray-Ban.</span>
+      </div>`,
+    words: [W("A tua chave está aqui.", "Your key is here.", ""), W("A tua chave está aí.", "Your key is there (by you).", "uh-EE"), W("A tua chave está ali.", "Your key is over there.", "uh-LEE"),
+      W("Onde está a tua carta de condução?", "Where's your driving licence?", ""), W("Está na carteira.", "It's in my wallet.", "")],
+    links: [],
+    quiz: [
+      { q: "O que é isso ___?", opts: ["aí", "aqui", "ali"], why: "isso ↔ aí." },
+      { q: "Isto ___ é uma moeda de 2 euros.", opts: ["aqui", "aí", "ali"], why: "isto ↔ aqui." },
+      { q: "O que é aquilo ___?", opts: ["ali", "aí", "aqui"], why: "aquilo ↔ ali." },
+      { q: "The key hangs on a far wall:", opts: ["A tua chave está ali.", "A tua chave está aqui.", "A tua chave está aí."], why: "Far from both → ali." },
+      { q: "Your friend holds the key you're looking for:", opts: ["Está aí!", "Está aqui!", "Está ali!"], why: "Near the listener → aí." },
+    ]
+  },
+  {
+    id: "pron5", title: "Pronunciation: R, RR and -em", sub: "Pronúncia A–E, p. 35",
+    explain: `
+      <p><b>-em at the end (A):</b> a nasal “ayng”: bem, sem, cem, quem, tem, têm. Not like English “em”.</p>
+      <p><b>Strong R [ʀ] (C, D):</b> at the start of a word and for RR: rua, russo, relógio, garrafa, cigarro, Marrocos, Inglaterra.</p>
+      <p><b>Soft R [ɾ] (E):</b> between vowels and before consonants: parede, porta, carta, falar, verde.</p>
+      <p>Revise the alphabet lesson: <b>caro</b> (expensive) vs <b>carro</b> (car).</p>`,
+    words: [W("bem", "well", "bayng"), W("quem", "who", "kayng"), W("garrafa", "bottle", "guh-RRA-fuh"), W("cigarro", "cigarette", ""), W("porta", "door", "")],
+    links: [],
+    quiz: [
+      { q: "Which word has the strong (throat) R?", opts: ["rua", "porta", "falar"], why: "R at the start = strong." },
+      { q: "Which word has the soft R?", opts: ["parede", "relógio", "russo"], why: "Single R between vowels = tap." },
+      { q: "Listen. Which word?", say: "carro", opts: ["carro", "caro"], why: "Strong R = carro (car)." },
+      { q: "“bem” sounds like…", opts: ["bayng (nasal)", "bem as in English", "beeng"], why: "Final -em is a nasal “ayng”." },
+      { q: "Listen. Which word?", say: "quem", opts: ["quem", "cem", "sem"], why: "quem (who), cem (100), sem (without)." },
+    ]
+  }]
+},
+{
+  id: "u6", num: "6", label: "Unidade 6 · pages 36–39", title: "Sou estudante",
+  sub: "Jobs, spelling, floors, filling in a form, quanto",
+  source: "Passaporte para Português 1, Unidade 6 (pp. 36–39) + Gramática p. 49",
+  chunks: [
+  {
+    id: "profissoes", title: "Jobs: Sou médica", sub: "Exercises A, B · Gramática A",
+    explain: `
+      <p>Jobs change with gender like other nouns:</p>
+      <ul>
+        <li><b>-o → -a</b>: médico / médica, advogado / advogada, engenheiro / engenheira, empregado / empregada</li>
+        <li><b>-or → -ora</b>: professor / professora, cantor / cantora</li>
+        <li><b>special</b>: ator / <b>atriz</b></li>
+        <li><b>same for both</b>: estudante, jornalista, agente da polícia</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">No article with jobs</div>
+        <span class="pt">Sou médica.</span> I'm <i>a</i> doctor. English needs “a”, Portuguese doesn't.
+      </div>
+      <p><span class="pt">Qual é a tua profissão?</span> What's your job? <span class="pt">Sou enfermeiro.</span></p>`,
+    words: [W("médico / médica", "doctor", "MEH-dee-koo"), W("enfermeiro / enfermeira", "nurse", "en-fur-MAY-roo"), W("advogado / advogada", "lawyer", ""),
+      W("engenheiro", "engineer", "en-zhuh-NYAY-roo"), W("informático", "IT specialist", ""), W("empregado de mesa", "waiter", ""), W("professor / professora", "teacher", ""), W("ator / atriz", "actor / actress", "")],
+    links: [],
+    quiz: [
+      { q: "Feminine of “ator”:", opts: ["atriz", "atora", "atriza"], why: "Irregular: ator / atriz." },
+      { q: "Feminine of “professor”:", opts: ["professora", "professoresa", "professor"], why: "-or → -ora." },
+      { q: "Feminine of “estudante”:", opts: ["estudante", "estudanta", "estudanto"], why: "-e jobs don't change." },
+      { q: "I'm a doctor (woman):", opts: ["Sou médica.", "Sou uma médica.", "Sou a médica."], why: "No article with jobs." },
+      { q: "Masculine of “enfermeira”:", opts: ["enfermeiro", "enfermeira", "enfermeiror"], why: "-a → -o." },
+      { q: "“empregado de mesa” is…", opts: ["waiter", "employee", "table maker"], why: "Literally “table employee”." },
+    ]
+  },
+  {
+    id: "soletrar", title: "How do you spell your name?", sub: "Exercises C–F",
+    explain: `
+      <p>You learned the letter names in Lesson 0. Now use them: <span class="pt">Como se escreve o seu nome?</span></p>
+      <p><b>Acronyms (D)</b> are read letter by letter, using letter names:</p>
+      <ul>
+        <li>RTP “erre-tê-pê” (Portuguese TV)</li>
+        <li>GNR “gê-ene-erre” (National Guard)</li>
+        <li>IRS (income tax) · TPC (homework, <i>trabalho para casa</i>) · CC (Cartão de Cidadão, ID card)</li>
+        <li>CD “cê-dê”, DVD, PDF “pê-dê-efe”, USB “u-esse-bê”</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Practise with your own name</div>
+        Spell your name out loud right now. Then try your surname. That's exactly what the front desk will ask you.
+      </div>`,
+    words: [W("Como se escreve o teu nome?", "How do you spell your name?", ""), W("RTP", "", "erre tê pê"), W("CC", "Citizen Card (ID)", "cê cê"), W("TPC", "homework", "tê pê cê")],
+    links: [],
+    quiz: [
+      { q: "Listen to the spelling. Which acronym?", say: "gê, ene, erre", opts: ["GNR", "JNR", "GMR"], why: "gê = G, ene = N, erre = R." },
+      { q: "Listen to the spelling. Which acronym?", say: "pê, dê, efe", opts: ["PDF", "PTF", "BDF"], why: "pê = P, dê = D, efe = F." },
+      { q: "Listen. Which letter?", say: "jota", opts: ["J", "G", "I"], why: "jota = J." },
+      { q: "Listen to the spelling. Which name?", say: "a, tê, tê, i, ele, a", opts: ["Attila", "Atila", "Attilla"], why: "A-T-T-I-L-A (exercise F)." },
+      { q: "“TPC” is…", opts: ["homework", "a TV channel", "an ID card"], why: "trabalho para casa." },
+    ]
+  },
+  {
+    id: "andar", title: "Ordinals and floors", sub: "Exercises G–J · Gramática B",
+    explain: `
+      <ul>
+        <li>1.º <span class="pt">primeiro</span> · 2.º <span class="pt">segundo</span> · 3.º <span class="pt">terceiro</span> · 4.º <span class="pt">quarto</span> · 5.º <span class="pt">quinto</span></li>
+        <li>6.º <span class="pt">sexto</span> · 7.º <span class="pt">sétimo</span> · 8.º <span class="pt">oitavo</span> · 9.º <span class="pt">nono</span> · 10.º <span class="pt">décimo</span></li>
+      </ul>
+      <p>Feminine: 1.ª primeira, 2.ª segunda… Kings and streets use them too: <span class="pt">D. Pedro IV</span> = Dom Pedro <i>Quarto</i>.</p>
+      <div class="hook"><div class="eyebrow">Important box: Lisbon addresses</div>
+        <b>R/C</b> = rés do chão (ground floor) · <b>Esq.</b> = esquerdo (left) · <b>Dto.</b> = direito (right).<br>
+        <span class="pt">2.º Esq.</span> = 2nd floor, left-hand flat.
+      </div>
+      <p><span class="pt">Em que andar moras? — No segundo.</span> Ordinals go <b>before</b> the noun: <span class="pt">o primeiro nome</span>. But <span class="pt">o nome completo</span> (full name).</p>`,
+    words: [W("primeiro", "first", "pree-MAY-roo"), W("terceiro", "third", "tur-SAY-roo"), W("sétimo", "seventh", "SEH-tee-moo"), W("décimo", "tenth", ""),
+      W("Em que andar moras?", "Which floor do you live on?", ""), W("No segundo.", "On the second.", ""), W("rés do chão", "ground floor", "RRESH doo SHOWNG")],
+    links: [],
+    quiz: [
+      { q: "4.º is…", opts: ["quarto", "quatro", "quinto"], why: "quarto = 4th (also = room!). quatro = 4." },
+      { q: "7.º is…", opts: ["sétimo", "setenta", "sexto"], why: "sexto = 6th." },
+      { q: "Mafalda lives in “1.º Dto.”:", opts: ["1st floor, right", "1st floor, left", "ground floor, right"], why: "Dto. = direito." },
+      { q: "Lúcia lives in “R/C Esq.”:", opts: ["ground floor, left", "ground floor, right", "1st floor, left"], why: "R/C = rés do chão, Esq. = esquerdo." },
+      { q: "Ela mora ___ terceiro andar.", opts: ["no", "na", "em"], why: "o andar → no." },
+      { q: "Correct order:", opts: ["o primeiro nome", "o nome primeiro", "primeiro o nome"], why: "Ordinals go before the noun." },
+    ]
+  },
+  {
+    id: "dados", title: "Personal details: filling in a form", sub: "Exercises K–P · Gramática C",
+    explain: `
+      <p>The form (<i>ficha</i>) at a school or a <i>junta</i>:</p>
+      <ul>
+        <li><b>Nome</b> · <b>apelido</b> (surname, a false friend!) · <b>nome completo</b></li>
+        <li><b>Idade</b>: <span class="pt">Tenho 32 anos.</span> Age uses <b>ter</b>: “I have 32 years”.</li>
+        <li><b>Nacionalidade</b> · <b>Profissão</b></li>
+        <li><b>Estado civil</b>: solteiro/a (single), casado/a (married), divorciado/a</li>
+        <li><b>Morada</b> (address), <b>código postal</b>, <b>telefone</b>, <b>telemóvel</b></li>
+        <li><b>E-mail</b>: @ = <span class="pt">arroba</span>, . = <span class="pt">ponto</span></li>
+      </ul>
+      <p><b>Two ways to ask:</b> <span class="pt">Quantos anos tem?</span> = <span class="pt">Que idade tem?</span> · <span class="pt">Como se chama?</span> = <span class="pt">Qual é o seu nome?</span></p>
+      <div class="hook"><div class="eyebrow">quanto agrees with the noun</div>
+        <span class="pt">quanto</span> dinheiro · <span class="pt">quanta</span> água · <span class="pt">quantos</span> anos · <span class="pt">quantas</span> línguas
+      </div>`,
+    words: [W("Qual é o seu apelido?", "What's your surname?", "uh-puh-LEE-doo"), W("Tenho trinta e dois anos.", "I'm 32.", ""), W("Sou casada.", "I'm married. (f)", ""),
+      W("Qual é a sua morada?", "What's your address?", ""), W("arroba", "@", "uh-RRO-buh"), W("Quantas línguas falas?", "How many languages do you speak?", "")],
+    links: [],
+    quiz: [
+      { q: "“Tenho 32 anos” gives your…", opts: ["idade", "morada", "estado civil"], why: "Age uses ter: tenho X anos." },
+      { q: "“Sou casada” gives your…", opts: ["estado civil", "profissão", "nacionalidade"], why: "casado/a = married." },
+      { q: "“apelido” means…", opts: ["surname", "nickname", "first name"], why: "False friend: apelido = surname." },
+      { q: "Same question as “Quantos anos tem?”:", opts: ["Que idade tem?", "Qual é o seu nome?", "É casado?"], why: "Exercise N." },
+      { q: "___ dinheiro tens?", opts: ["Quanto", "Quantos", "Quanta"], why: "o dinheiro → quanto." },
+      { q: "___ línguas falas?", opts: ["Quantas", "Quantos", "Quanta"], why: "as línguas → quantas." },
+      { q: "___ alunos estão aqui?", opts: ["Quantos", "Quantas", "Quanto"], why: "os alunos → quantos." },
+      { q: "Andriy: “___ 24 anos.”", opts: ["Tenho", "Sou", "Estou"], why: "Age uses ter (exercise P)." },
+    ]
+  },
+  {
+    id: "pron6", title: "Pronunciation: en-, ss, S", sub: "Pronúncia A–C, p. 39",
+    explain: `
+      <p><b>en- / em- at the start (A):</b> nasal: <b>en</b>fermeiro, <b>en</b>genheiro, <b>em</b>pregado, <b>em</b>presário.</p>
+      <p><b>SS (B)</b> is always a clean [s]: Rú<b>ss</b>ia, no<b>ss</b>o, deza<b>ss</b>ete, pa<b>ss</b>aporte.</p>
+      <p><b>S summary (C):</b></p>
+      <ul>
+        <li>[s] at the start or after a consonant: segunda, professor</li>
+        <li>[z] between vowels: mesa, casado, inglesa, brasileiro</li>
+        <li>[ʃ] at the end or before a consonant: Espanha, nós, país, Marrocos</li>
+      </ul>`,
+    words: [W("enfermeiro", "nurse", ""), W("passaporte", "passport", ""), W("casado", "married", "kuh-ZA-doo"), W("nós", "we", "nosh")],
+    links: [],
+    quiz: [
+      { q: "S in “mesa” is…", opts: ["[z]", "[s]", "[ʃ]"], why: "Between vowels → z." },
+      { q: "S in “nós” is…", opts: ["[ʃ] sh", "[s]", "[z]"], why: "End of word → sh." },
+      { q: "SS in “nosso” is…", opts: ["[s]", "[z]", "[ʃ]"], why: "SS is always s." },
+      { q: "S in “segunda” is…", opts: ["[s]", "[z]", "[ʃ]"], why: "Start of word → s." },
+    ]
+  }]
+},
+{
+  id: "u7", num: "7", label: "Unidade 7 · pages 40–43", title: "Gosto da minha cidade",
+  sub: "Describing places, adjectives, gostar de, porque",
+  source: "Passaporte para Português 1, Unidade 7 (pp. 40–43) + Gramática p. 50",
+  chunks: [
+  {
+    id: "adjetivos", title: "Adjectives and opposites", sub: "Exercises A, B, C, D",
+    explain: `
+      <p><b>Where? (A)</b> <span class="pt">no centro</span> (in the centre), <span class="pt">perto do centro</span> (near), <span class="pt">longe do centro</span> (far), <span class="pt">fora da cidade</span> (outside).</p>
+      <p><b>Opposites (C):</b> learn them in pairs, it halves the work.</p>
+      <ul>
+        <li>bonito ↔ feio (pretty ↔ ugly)</li>
+        <li>bom ↔ mau (good ↔ bad)</li>
+        <li>novo ↔ velho (new/young ↔ old)</li>
+        <li>grande ↔ pequeno (big ↔ small)</li>
+        <li>rico ↔ pobre (rich ↔ poor)</li>
+        <li>caro ↔ barato (expensive ↔ cheap)</li>
+        <li>antigo ↔ moderno (old/historic ↔ modern)</li>
+        <li>simpático ↔ antipático (nice ↔ unfriendly)</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Two kinds of old</div>
+        <b>velho</b> = old and worn (a person, an old car). <b>antigo</b> = old and historic (a city, a temple).
+      </div>`,
+    words: [W("perto", "near", "PER-too"), W("longe", "far", "LONZH"), W("bonito / feio", "pretty / ugly", "boo-NEE-too / FAY-oo"), W("barato / caro", "cheap / expensive", ""),
+      W("antigo / moderno", "historic / modern", ""), W("simpático", "nice, friendly", "seem-PA-tee-koo"), W("Qual é o oposto de feio?", "What's the opposite of ugly?", "")],
+    links: [],
+    quiz: [
+      { q: "Opposite of “feio”:", opts: ["bonito", "bom", "barato"], why: "feio ↔ bonito." },
+      { q: "Opposite of “barato”:", opts: ["caro", "pobre", "velho"], why: "barato ↔ caro." },
+      { q: "Opposite of “antipático”:", opts: ["simpático", "antigo", "bonito"], why: "antipático ↔ simpático." },
+      { q: "Opposite of “pequeno”:", opts: ["grande", "longe", "moderno"], why: "pequeno ↔ grande." },
+      { q: "Rodrigo is 10 km from the centre:", opts: ["Está longe do centro.", "Está perto do centro.", "Está no centro."], why: "longe = far." },
+      { q: "An old Roman temple is…", opts: ["antigo", "velho", "novo"], why: "Historic → antigo." },
+      { q: "A barking dog on a chain is…", opts: ["mau", "bom", "rico"], why: "mau = bad, mean (picture 1)." },
+    ]
+  },
+  {
+    id: "concordancia", title: "Adjectives agree", sub: "Gramática A, D",
+    explain: `
+      <p>Adjectives match the noun in gender and number, and usually come <b>after</b> it:</p>
+      <ul>
+        <li>-o: bonito / bonita / bonitos / bonitas</li>
+        <li>-or: falador / faladora / faladores / faladoras</li>
+        <li>-e: grande / grandes (same for m/f)</li>
+        <li>-il / -el: difícil → difíceis, agradável → agradáveis</li>
+        <li>irregular: <b>bom / boa / bons / boas</b>, <b>mau / má / maus / más</b></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Word order</div>
+        <span class="pt">uma rua antiga</span>, <span class="pt">um carro bonito</span>. Adjective after noun.<br>
+        <b>muito / bastante</b> (very / quite) go <b>before</b> the adjective: <span class="pt">muito bonito</span>, <span class="pt">bastante grande</span>.<br>
+        With a verb they go after: <span class="pt">Gosto muito.</span>
+      </div>`,
+    words: [W("uma cidade antiga", "a historic city", ""), W("uma casa pequena", "a small house", ""), W("os restaurantes são bons", "the restaurants are good", ""),
+      W("As pessoas são muito simpáticas.", "The people are very nice.", ""), W("bastante barato", "quite cheap", "bush-TUNT")],
+    links: [],
+    quiz: [
+      { q: "Feminine of “bom”:", opts: ["boa", "bona", "boma"], why: "Irregular: bom / boa." },
+      { q: "Feminine of “mau”:", opts: ["má", "maua", "mal"], why: "Irregular: mau / má." },
+      { q: "Plural of “difícil”:", opts: ["difíceis", "difícils", "difíciles"], why: "-il → -eis." },
+      { q: "Temos uma casa ___.", opts: ["pequena", "pequeno", "pequenas"], why: "a casa → pequena, after the noun." },
+      { q: "Correct order:", opts: ["O carro dela é muito caro!", "O carro dela é caro muito!", "O muito carro dela é caro!"], why: "muito before the adjective." },
+      { q: "Correct order:", opts: ["Évora é uma cidade antiga.", "Évora é uma antiga cidade.", "Évora é antiga uma cidade."], why: "Adjective after the noun." },
+      { q: "Os restaurantes são muito ___.", opts: ["bons", "boas", "bom"], why: "os restaurantes → bons." },
+    ]
+  },
+  {
+    id: "gostar", title: "Gostar de: what you like", sub: "Exercises H–M · Gramática B, C",
+    explain: `
+      <p><b>gostar</b> is a regular -ar verb, but it always needs <b>de</b>. Think “to be fond <b>of</b>”:</p>
+      <ul>
+        <li><span class="pt">Gosto <b>de</b> Portugal.</span> · <span class="pt">Gosto <b>de</b> música.</span></li>
+        <li>de + o/a = do/da: <span class="pt">Gosto <b>da</b> minha cidade.</span> · <span class="pt">O Hugo gosta <b>da</b> Cátia.</span></li>
+        <li>de + verb: <span class="pt">Gosto <b>de</b> dançar.</span></li>
+      </ul>
+      <p><b>How much:</b> <span class="pt">Gosto muito.</span> I like it a lot. <span class="pt">Não gosto nada.</span> I don't like it at all.</p>
+      <div class="hook"><div class="eyebrow">Important box: Gosto disto!</div>
+        de + isto = <b>disto</b>, de + isso = <b>disso</b>, de + aquilo = <b>daquilo</b>, de + aqui = <b>daqui</b>.<br>
+        <span class="pt">Gostas disso?</span> Do you like that? <span class="pt">5 pessoas gostam disto</span>, that's Facebook's “5 people like this”.
+      </div>
+      <p><b>Why? Because:</b> <span class="pt">Porque é que gostas do Luís? — Porque é simpático.</span> Question “porquê?” has an accent at the end, the answer “porque” has none.</p>`,
+    words: [W("Gostas disto?", "Do you like this?", "GOSH-tush DEESH-too"), W("Gosto muito da minha cidade.", "I really like my city.", ""), W("Não gosto nada.", "I don't like it at all.", ""),
+      W("Porque é que gostas do Luís?", "Why do you like Luís?", ""), W("Porque é simpático.", "Because he's nice.", ""), W("Estou de férias. Boas férias!", "I'm on holiday. Have a good holiday!", "")],
+    links: [],
+    quiz: [
+      { q: "___ da minha casa? (tu)", opts: ["Gostas", "Gosta", "Gosto"], why: "tu → gostas." },
+      { q: "Elas gostam ___ Portugal.", opts: ["de", "do", "–"], why: "Portugal has no article → de." },
+      { q: "O Rui não gosta ___ Rita.", opts: ["da", "de", "a"], why: "a Rita → da Rita." },
+      { q: "Eles não gostam ___. (isto)", opts: ["disto", "de isto", "isto"], why: "de + isto = disto." },
+      { q: "O centro é longe ___. (aqui)", opts: ["daqui", "de aqui", "aqui"], why: "de + aqui = daqui." },
+      { q: "“Não gosto nada” means…", opts: ["I don't like it at all", "I like nothing here", "I don't like it much"], why: "nada = not at all." },
+      { q: "“Porque é que gostas do Luís?” — answer:", opts: ["Porque é simpático.", "Porquê é simpático.", "Por que simpático."], why: "Answer with porque (no accent)." },
+    ]
+  },
+  {
+    id: "cidades", title: "Reading: Macau and Ouro Preto", sub: "Exercises E, F, G",
+    explain: `
+      <p><b>Luís in Macau:</b> <span class="pt">Macau é uma cidade rica e muito moderna. Gosto muito do meu hotel. O quarto é grande e bonito. Os restaurantes são muito bons. As pessoas são muito simpáticas!</span></p>
+      <p><b>Song in Ouro Preto (Brazil):</b> <span class="pt">Ouro Preto é uma cidade antiga, bastante pequena e bonita. O centro histórico é lindo. O nosso hotel é velho e bastante feio, mas também muito barato. Os restaurantes não são maus.</span> The hotel <span class="pt">fica fora do centro, na parte nova da cidade.</span></p>
+      <div class="hook"><div class="eyebrow">Real-life detail</div>
+        Macau was Portuguese until 1999, and Portuguese is still an official language there. Ouro Preto is a colonial gold-mining town in Minas Gerais.
+      </div>`,
+    words: [W("Macau é uma cidade rica e muito moderna.", "Macau is a rich and very modern city.", ""), W("O centro histórico é lindo.", "The historic centre is beautiful.", ""),
+      W("lindo", "beautiful", "LEEN-doo"), W("O hotel fica fora do centro.", "The hotel is outside the centre.", "")],
+    links: [],
+    quiz: [
+      { q: "Como é o quarto do Luís?", opts: ["Grande e bonito.", "Pequeno e feio.", "Velho e barato."], why: "“O quarto é grande e bonito.”" },
+      { q: "Como são as pessoas em Macau?", opts: ["Muito simpáticas.", "Antipáticas.", "Ricas."], why: "“As pessoas são muito simpáticas!”" },
+      { q: "Como é o hotel do Song?", opts: ["Velho, feio, mas muito barato.", "Moderno e caro.", "Grande e bonito."], why: "From Song's post." },
+      { q: "Onde é o hotel do Song?", opts: ["Fora do centro, na parte nova.", "No centro histórico.", "Perto do centro."], why: "Song's comment at 22:50." },
+      { q: "Os restaurantes em Ouro Preto…", opts: ["não são maus.", "são muito caros.", "são muito bons."], why: "“não são maus” = not bad." },
+    ]
+  },
+  {
+    id: "pron7", title: "Pronunciation: Z, CH and nasal pairs", sub: "Pronúncia A–E, p. 43",
+    explain: `
+      <p><b>Z at the end = [ʃ] (A, B):</b> de<b>z</b> “desh”, atri<b>z</b>, di<b>z</b>. In the middle it's a normal z: a<b>z</b>ul, <b>z</b>ero, cin<b>z</b>ento.</p>
+      <p><b>CH = [ʃ] (C):</b> chama, China, chá, chaves, acho, ficha.</p>
+      <p><b>Minimal pairs (D, E):</b> listen for the nose.</p>
+      <ul>
+        <li>pá (shovel) · pão (bread) · pau (stick)</li>
+        <li>má (bad, f) · mão (hand) · mau (bad, m)</li>
+      </ul>
+      <p>pão and mão are nasal, pau and mau are not.</p>`,
+    words: [W("dez", "ten", "desh"), W("pão", "bread", "powng"), W("pau", "stick", "pow"), W("mão", "hand", "mowng"), W("mau", "bad", "mow"), W("acho", "I think", "A-shoo")],
+    links: [],
+    quiz: [
+      { q: "Listen. Which word?", say: "pão", opts: ["pão", "pau", "pá"], why: "Nasal → pão (bread)." },
+      { q: "Listen. Which word?", say: "mau", opts: ["mau", "mão", "má"], why: "Not nasal, ends in “ow” → mau." },
+      { q: "Z in “dez” sounds like…", opts: ["sh", "z", "s"], why: "Final Z = sh." },
+      { q: "Z in “azul” sounds like…", opts: ["z", "sh", "s"], why: "Z in the middle = z." },
+      { q: "Which words have nasal vowels?", opts: ["pão, mão", "pau, mau", "pá, má"], why: "The tilde ã = nasal." },
+    ]
+  }]
+},
+{
+  id: "u8", num: "8", label: "Unidade 8 · pages 44–47", title: "Trabalho num escritório",
+  sub: "Workplaces, num/numa, routines, muito/pouco, opinions",
+  source: "Passaporte para Português 1, Unidade 8 (pp. 44–47) + Gramática p. 51",
+  chunks: [
+  {
+    id: "locais", title: "Workplaces: num, numa", sub: "Exercise A · Gramática A",
+    explain: `
+      <p><b>em + um/uma</b> merge, like em + o = no:</p>
+      <ul>
+        <li>em + um = <b>num</b>: <span class="pt">Trabalho num escritório.</span></li>
+        <li>em + uma = <b>numa</b>: <span class="pt">Trabalha numa escola.</span></li>
+        <li>de + um = <b>dum</b>, de + uma = <b>duma</b>: <span class="pt">É duma cidade perto de Paris.</span></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Who works where (A)</div>
+        professor → numa escola · ator → num teatro · médica → num hospital · advogado → num escritório · empresária → numa empresa · arquiteta → num ateliê · empregado de mesa → num restaurante · empregada doméstica → numa casa
+      </div>`,
+    words: [W("Trabalho num escritório.", "I work in an office.", ""), W("numa escola", "in a school", "NOO-muh"), W("num hospital", "in a hospital", "noong osh-pee-TAL"),
+      W("numa empresa", "in a company", ""), W("o ateliê", "studio", "uh-tuh-LYEH")],
+    links: [],
+    quiz: [
+      { q: "Ela trabalha ___ escola.", opts: ["numa", "num", "na"], why: "a escola, “a school” → numa." },
+      { q: "Trabalhamos ___ hospital.", opts: ["num", "numa", "no"], why: "o hospital → num." },
+      { q: "Ele é ___ cidade perto de Paris.", opts: ["duma", "dum", "numa"], why: "from a city → de + uma = duma." },
+      { q: "Onde trabalha um ator?", opts: ["Num teatro.", "Num ateliê.", "Numa empresa."], why: "Exercise A." },
+      { q: "Onde trabalha uma arquiteta?", opts: ["Num ateliê.", "Num hospital.", "Numa casa."], why: "Exercise A." },
+    ]
+  },
+  {
+    id: "rotina", title: "Work routines: -ar verbs and por", sub: "Exercise B · Gramática B",
+    explain: `
+      <p>All regular -ar verbs, same endings as falar:</p>
+      <ul>
+        <li><span class="pt">trabalhar</span> to work · <span class="pt">ganhar</span> to earn · <span class="pt">usar</span> to use</li>
+        <li><span class="pt">estudar</span> to study · <span class="pt">viajar</span> to travel</li>
+      </ul>
+      ${conj(["trabalho", "trabalhas", "trabalha", "trabalhamos", "trabalham"], ["work", "work", "works", "work", "work"])}
+      <div class="hook"><div class="eyebrow">Important box: por = per</div>
+        <span class="pt">Trabalho oito horas <b>por</b> dia.</span> 8 hours per day. Also <span class="pt">por semana</span>, <span class="pt">por ano</span>.
+      </div>
+      <p>Phrases: <span class="pt">ganhar muito dinheiro</span>, <span class="pt">estudar na universidade</span>, <span class="pt">usar o computador</span>, <span class="pt">trabalhar em casa</span>, <span class="pt">falar ao telemóvel</span> (on the phone).</p>`,
+    words: [W("Quantas horas trabalha por dia?", "How many hours do you work a day?", ""), W("Trabalho oito horas por dia.", "I work 8 hours a day.", ""),
+      W("ganhar muito dinheiro", "earn a lot of money", ""), W("falar ao telemóvel", "talk on the phone", ""), W("viajar muito", "travel a lot", "vyuh-ZHAR")],
+    links: [],
+    quiz: [
+      { q: "___ muito. (nós / viajar)", opts: ["Viajamos", "Viajam", "Viajo"], why: "nós → -amos." },
+      { q: "Elas não ___ o computador. (usar)", opts: ["usam", "usa", "usamos"], why: "elas → -am." },
+      { q: "___ bem? (tu / ganhar)", opts: ["Ganhas", "Ganha", "Ganho"], why: "tu → -as." },
+      { q: "O Rui e a Ana ___ à noite. (trabalhar)", opts: ["trabalham", "trabalha", "trabalhamos"], why: "Two people → -am." },
+      { q: "Trabalho seis dias ___ semana.", opts: ["por", "de", "em"], why: "Per week → por semana." },
+      { q: "“falar ao telemóvel” means…", opts: ["talk on the phone", "sell phones", "fix the phone"], why: "Picture 4 in exercise B." },
+    ]
+  },
+  {
+    id: "nuria", title: "Reading: Núria the doctor", sub: "Exercises C, D, E",
+    explain: `
+      <p><span class="pt">Trabalho num hospital, em Lisboa. <b>Normalmente</b>, são oito horas por dia. Mas, <b>às vezes</b>, trabalho dez ou até doze horas. São cinco dias por semana. Ganha bem? <b>Infelizmente</b>, ganho pouco.</span></p>
+      <p><span class="pt">É muito <b>interessante</b>. Gosto de trabalhar com pessoas. Gosto de ser médica. E também gosto dos meus <b>colegas</b>. Não gosto: trabalho muitas horas, às vezes <b>à noite</b>. E não gosto da minha <b>chefe</b>. É uma pessoa muito <b>difícil</b>.</span></p>
+      <div class="hook"><div class="eyebrow">Highlighted words (E)</div>
+        normalmente = usually · às vezes = sometimes · infelizmente = unfortunately · até = up to · à noite = at night · o/a colega · o/a chefe (same word for him and her)
+      </div>`,
+    words: [W("Normalmente", "usually", "nor-mal-MENT"), W("às vezes", "sometimes", "ash VAY-zush"), W("Infelizmente, ganho pouco.", "Unfortunately, I earn little.", ""),
+      W("à noite", "at night", ""), W("a minha chefe", "my boss (f)", ""), W("Gosto de trabalhar com pessoas.", "I like working with people.", "")],
+    links: [],
+    quiz: [
+      { q: "Qual é a profissão da Núria?", opts: ["Médica.", "Enfermeira.", "Professora."], why: "“Gosto de ser médica.”" },
+      { q: "Quantos dias trabalha por semana?", opts: ["Cinco.", "Seis.", "Sete."], why: "“São cinco dias por semana.”" },
+      { q: "“às vezes” means…", opts: ["sometimes", "always", "at times of day"], why: "às vezes = sometimes." },
+      { q: "“Infelizmente” means…", opts: ["unfortunately", "happily", "usually"], why: "feliz = happy, in- = un-." },
+      { q: "What doesn't Núria like?", opts: ["Her boss and the long hours.", "Her colleagues.", "Working with people."], why: "“Não gosto da minha chefe.”" },
+      { q: "A female boss is…", opts: ["a chefe", "a chefa", "o chefe"], why: "Important box: o chefe / a chefe." },
+    ]
+  },
+  {
+    id: "muito", title: "Muito and pouco", sub: "Gramática C, D",
+    explain: `
+      <p><b>Before a noun</b>, muito/pouco agree with it, like adjectives:</p>
+      <ul>
+        <li><span class="pt">muito / pouco</span> café</li>
+        <li><span class="pt">muita / pouca</span> água</li>
+        <li><span class="pt">muitos / poucos</span> livros</li>
+        <li><span class="pt">muitas / poucas</span> horas</li>
+      </ul>
+      <p><b>With a verb</b>, they never change: <span class="pt">A Rita trabalha muito.</span> <span class="pt">Estudo pouco.</span></p>
+      <div class="hook"><div class="eyebrow">Quick test</div>
+        Is there a noun right after it? Then make it agree. A verb before it? Leave it as muito/pouco.
+      </div>`,
+    words: [W("Tenho muitos livros.", "I have many books.", ""), W("Ela trabalha muitas horas.", "She works many hours.", ""), W("A garrafa tem pouca água.", "The bottle has little water.", ""), W("O Jorge estuda muito.", "Jorge studies a lot.", "")],
+    links: [],
+    quiz: [
+      { q: "Ela trabalha ___ horas.", opts: ["muitas", "muito", "muitos"], why: "as horas → muitas." },
+      { q: "O Jorge estuda ___.", opts: ["muito", "muitos", "muita"], why: "After a verb → muito (no change)." },
+      { q: "Ele tem ___ dinheiro.", opts: ["muito", "muita", "muitos"], why: "o dinheiro → muito." },
+      { q: "Ainda tens ___ água?", opts: ["muita", "muito", "muitas"], why: "a água → muita." },
+      { q: "Ele fala ___ línguas.", opts: ["poucas", "pouco", "poucos"], why: "as línguas → poucas." },
+      { q: "A Ana trabalha ___.", opts: ["pouco", "pouca", "poucas"], why: "After a verb → pouco." },
+    ]
+  },
+  {
+    id: "opiniao", title: "Opinions: Eu acho que…", sub: "Exercises I–L · Pronúncia p. 47",
+    explain: `
+      <p><b>Giving opinions (J):</b></p>
+      <ul>
+        <li><span class="pt">Eu acho que a Sara é advogada.</span> I think Sara is a lawyer.</li>
+        <li><span class="pt">Porquê?</span> Why? — <span class="pt">Porque trabalha num escritório.</span></li>
+        <li><span class="pt">Tiago, está pronto?</span> Tiago, are you ready?</li>
+      </ul>
+      <p><b>Pronunciation:</b></p>
+      <ul>
+        <li><b>H</b> is always silent: hospital, hotel, homem, hora, hindi.</li>
+        <li><b>N [n]</b> vs <b>NH [ɲ]</b>: ano, pequeno, caneta vs Espanha, dinheiro, sozinho, minha.</li>
+        <li>-am at the end is not stressed: <b>GA</b>nham, vi<b>A</b>jam, <b>U</b>sam. But -ão is: li<b>MÃO</b>, avi<b>ÃO</b>, Ja<b>PÃO</b>. Both sound like “owng”!</li>
+      </ul>`,
+    words: [W("Eu acho que a Sara é advogada.", "I think Sara is a lawyer.", ""), W("Porquê?", "Why?", "poor-KAY"), W("sozinho", "alone", "so-ZEE-nyoo"), W("homem", "man", "O-mayng"), W("ganham", "they earn", "GUH-nyowng")],
+    links: [],
+    quiz: [
+      { q: "“Eu acho que…” means…", opts: ["I think that…", "I find that…", "I hope that…"], why: "achar = to think (opinion)." },
+      { q: "H in “hotel” sounds like…", opts: ["nothing", "English H", "sh"], why: "H is always silent." },
+      { q: "Which word has the “ny” sound?", opts: ["dinheiro", "pequeno", "ano"], why: "NH = ny." },
+      { q: "Stressed syllable in “ganham”:", opts: ["GA", "NHAM"], why: "Verb ending -am is unstressed." },
+      { q: "Stressed syllable in “limão”:", opts: ["MÃO", "LI"], why: "The tilde carries the stress." },
+    ]
+  }]
+},
+{
+  id: "u9", num: "9", label: "Unidade 9 · pages 54–57", title: "Tenho um irmão",
+  sub: "Family, plural possessives, este/esse/aquele",
+  source: "Passaporte para Português 1, Unidade 9 (pp. 54–57) + Caderno de Exercícios pp. 24–25. Gramática p. 70 not seen yet",
+  chunks: [
+  {
+    id: "familia", title: "The family", sub: "Exercises A–F",
+    explain: `
+      <ul>
+        <li><span class="pt">o pai / a mãe</span> father / mother → <span class="pt">os pais</span> <b>parents</b></li>
+        <li><span class="pt">o filho / a filha</span> son / daughter → <span class="pt">os filhos</span> <b>children</b></li>
+        <li><span class="pt">o irmão / a irmã</span> → <span class="pt">os irmãos</span> <b>siblings</b></li>
+        <li><span class="pt">o avô / a avó</span> → <span class="pt">os avós</span> <b>grandparents</b></li>
+        <li><span class="pt">o neto / a neta</span> grandson / granddaughter → <span class="pt">os netos</span></li>
+        <li><span class="pt">o tio / a tia</span> uncle / aunt · <span class="pt">o primo / a prima</span> cousin</li>
+        <li><span class="pt">o marido / a mulher</span> husband / wife · <span class="pt">o namorado / a namorada</span> boyfriend / girlfriend</li>
+        <li><span class="pt">o rapaz / a rapariga</span> boy / girl · <span class="pt">o homem / a mulher</span> man / woman</li>
+        <li><span class="pt">a sogra</span> mother-in-law · <span class="pt">filho único</span> only child</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Masculine plural = the whole group</div>
+        <span class="pt">os pais</span> = mum and dad. <span class="pt">Tenho dois irmãos</span> can mean two brothers, or a brother and a sister.
+      </div>
+      <p>Careful: <b>avô</b> (grandpa, closed ô) vs <b>avó</b> (grandma, open ó). And <span class="pt">a mulher</span> means both “woman” and “wife”.</p>`,
+    words: [W("Tens irmãos?", "Do you have siblings?", ""), W("Tenho. Um irmão e uma irmã.", "Yes. A brother and a sister.", ""), W("o avô", "grandfather", "uh-VOH"), W("a avó", "grandmother", "uh-VAW"),
+      W("os pais", "parents", "PAISH"), W("a rapariga", "girl", "rruh-puh-REE-guh"), W("filho único", "only child", ""), W("Que pena!", "What a pity!", "")],
+    links: [],
+    quiz: [
+      { q: "O pai do meu pai é o meu…", opts: ["avô", "avó", "tio"], why: "Exercise E, 1." },
+      { q: "A irmã da minha mãe é a minha…", opts: ["tia", "prima", "avó"], why: "Exercise E, 3." },
+      { q: "A filha da minha tia é a minha…", opts: ["prima", "irmã", "neta"], why: "Exercise E, 4." },
+      { q: "O filho do meu filho é o meu…", opts: ["neto", "primo", "sobrinho"], why: "Exercise E, 5." },
+      { q: "o pai + a mãe =", opts: ["os pais", "as mães", "os padres"], why: "Exercise F." },
+      { q: "o avô + a avó =", opts: ["os avós", "os avôs", "as avós"], why: "Mixed group → os avós." },
+      { q: "Listen. Which word?", say: "avó", opts: ["avó (grandmother)", "avô (grandfather)"], why: "Open “aw” = avó." },
+      { q: "Afonso has no siblings. He's…", opts: ["filho único", "solteiro", "sozinho"], why: "filho único = only child." },
+    ]
+  },
+  {
+    id: "poss2", title: "My children, our parents", sub: "Possessives in the plural · Caderno D",
+    explain: `
+      <p>Possessives add <b>-s</b> in the plural, together with the article:</p>
+      <ul>
+        <li><span class="pt">o meu filho → os meus filhos</span> · <span class="pt">a minha irmã → as minhas irmãs</span></li>
+        <li><span class="pt">os teus / as tuas</span> · <span class="pt">os seus / as suas</span></li>
+        <li><span class="pt">os nossos / as nossas</span> · <span class="pt">os vossos / as vossas</span></li>
+        <li><b>dele / dela / deles / delas</b> never change: <span class="pt">os filhos dele</span></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Agree with the thing, not the owner</div>
+        A man says <span class="pt">as minhas filhas</span>. It's feminine because <i>filhas</i> is.
+      </div>
+      <p><span class="pt">Os nossos filhos são o Bernardo e a Verónica.</span> (Rita, exercise A)</p>`,
+    words: [W("os meus pais", "my parents", ""), W("as minhas primas", "my cousins (f)", ""), W("Os nossos filhos são o Bernardo e a Verónica.", "Our children are Bernardo and Verónica.", ""), W("os filhos dele", "his children", "")],
+    links: [],
+    quiz: [
+      { q: "Plural: “o meu filho” →", opts: ["os meus filhos", "os meu filhos", "o meus filhos"], why: "Both article and possessive add -s." },
+      { q: "Plural: “a tua irmã” →", opts: ["as tuas irmãs", "as tua irmãs", "os teus irmãs"], why: "a → as, tua → tuas." },
+      { q: "___ pais moram no Porto. (my)", opts: ["Os meus", "As minhas", "Os minhas"], why: "os pais → os meus." },
+      { q: "Rita: “___ filhos são o Bernardo e a Verónica.”", opts: ["Os nossos", "Os meus", "As nossas"], why: "Rita + Fernando = nós → os nossos." },
+      { q: "His sisters:", opts: ["as irmãs dele", "as deles irmãs", "as dele irmãs"], why: "dele goes after the noun and never changes." },
+    ]
+  },
+  {
+    id: "este", title: "Este, esse, aquele", sub: "Exercises D, K · Caderno E, G",
+    explain: `
+      <p>Same three distances as isto/isso/aquilo, but these go with a noun or a person, so they agree:</p>
+      <ul>
+        <li>near me: <b>este / esta / estes / estas</b> (this)</li>
+        <li>near you: <b>esse / essa / esses / essas</b> (that)</li>
+        <li>far: <b>aquele / aquela / aqueles / aquelas</b> (that over there)</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Introducing people in a photo</div>
+        <span class="pt">Este é o meu avô.</span> This is my grandfather.<br>
+        <span class="pt">Esta é a minha avó.</span> This is my grandmother.<br>
+        <span class="pt">Estas são as minhas primas.</span>
+      </div>
+      <p>Don't confuse <b>esta</b> “ESH-tuh” (this, f) with <b>está</b> “shTAH” (is). The accent moves the stress (Pronúncia E).</p>`,
+    words: [W("Este é o meu avô.", "This is my grandfather.", ""), W("Esta é a minha tia.", "This is my aunt.", "ESH-tuh"), W("Ela está em casa.", "She's at home.", "shTAH"),
+      W("Aquela rapariga é a Mariana.", "That girl is Mariana.", ""), W("Este rapaz é o meu amigo.", "This boy is my friend.", "")],
+    links: [],
+    quiz: [
+      { q: "Showing a photo: “___ é a minha mãe.”", opts: ["Esta", "Este", "Isto"], why: "a mãe → esta." },
+      { q: "“___ são os meus pais.”", opts: ["Estes", "Estas", "Este"], why: "os pais → estes." },
+      { q: "Pointing far away: “___ casa é do meu avô.”", opts: ["Aquela", "Aquele", "Esta"], why: "Far + a casa → aquela." },
+      { q: "Your friend holds a pen: “___ caneta é minha!”", opts: ["Essa", "Esta", "Aquela"], why: "Near the listener → essa." },
+      { q: "Listen. Which word?", say: "Ela está em casa.", opts: ["está (is)", "esta (this)"], why: "Stress at the end: shTAH." },
+    ]
+  },
+  {
+    id: "pron9", title: "Pronunciation: L, LH and pais / país", sub: "Pronúncia A–F, p. 57",
+    explain: `
+      <p><b>L [ɫ] (A):</b> lindo, escola, aluno, lápis, dele, sala.</p>
+      <p><b>LH [ʎ] (B):</b> like “lli” in <i>million</i>: filha, mulher, trabalho, velho, vermelho.</p>
+      <p><b>Same letters, different word (D):</b></p>
+      <ul>
+        <li><span class="pt">país</span> “puh-EESH”, 2 syllables = country</li>
+        <li><span class="pt">pais</span> “PAISH”, 1 syllable = parents</li>
+      </ul>
+      <p><b>avó / avô / avós / avôs (F):</b> open ó vs closed ô.</p>
+      <p><b>Important box:</b> <span class="pt">giro</span> = <span class="pt">bonito</span> (informal, Portugal only). <span class="pt">O namorado dela é muito giro!</span></p>`,
+    words: [W("O meu país fica longe.", "My country is far away.", ""), W("Os meus pais não trabalham.", "My parents don't work.", ""), W("filha", "daughter", "FEE-lyuh"), W("mulher", "woman / wife", "moo-LYER"), W("giro", "cute, pretty (informal)", "ZHEE-roo")],
+    links: [],
+    quiz: [
+      { q: "“país” or “pais”: parents =", opts: ["pais", "país"], why: "pais (1 syllable) = parents." },
+      { q: "Listen. Which word?", say: "país", opts: ["país (country)", "pais (parents)"], why: "Two syllables, stress on í." },
+      { q: "Which word has LH [ʎ]?", opts: ["trabalho", "escola", "aluno"], why: "LH = ly." },
+      { q: "“O teu namorado é giro” means he is…", opts: ["cute", "dizzy", "rich"], why: "giro = bonito (informal)." },
+    ]
+  }]
+},
+{
+  id: "u10", num: "10", label: "Unidade 10 · pages 58–61", title: "Tenho olhos azuis",
+  sub: "Appearance, estar com fome, hobbies, ler and ver",
+  source: "Passaporte para Português 1, Unidade 10 (pp. 58–61). Gramática p. 71 not seen yet",
+  chunks: [
+  {
+    id: "aparencia", title: "What people look like", sub: "Exercises A–F",
+    explain: `
+      <p>Three verbs describe a person:</p>
+      <ul>
+        <li><b>ser</b> + adjective: <span class="pt">É alto / baixo / magro / gordo / loiro / moreno / ruivo / careca.</span></li>
+        <li><b>ter</b> + body: <span class="pt">Tem olhos azuis. Tem cabelo curto / comprido. Tem barba / bigode.</span></li>
+        <li><b>usar</b>: <span class="pt">Usa óculos.</span> wears glasses</li>
+      </ul>
+      <div class="hook"><div class="eyebrow">Like English</div>
+        She <i>is</i> tall · she <i>has</i> blue eyes · she <i>wears</i> glasses. Same three verbs in the same places.
+      </div>
+      <ul>
+        <li>olhos azuis / verdes / castanhos / claros (light) / escuros (dark)</li>
+        <li>cabelo curto / comprido / branco / castanho / loiro</li>
+        <li><span class="pt">moreno</span> = dark-haired. <span class="pt">ruivo</span> = red-haired. <span class="pt">de altura média</span> = medium height</li>
+      </ul>`,
+    words: [W("Tenho olhos azuis.", "I have blue eyes.", "OL-yoosh uh-ZOOISH"), W("É alta e usa óculos.", "She's tall and wears glasses.", ""), W("Tem cabelo curto e castanho.", "Has short brown hair.", ""),
+      W("careca", "bald", "kuh-REH-kuh"), W("barba / bigode", "beard / moustache", ""), W("magro / gordo", "thin / fat", ""), W("comprido", "long", "kom-PREE-doo")],
+    links: [],
+    quiz: [
+      { q: "She is tall:", opts: ["Ela é alta.", "Ela tem alta.", "Ela está alta."], why: "ser + adjective." },
+      { q: "He has a beard:", opts: ["Ele tem barba.", "Ele é barba.", "Ele usa barba."], why: "ter + body part." },
+      { q: "She wears glasses:", opts: ["Ela usa óculos.", "Ela é óculos.", "Ela tem óculos."], why: "usar óculos." },
+      { q: "“ruivo” means…", opts: ["red-haired", "blond", "bald"], why: "loiro = blond, careca = bald." },
+      { q: "Opposite of “curto” (hair):", opts: ["comprido", "alto", "grande"], why: "cabelo curto ↔ comprido." },
+      { q: "Opposite of “claros” (eyes):", opts: ["escuros", "castanhos", "azuis"], why: "claros ↔ escuros." },
+      { q: "“É alta e usa óculos. Tem cabelo curto e castanho.” Who?", opts: ["Acho que é a Paula.", "Acho que é o Paula.", "Eu acho é a Paula."], why: "Exercise F: Acho que é…" },
+    ]
+  },
+  {
+    id: "fome", title: "Are you hungry? Estar com…", sub: "Exercises G, H",
+    explain: `
+      <p>Temporary body states use <b>estar com</b> + noun. Literally “to be with hunger”:</p>
+      <ul>
+        <li><span class="pt">estar com fome</span> to be hungry</li>
+        <li><span class="pt">estar com sede</span> to be thirsty</li>
+        <li><span class="pt">estar com calor / frio</span> to be hot / cold</li>
+        <li><span class="pt">estar com sono</span> to be sleepy</li>
+      </ul>
+      <p>And with adjectives: <span class="pt">estar doente</span> (sick), <span class="pt">estar cansado</span> (tired).</p>
+      <div class="hook"><div class="eyebrow">ser vs estar again</div>
+        <span class="pt">Ele é magro.</span> He's thin (always).<br>
+        <span class="pt">Ele está cansado.</span> He's tired (now). Temporary → estar.
+      </div>`,
+    words: [W("Estás com fome?", "Are you hungry?", "shTASH kong FOM"), W("Estou com sede.", "I'm thirsty.", ""), W("O Pedro está com frio.", "Pedro is cold.", ""),
+      W("Estou cansada.", "I'm tired. (f)", ""), W("Ele está doente.", "He's sick.", "")],
+    links: [],
+    quiz: [
+      { q: "I'm hungry:", opts: ["Estou com fome.", "Sou com fome.", "Tenho fome."], why: "In Portugal: estar com fome." },
+      { q: "40° outside. He…", opts: ["está com calor", "está com frio", "está com sede"], why: "calor = heat." },
+      { q: "He dreams of a glass of water:", opts: ["Está com sede.", "Está com fome.", "Está doente."], why: "sede = thirst." },
+      { q: "He has a thermometer and an ice pack:", opts: ["Está doente.", "Está com calor.", "Está cansado."], why: "doente = sick." },
+      { q: "Ele ___ cansado hoje.", opts: ["está", "é", "tem"], why: "Temporary → estar." },
+      { q: "Ele ___ alto.", opts: ["é", "está", "tem"], why: "Permanent → ser." },
+    ]
+  },
+  {
+    id: "gostos", title: "Hobbies: gostas de dançar?", sub: "Exercises I, J, K",
+    explain: `
+      <p><b>gostar de + verb</b>: <span class="pt">Gosto de dançar. Gostas de cozinhar?</span></p>
+      <ul>
+        <li>jogar futebol · dançar · cantar · cozinhar · ler · ver televisão</li>
+      </ul>
+      <p><b>ler</b> and <b>ver</b> are irregular. <b>ler</b> (to read):</p>
+      ${conj(["leio", "lês", "lê", "lemos", "leem"], ["read", "read", "reads", "read", "read"])}
+      <p><b>ver</b> (to see, to watch):</p>
+      ${conj(["vejo", "vês", "vê", "vemos", "veem"], ["see", "see", "sees", "see", "see"])}
+      <div class="hook"><div class="eyebrow">The chat (J): Rui & Sara</div>
+        <span class="pt">Gostas de dançar, Rui? — Dançar? Não muito. Porquê? — Eu gosto de dançar salsa. E quizomba. Tu gostas de quê? — Gosto de cozinhar. E leio muito. — Eu não. Mas vejo muitos filmes.</span>
+      </div>
+      <p><span class="pt">Fumas?</span> Do you smoke? <span class="pt">Não, não fumo.</span></p>`,
+    words: [W("Gostas de dançar?", "Do you like dancing?", ""), W("Gosto de cozinhar.", "I like cooking.", "koo-zee-NYAR"), W("Leio muito.", "I read a lot.", "LAY-oo"),
+      W("Vejo muitos filmes.", "I watch a lot of films.", "VAY-zhoo"), W("ver televisão", "watch TV", ""), W("jogar futebol", "play football", "")],
+    links: [],
+    quiz: [
+      { q: "Eu ___ muito. (ler)", opts: ["leio", "lo", "leo"], why: "ler → eu leio." },
+      { q: "Eu ___ muitos filmes. (ver)", opts: ["vejo", "veio", "vo"], why: "ver → eu vejo." },
+      { q: "Eles ___ televisão. (ver)", opts: ["veem", "vêm", "vem"], why: "ver → eles veem." },
+      { q: "Tu ___ jornais? (ler)", opts: ["lês", "les", "leis"], why: "ler → tu lês." },
+      { q: "What does Sara like?", opts: ["Dancing salsa and watching films.", "Cooking and reading.", "Football."], why: "From the chat." },
+      { q: "Why doesn't Rui have a TV?", opts: ["Porque não gosta de televisão.", "Porque é caro.", "Porque lê muito."], why: "“Porque não. Não gosto de televisão.”" },
+      { q: "“Fumas?” means…", opts: ["Do you smoke?", "Are you hungry?", "Are you tired?"], why: "fumar = to smoke." },
+    ]
+  },
+  {
+    id: "qual", title: "Qual? Which one?", sub: "Exercise A · Gramática p. 71",
+    explain: `
+      <p><b>qual</b> = which one (choosing from options). Plural: <b>quais</b>.</p>
+      <ul>
+        <li><span class="pt">Qual é que é azul? O direito ou o esquerdo?</span> Which one is blue? The right or the left?</li>
+        <li><span class="pt">Qual é o teu nome?</span> In Portuguese, “what is your name / address / job” uses <b>qual</b>, not <b>o que</b>.</li>
+        <li><span class="pt">Quais são os países com muitas pessoas com olhos claros?</span></li>
+      </ul>
+      <div class="hook"><div class="eyebrow">o que vs qual</div>
+        <span class="pt">O que é isto?</span> asks for a definition (What is this thing?).<br>
+        <span class="pt">Qual é a tua morada?</span> asks for one specific answer. Rule of thumb: <b>Qual é + o/a…</b>
+      </div>
+      <p><span class="pt">Não sei bem qual é. Acho que é o direito.</span> I'm not sure which. I think it's the right one.</p>`,
+    words: [W("Patrícia, tu tens um gato?!", "Patrícia, you have a cat?!", ""), W("Tem um olho azul e um verde.", "It has one blue eye and one green.", ""),
+      W("Qual é que é azul?", "Which one is blue?", ""), W("Acho que é o direito.", "I think it's the right one.", "")],
+    links: [],
+    quiz: [
+      { q: "___ é a tua morada?", opts: ["Qual", "O que", "Quem"], why: "Qual é + o/a …" },
+      { q: "___ é isto? — É um livro.", opts: ["O que", "Qual", "Quais"], why: "Asking what a thing is → o que." },
+      { q: "___ são os teus livros?", opts: ["Quais", "Qual", "O que"], why: "Plural → quais." },
+      { q: "The cat has…", opts: ["one blue eye and one green", "two blue eyes", "two green eyes"], why: "Dialogue A." },
+    ]
+  },
+  {
+    id: "pron10", title: "Pronunciation: X and linking words", sub: "Pronúncia A–D, p. 61",
+    explain: `
+      <p><b>X (A):</b> mostly [ʃ]: sexta, baixo, Xangai, México (in Portugal: “MEH-shee-koo”). But <span class="pt">próximo</span> = “PRO-see-moo” [s].</p>
+      <p><b>Verb forms (C):</b> ver / ler, vês / lês, veem / leem.</p>
+      <p><b>Linking (D):</b> a final unstressed E disappears and joins the next vowel:</p>
+      <ul>
+        <li><span class="pt">garrafa de água</span> → “garrafa d'água”</li>
+        <li><span class="pt">línguas de Angola</span> → “línguas d'Angola”</li>
+        <li><span class="pt">sala de aula</span> → “sala d'aula”</li>
+      </ul>
+      <p>That's why spoken Portuguese from Portugal sounds so fast. The words glue together.</p>`,
+    words: [W("sexta-feira", "Friday", "SAYSH-tuh"), W("baixo", "short", "BAI-shoo"), W("próximo", "next", "PRO-see-moo"), W("garrafa de água", "water bottle", ""), W("sala de aula", "classroom", "")],
+    links: [],
+    quiz: [
+      { q: "In which word is X different?", opts: ["próxima", "sexta", "baixo"], why: "próxima has [s], the others [ʃ]." },
+      { q: "X in “baixo” sounds like…", opts: ["sh", "ks", "z"], why: "baixo = BAI-shoo." },
+      { q: "How do people say “sala de aula” fast?", opts: ["sala d'aula", "sala dee aula", "sal de aula"], why: "The unstressed E disappears and links." },
+      { q: "Listen. Which word?", say: "leem", opts: ["leem", "lê", "ler"], why: "eles leem = they read." },
+    ]
+  }]
+},
+];
+
+const COURSE = [
+  { lesson: "alfabeto" },
+  { lesson: "u1" }, { lesson: "u2" }, { lesson: "u3" }, { lesson: "u4" }, { lesson: "u5" },
+  { exam: ["u1", "u2", "u3", "u4", "u5"], title: "Exame · Unidades 1–5", sub: "15 mixed questions from units 1–5" },
+  { lesson: "u6" }, { lesson: "u7" }, { lesson: "u8" }, { lesson: "u9" }, { lesson: "u10" },
+  { exam: ["u6", "u7", "u8", "u9", "u10"], title: "Exame · Unidades 6–10", sub: "15 mixed questions from units 6–10" },
+];
+
+/* ---------- level 2, hints, glossary ---------- */
+const GLOSS = {};
+GLOSS_RAW.trim().split("|").forEach(p => { const [k, v] = p.split("="); if (k && v) GLOSS[k.trim().toLowerCase()] = v.trim(); });
+Object.entries(NEW_CHUNKS).forEach(([lid, cs]) => lessonById0(lid).chunks.push(...cs));
+function lessonById0(id) { return LESSONS.find(l => l.id === id); }
+LESSONS.forEach(l => l.chunks.forEach(c => {
+  c.words.forEach(w => {
+    const pts = w.pt.split(" / "), ens = w.en.split(" / ");
+    pts.forEach((p, i) => { const k = p.trim().toLowerCase(); if (w.en && !/[\s!?.,]/.test(k) && !GLOSS[k]) GLOSS[k] = (ens[i] || w.en).trim(); });
+  });
+  const x = EXTRA[l.id + "." + c.id] || {};
+  c.task = x.task || ""; c.hint = x.hint || ""; c.quiz2 = (x.quiz2 || []).slice();
+  const wr = WRITE[l.id + "." + c.id] || [];
+  c.quiz.push(...wr.slice(0, 2)); c.quiz2.push(...wr.slice(2));
+  c.gram = GRAM[l.id + "." + c.id] || "";
+  c.quiz.forEach(q => { const f = L1_FIX[q.q]; if (f) Object.assign(q, f); });
+}));
+const SKIP = new Set(["que", "uma", "dos", "das", "nos", "nas", "the"]);
+const ASKS_MEANING = /means…|means$|” is…|^[^“]*is…$/;
+function gl(text, on) {
+  if (!on) return text;
+  return text.replace(/(<[^>]+>)|([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ-]*)/g, (m, tag, w) => {
+    if (tag) return tag;
+    const k = w.toLowerCase();
+    return GLOSS[k] && k.length > 2 && !SKIP.has(k) ? `<span class="gw" data-gl="${k}">${w}</span>` : w;
+  });
+}
+let glTimer = null;
+function showGloss(k, word) {
+  const el = document.getElementById("gl");
+  el.innerHTML = `<b>${word}</b> — ${GLOSS[k]}`; el.hidden = false;
+  speak(word);
+  clearTimeout(glTimer); glTimer = setTimeout(() => { el.hidden = true; }, 3500);
+}
+// one question object, ready for the quiz screen
+function mk(l, c, q, i, lvl, extra) {
+  return { ...q, id: lvl === 2 ? `${l.id}.${c.id}.L2.${i}` : qid(l.id, c.id, i), lvl, from: c.title,
+    task: q.task !== undefined ? q.task : q.t === "w" ? (q.say ? "Listen and write." : "Write the answer. Accents matter.") : (q.q.includes("___") ? c.task : ""), hint: c.hint, ...extra };
+}
+const trKey = q => q.replace(/^.*?: “|”$/g, "");
+function filled(q) {
+  const ans = q.opts ? q.opts[0] : q.a ? q.a[0] : "";
+  if (!ans) return "";
+  const parts = ans.startsWith("–") ? [""] : ans.split(" … ");
+  let i = 0;
+  return q.q.replace(/^.*?: “/, "").replace(/\s*\([^)]*\)/g, "").replace(/[“”]/g, "")
+    .replace(/___/g, () => { const w = parts[i++] ?? parts[0]; return w ? `<b>${w}</b>` : ""; }).trim();
+}
+// the finished Portuguese sentence, read aloud after answering
+function answerSentence(q) {
+  if (q.t === "order") return q.a.join(" ");
+  if (q.t === "w") return q.say ? q.say : (q.q.includes("___") && q.en ? filled(q).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim() : "");
+  if (q.q.includes("___") && TR[trKey(q.q)]) return filled(q).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return "";
+}
+const ACC = ["á", "à", "â", "ã", "ç", "é", "ê", "í", "ó", "ô", "õ", "ú"];
+const normA = t => String(t).toLowerCase().replace(/[‐‑–—]/g, "-").replace(/[.!?¿¡,;:]+$/g, "").replace(/\s+/g, " ").trim();
+const flatA = t => normA(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/-/g, " ");
+function judge(given, answers) {
+  const g = normA(given);
+  if (!g) return "bad";
+  if (answers.some(a => normA(a) === g)) return "ok";
+  if (answers.some(a => flatA(a) === flatA(given))) return "near";
+  return "bad";
+}
+const doneKey = (l, c, lvl) => l.id + "." + c.id + (lvl === 2 ? ".2" : "");
+
+/* ---------- storage (per device) ---------- */
+const KEY = "caderno.v1";
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
+let S = Object.assign({ done: {}, mistakes: {} }, load());
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
+
+/* ---------- speech (pt-PT) ---------- */
+let voice = null, voiceNote = "";
+function pickVoice() {
+  if (!("speechSynthesis" in window)) { voiceNote = "No audio on this device"; return; }
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => v.lang === "pt-PT" || v.lang === "pt_PT") || null;
+  if (voice) voiceNote = "Voice: " + voice.name + " (Portugal)";
+  else if (vs.some(v => v.lang.startsWith("pt"))) { voice = vs.find(v => v.lang.startsWith("pt")); voiceNote = "Only a Brazilian voice found"; }
+  else voiceNote = vs.length ? "No Portuguese voice installed" : "";
+  const el = document.getElementById("voice"); if (el) el.textContent = voiceNote;
+}
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text, slow) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "pt-PT"; if (voice) u.voice = voice;
+  u.rate = slow ? 0.6 : 0.85;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- helpers ---------- */
+const $app = document.getElementById("app");
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const lessonById = id => LESSONS.find(l => l.id === id);
+const qid = (l, c, i) => `${l}.${c}.${i}`;
+function allQuestions() {
+  const out = [];
+  LESSONS.forEach(l => l.chunks.forEach(c => {
+    c.quiz.forEach((q, i) => out.push(mk(l, c, q, i, 1)));
+    c.quiz2.forEach((q, i) => out.push(mk(l, c, q, i, 2)));
+  }));
+  return out;
+}
+const byId = id => allQuestions().find(q => q.id === id);
+const mistakeCount = () => Object.keys(S.mistakes).length;
+const icon = { play: `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>` };
+function topbar(backTo, backLabel) {
+  return `<div class="topbar">${backTo ? `<button class="back" data-go="${backTo}">‹ ${backLabel}</button>` : `<span></span>`}<span class="voice" id="voice">${voiceNote}</span></div>`;
+}
+const view = { name: "home" };
+function go(name, extra) { Object.assign(view, { name }, extra || {}); render(); window.scrollTo(0, 0); }
+
+/* ---------- views ---------- */
+function home() {
+  let nextSet = false;
+  const stops = COURSE.map((s, i) => {
+    if (s.lesson) {
+      const l = lessonById(s.lesson), total = l.chunks.length * 2;
+      const done = l.chunks.reduce((n, c) => n + (S.done[doneKey(l, c, 1)] ? 1 : 0) + (S.done[doneKey(l, c, 2)] ? 1 : 0), 0), pct = Math.round(done / total * 100);
+      const isNext = pct < 100 && !nextSet; if (isNext) nextSet = true;
+      return `<button class="stop ${isNext ? "next" : ""}" data-go="lesson" data-lesson="${l.id}">
+        <span class="num">${l.num}</span><span class="body"><h3>${l.title}</h3><span class="small muted">${l.sub}</span>
+        <span class="bar"><i style="width:${pct}%"></i></span><span class="small muted">${done} of ${total} levels done</span></span></button>`;
+    }
+    if (s.exam) return `<button class="stop exam" data-go="exam" data-lessons="${s.exam.join(",")}"><span class="num">✓</span><span class="body"><h3>${s.title}</h3><span class="small muted">${s.sub}</span></span></button>`;
+    return `<div class="stop locked"><span class="num">${s.num}</span><span class="body"><h3>${s.title}</h3>${s.sub ? `<span class="small muted">${s.sub}</span>` : ""}</span></div>`;
+  }).join("");
+  const m = mistakeCount();
+  return `${topbar()}
+    <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
+    ${m ? `<div class="review"><div><h3>Review</h3><p class="small muted">${m} thing${m > 1 ? "s" : ""} you got wrong. Quick fix before you move on.</p></div><button class="btn" data-go="review">Start</button></div>` : ""}
+    <div class="path">${stops}</div>
+    <p class="small muted">Your progress is saved on this phone.</p>`;
+}
+
+function lesson() {
+  const l = lessonById(view.lesson);
+  const items = l.chunks.map((c, i) => {
+    const d1 = S.done[doneKey(l, c, 1)], d2 = S.done[doneKey(l, c, 2)];
+    return `<button class="chunk ${d1 ? "done" : ""}" data-go="chunk" data-lesson="${l.id}" data-chunk="${c.id}">
+      <span class="tick">${d1 ? "✓" : i + 1}</span><span class="body"><h3>${c.gram ? `<span class="gram-chip">GRAMÁTICA</span>` : ""}${c.title}</h3><span class="small muted">${c.sub}</span>
+      <span class="small muted">Level 1 ${d1 ? "✓" : "–"} · Level 2 ${d2 ? "✓" : "–"}</span></span></button>`;
+  }).join("");
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">${l.label || "Lesson " + l.num}</p><h1>${l.title}</h1><p class="muted">${l.sub}</p></div>
+    <div class="chunks">${items}</div>
+    <button class="btn ghost" data-go="mix" data-lesson="${l.id}">Mixed check · all parts</button>
+    <p class="small muted">Based on: ${l.source}</p>`;
+}
+
+function chunk() {
+  const l = lessonById(view.lesson), c = l.chunks.find(c => c.id === view.chunk);
+  const words = c.words.map(w => `<button class="word" data-say="${w.pt.replace(/"/g, "&quot;")}"><span class="play">${icon.play}</span>
+      <span class="body"><span class="pt">${w.pt}</span><span class="en">${w.en}</span>${w.hint ? `<span class="say small">“${w.hint}”</span>` : ""}</span></button>`).join("");
+  const links = c.links.length ? `<div class="links"><p class="eyebrow">Listen to real people</p>${c.links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${t} ↗</a>`).join("")}</div>` : "";
+  return `${topbar("lesson", l.title)}
+    <div style="display:flex;flex-direction:column;gap:6px">${c.gram ? `<span class="gram-banner">GRAMÁTICA <span>Passaporte ${c.gram}</span></span>` : `<p class="eyebrow">Explain</p>`}<h2>${c.title}</h2></div>
+    <div class="explain ${c.gram ? "gram" : ""}">${c.explain}</div>
+    <div><p class="eyebrow">Tap to hear · say it out loud after the voice</p></div>
+    <div class="words">${words}</div>
+    ${links}
+    <div class="levels">
+      <button class="btn" data-go="practice" data-level="1" data-lesson="${l.id}" data-chunk="${c.id}">Level 1 · Learn the rule · ${c.quiz.length} questions${S.done[doneKey(l, c, 1)] ? " ✓" : ""}</button>
+      ${c.quiz2.length ? `<button class="btn ${S.done[doneKey(l, c, 1)] ? "" : "ghost"}" data-go="practice" data-level="2" data-lesson="${l.id}" data-chunk="${c.id}">
+        <span>Level 2 · Check yourself · ${c.quiz2.length} new questions${S.done[doneKey(l, c, 2)] ? " ✓" : ""}<br><span class="lvl-note">Harder, with new examples${S.done[doneKey(l, c, 1)] ? "" : ". Best after Level 1"}</span></span></button>` : ""}
+    </div>`;
+}
+
+/* ---------- quiz ---------- */
+let Q = null;
+function startQuiz(title, questions, back, onDone) {
+  Q = { title, qs: questions, i: 0, res: [], picked: null, back, onDone, order: null, revealed: false, hintShown: false, built: [], trShown: false, typed: "", near: false };
+  go("quiz");
+  autoSay();
+}
+function autoSay() { const q = Q && Q.qs[Q.i]; if (q && q.say) speak(q.say); }
+function quiz() {
+  const q = Q.qs[Q.i];
+  const isOrder = q.t === "order", isWrite = q.t === "w";
+  if (!Q.order) Q.order = shuffle((isOrder || isWrite ? q.a : q.opts).map((_, i) => i));
+  const bars = Q.qs.map((_, i) => `<i class="${i < Q.res.length ? (Q.res[i] ? "ok" : "no") : i === Q.i ? "cur" : ""}"></i>`).join("");
+  const answered = Q.picked !== null;
+  const right = Q.picked === 0;
+  const glossQ = !ASKS_MEANING.test(q.q);
+  let body;
+  if (isWrite) {
+    const esc = t => String(t).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    body = `<input id="wa" class="winput ${answered ? (right ? "ok" : "no") : ""}" value="${esc(Q.typed)}" ${answered ? "disabled" : ""}
+        autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type your answer" aria-label="Your answer">
+      ${answered ? "" : `<div class="accents">${ACC.map(ch => `<button type="button" class="acc" data-acc="${ch}">${ch}</button>`).join("")}</div>
+        <button class="btn" data-wcheck>Check</button>`}`;
+  } else if (isOrder) {
+    const built = Q.built.map((k, pos) => `<button class="tile" data-unbuild="${pos}">${answered ? gl(q.a[k], true) : q.a[k]}</button>`).join("");
+    const pool = Q.order.map(k => `<button class="tile ${Q.built.includes(k) ? "used" : ""}" data-tile="${k}">${q.a[k]}</button>`).join("");
+    body = `<div class="built ${answered ? (right ? "ok" : "no") : ""}">${built || `<span class="muted small">Tap the words in the right order</span>`}</div>
+      ${answered ? "" : `<div class="pool">${pool}</div>`}
+      ${!answered && Q.built.length === q.a.length ? `<button class="btn" data-check>Check</button>` : ""}`;
+  } else {
+    body = `<div class="opts">${Q.order.map(k => {
+      let cls = "";
+      if (answered && k === 0) cls = "ok"; else if (answered && k === Q.picked) cls = "no";
+      return `<button class="opt ${cls}" data-pick="${k}">${gl(q.opts[k], answered)}</button>`;
+    }).join("")}</div>`;
+  }
+  const tr = q.q.includes("___") ? (q.en || TR[trKey(q.q)]) : "";
+  let why = isOrder && !right ? `Right order: <b>${q.a.join(" ")}</b><br>${q.why}` : q.why;
+  if (isWrite && answered && !right) why = `Answer: <b>${q.a[0]}</b><br>${why}`;
+  if (isWrite && answered && Q.near) why = `Almost! Watch the accent: <b>${q.a[0]}</b><br>${q.why}`;
+  if (isWrite && answered && q.en && !q.q.includes("___")) why += `<br><span class="muted">= ${q.en}</span>`;
+  if (tr) why = `<span class="pt">${gl(filled(q), true)}</span> <span class="muted">= ${tr}</span><br>${why}`;
+  const said = answered ? answerSentence(q) : "";
+  if (said) why += `<button class="hintbtn" style="margin-top:6px" data-say="${said.replace(/"/g, "&quot;")}">${icon.play} Hear it again</button>`;
+  if (!right && q.hint) why += `<br><span class="small muted">Rule: ${q.hint}</span>`;
+  return `${topbar(Q.back.name, "Stop")}
+    <div class="progress">${bars}</div>
+    ${q.warm ? `<span class="tag">From earlier · ${q.from}</span>` : ""}
+    <div class="quiz">
+      ${q.task ? `<p class="task">${q.task}</p>` : ""}
+      <p class="qtext">${gl(q.q, glossQ)}</p>
+      ${q.say ? `<button class="bigplay" data-say="${q.say}">${icon.play} Play again, slower</button>
+        ${!answered && !Q.revealed && !isWrite ? `<button class="reveal" data-reveal>Can't hear? Show the text</button>` : ""}
+        ${Q.revealed || answered ? `<p class="muted" style="text-align:center">“${gl(q.say, answered)}”</p>` : ""}` : ""}
+      ${body}
+      ${!answered && tr ? (Q.trShown ? `<div class="hintbox">${tr}</div>` : `<button class="hintbtn" data-tr>Translate</button>`) : ""}
+      ${!answered && q.hint ? (Q.hintShown ? `<div class="hintbox">${q.hint}</div>` : `<button class="hintbtn" data-hint>Hint</button>`) : ""}
+      ${answered ? `<div class="why ${right ? "ok" : "no"}"><strong>${right ? (Q.near ? "Quase!" : "Certo!") : "Not quite"}</strong><span>${why}</span></div>
+        <button class="btn" data-next>${Q.i + 1 < Q.qs.length ? "Next" : "See result"}</button>` : ""}
+      ${glossQ ? `<p class="small muted">Tip: tap an underlined word to see what it means.</p>` : ""}
+    </div>`;
+}
+function pick(k) {
+  if (Q.picked !== null) return;
+  const q = Q.qs[Q.i];
+  Q.picked = k;
+  const ok = k === 0;
+  Q.res.push(ok);
+  if (ok) { if (S.mistakes[q.id]) { S.mistakes[q.id]--; if (S.mistakes[q.id] <= 0) delete S.mistakes[q.id]; } }
+  else S.mistakes[q.id] = 2; // must get it right twice to clear
+  save(); render();
+  const said = answerSentence(q); if (said) speak(said);
+}
+function next() {
+  Q.i++; Q.picked = null; Q.order = null; Q.revealed = false; Q.hintShown = false; Q.built = []; Q.trShown = false; Q.typed = ""; Q.near = false;
+  if (Q.i >= Q.qs.length) { Q.onDone && Q.onDone(); go("result"); return; }
+  render(); window.scrollTo(0, 0); autoSay();
+}
+function result() {
+  const ok = Q.res.filter(Boolean).length, n = Q.res.length;
+  const missed = Q.qs.filter((_, i) => !Q.res[i]);
+  const msg = ok === n ? "Perfeito! Everything right." : ok / n >= 0.7 ? "Muito bem! Missed ones go to Review." : "Worth another round. Missed ones go to Review.";
+  return `${topbar(Q.back.name, "Back")}
+    <div><p class="eyebrow">${Q.title}</p><p class="score">${ok}/${n}</p><p>${msg}</p></div>
+    <div class="row">
+      ${missed.length ? `<button class="btn" data-retry>Retry the ${missed.length} I missed</button>` : ""}
+      <button class="btn ghost" data-go="${Q.back.name}">Done</button>
+    </div>`;
+}
+
+function render() {
+  const v = view.name;
+  setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
+  $app.innerHTML = v === "home" ? home() : v === "lesson" ? lesson() : v === "chunk" ? chunk() : v === "quiz" ? quiz() : v === "result" ? result() : home();
+}
+
+/* ---------- typed answers ---------- */
+function checkTyped() {
+  if (!Q || Q.picked !== null) return;
+  const q = Q.qs[Q.i], el = document.getElementById("wa");
+  if (el) Q.typed = el.value;
+  if (!Q.typed.trim()) return;
+  const r = judge(Q.typed, q.a);
+  Q.near = r === "near";
+  pick(r === "bad" ? 1 : 0);
+  if (Q.near) { S.mistakes[q.id] = 1; save(); }
+}
+$app.addEventListener("input", e => { if (e.target.id === "wa" && Q) Q.typed = e.target.value; });
+$app.addEventListener("keydown", e => { if (e.target.id === "wa" && e.key === "Enter") { e.preventDefault(); checkTyped(); } });
+// accent buttons: insert at the cursor without closing the phone keyboard
+$app.addEventListener("pointerdown", e => {
+  const b = e.target.closest(".acc"); if (!b) return;
+  e.preventDefault();
+  const el = document.getElementById("wa"); if (!el || el.disabled) return;
+  const a = el.selectionStart ?? el.value.length, z = el.selectionEnd ?? a;
+  el.value = el.value.slice(0, a) + b.dataset.acc + el.value.slice(z);
+  el.focus(); el.setSelectionRange(a + 1, a + 1); Q.typed = el.value;
+});
+
+/* ---------- events ---------- */
+$app.addEventListener("click", e => {
+  const w = e.target.closest(".gw"); if (w) { e.stopPropagation(); return showGloss(w.dataset.gl, w.textContent); }
+  const t = e.target.closest("button, a"); if (!t || t.tagName === "A") return;
+  if (t.hasAttribute("data-hint")) { Q.hintShown = true; return render(); }
+  if (t.hasAttribute("data-tr")) { Q.trShown = true; return render(); }
+  if (t.dataset.tile !== undefined) { if (Q.picked === null) { Q.built.push(+t.dataset.tile); render(); } return; }
+  if (t.dataset.unbuild !== undefined) { if (Q.picked === null) { Q.built.splice(+t.dataset.unbuild, 1); render(); } return; }
+  if (t.hasAttribute("data-wcheck")) return checkTyped();
+  if (t.hasAttribute("data-check")) { const q = Q.qs[Q.i]; return pick(Q.built.map(k => q.a[k]).join(" ") === q.a.join(" ") ? 0 : 1); }
+  if (t.dataset.say) return speak(t.dataset.say, t.classList.contains("bigplay"));
+  if (t.dataset.pick !== undefined) return pick(+t.dataset.pick);
+  if (t.hasAttribute("data-next")) return next();
+  if (t.hasAttribute("data-reveal")) { Q.revealed = true; return render(); }
+  if (t.hasAttribute("data-retry")) {
+    const missed = Q.qs.filter((_, i) => !Q.res[i]).map(q => ({ ...q, warm: false }));
+    return startQuiz(Q.title + " · retry", shuffle(missed), Q.back, null);
+  }
+  const g = t.dataset.go; if (!g) return;
+  if (g === "practice") {
+    const lvl = +t.dataset.level || 1;
+    const l = lessonById(t.dataset.lesson), idx = l.chunks.findIndex(c => c.id === t.dataset.chunk), c = l.chunks[idx];
+    const own = (lvl === 2 ? c.quiz2 : c.quiz).map((q, i) => mk(l, c, q, i, lvl));
+    // retrieval: 2 warm-up questions from earlier parts of this lesson
+    const earlier = l.chunks.slice(0, idx).flatMap(pc => [...pc.quiz.map((q, i) => mk(l, pc, q, i, 1, { warm: true })), ...(lvl === 2 ? pc.quiz2.map((q, i) => mk(l, pc, q, i, 2, { warm: true })) : [])]);
+    const warm = shuffle(earlier).slice(0, 2);
+    return startQuiz(c.title + " · Level " + lvl, [...warm, ...(lvl === 2 ? shuffle(own) : own)], { name: "chunk", lesson: l.id, chunk: c.id }, () => { S.done[doneKey(l, c, lvl)] = true; save(); });
+  }
+  if (g === "mix") {
+    const l = lessonById(t.dataset.lesson);
+    const qs = l.chunks.flatMap(c => [...c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true })), ...c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true }))]);
+    return startQuiz(l.title + " · mixed check", shuffle(qs).slice(0, 12), { name: "lesson", lesson: l.id }, null);
+  }
+  if (g === "exam") {
+    const ids = t.dataset.lessons.split(",");
+    const ls = LESSONS.filter(l => ids.includes(l.id));
+    const hard = ls.flatMap(l => l.chunks.flatMap(c => c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true, from: l.title + " · " + c.title }))));
+    const easy = ls.flatMap(l => l.chunks.flatMap(c => c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true, from: l.title + " · " + c.title }))));
+    return startQuiz(t.querySelector("h3").textContent, shuffle([...shuffle(hard).slice(0, 11), ...shuffle(easy).slice(0, 4)]), { name: "home" }, null);
+  }
+  if (g === "review") {
+    const qs = Object.keys(S.mistakes).map(byId).filter(Boolean).map(q => ({ ...q, warm: true }));
+    return startQuiz("Review", shuffle(qs).slice(0, 12), { name: "home" }, null);
+  }
+  go(g, t.dataset.lesson ? { lesson: t.dataset.lesson, chunk: t.dataset.chunk } : {});
+});
+
+render();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+</script>
+</body>
+</html>
