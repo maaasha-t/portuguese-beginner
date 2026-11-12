@@ -155,6 +155,38 @@ a { color: var(--accent); }
 .winput.no { border-color: var(--bad); background: var(--bad-soft); }
 .accents { display: flex; flex-wrap: wrap; gap: 6px; }
 .accents button { min-width: 40px; padding: 8px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 18px; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile-big { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; width: 100%; }
+.tile-big.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 14px; }
+.tile-big .ic { font-family: var(--font-display); font-weight: 800; font-size: 15px; width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.tile-big.lessons .ic { background: var(--tram); color: #16203a; }
+.tile-big.cards .ic { background: var(--gram-soft); color: var(--gram); }
+.tile-big h3 { font-size: 19px; }
+.unitchip { align-self: flex-start; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 700; color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 2px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-weight: 700; min-width: 48px; }
+.chip.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.search { width: 100%; font: inherit; font-size: 17px; padding: 12px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--fg); }
+.cardlist { display: flex; flex-direction: column; gap: 8px; }
+.cardrow { display: flex; flex-direction: column; gap: 4px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gram); border-radius: 12px; padding: 12px 14px; width: 100%; }
+.cardrow .k { font-size: 14px; color: var(--muted); }
+.cab { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.cab .key { background: var(--tram); color: #16203a; border-radius: 10px; padding: 10px 12px; font-weight: 700; }
+.cab .tbl { overflow-x: auto; }
+.cab table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.cab th, .cab td { text-align: left; padding: 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cab th { font-size: 12px; color: var(--muted); }
+.cab td b { color: var(--accent); }
+.cab ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.cab p { margin: 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.box { border-radius: 12px; padding: 10px 12px; background: var(--accent-soft); }
+.box h3 { margin: 0 0 4px; font-size: 17px; }
+.trap { border-left: 4px solid var(--bad); padding-left: 10px; font-size: 15px; }
+.mode-list { display: flex; flex-direction: column; gap: 8px; }
+.reslist { display: flex; flex-direction: column; gap: 10px; }
+.resitem { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
 .task { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0; }
 .gw { border-bottom: 2px dotted var(--accent); cursor: pointer; }
 .gltip { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 528px; margin: 0 auto; background: var(--fg); color: var(--bg); border-radius: 12px; padding: 12px 16px; font-size: 17px; z-index: 10; }
@@ -182,6 +214,7 @@ a { color: var(--accent); }
 <script src="extras.js"></script>
 <script src="translations.js"></script>
 <script src="extras2.js"></script>
+<script src="cards.js"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -1910,6 +1943,7 @@ function filled(q) {
 }
 // the finished Portuguese sentence, read aloud after answering
 function answerSentence(q) {
+  if (q.sayAfter) return q.sayAfter;
   if (q.t === "order") return q.a.join(" ");
   if (q.t === "w") return q.say ? q.say : (q.q.includes("___") && q.en ? filled(q).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim() : "");
   if (q.q.includes("___") && TR[trKey(q.q)]) return filled(q).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
@@ -1927,10 +1961,57 @@ function judge(given, answers) {
 }
 const doneKey = (l, c, lvl) => l.id + "." + c.id + (lvl === 2 ? ".2" : "");
 
+/* ---------- generated practice: phrases, verbs, rewrite ---------- */
+const PERSONS_SAY = ["eu", "tu", "ele", "nós", "eles"];
+function verbTable(v, hi) {
+  return `<span class="small">${PERSONS.map((p, i) => v[2 + i] ? `${i === hi ? "<b>" : ""}${PERSONS_SAY[i]} ${v[2 + i]}${i === hi ? "</b>" : ""}` : "").filter(Boolean).join(" · ")}</span>`;
+}
+let GEN = null;
+function generated() {
+  if (GEN) return GEN;
+  const phrases = [], verbs = [], rewrite = [];
+  LESSONS.forEach(l => l.chunks.forEach(c => [...c.quiz.map((q, i) => mk(l, c, q, i, 1)), ...c.quiz2.map((q, i) => mk(l, c, q, i, 2))].forEach(q => {
+    if (q.t === "order") return;
+    const en = q.t === "w" ? q.en : TR[trKey(q.q)];
+    if (!en || !q.q.includes("___") || /[:=→]|Write|Plural|Feminine|Masculine|Opposite/.test(q.q.replace(/^.*?: “/, ""))) return;
+    let sent = answerSentence(q);
+    if (!sent || /[—/()]/.test(sent) || / \/ /.test(en) || !/[.?!]$/.test(sent)) return;
+    sent = sent[0].toUpperCase() + sent.slice(1);
+    const words = sent.split(" ");
+    if (words.length < 3 || words.length > 8) return;
+    if (phrases.some(p => p.a.join(" ").toLowerCase() === sent.toLowerCase())) return;
+    phrases.push({ t: "order", id: q.id + ".ph", unit: +l.num, lesson: l.id, from: l.title, q: `Build it in Portuguese: “${en}”`, a: words, why: en, task: "Tap the words in the right order." });
+  })));
+  VERBS.forEach(v => PERSONS.forEach((p, i) => {
+    if (!v[2 + i]) return;
+    verbs.push({ t: "w", id: `verb.${v[0]}.${i}`, unit: v[7], irr: v[8], from: "Verbs", task: "Type the verb form. Accents matter.",
+      q: `<b>${v[0]}</b> (${v[1]}) · ${p}`, a: [v[2 + i]], why: verbTable(v, i), sayAfter: `${PERSONS_SAY[i]} ${v[2 + i]}`, noGloss: true });
+  }));
+  REWRITE.forEach(([u, ins, src, ans, en], i) => rewrite.push({ t: "w", id: `rw.${i}`, unit: u, from: "Rewrite", task: "Rewrite the whole sentence.",
+    q: `${ins}<br><span class="pt">${src}</span>`, a: ans, en, why: "", sayAfter: ans[0], noGloss: true }));
+  return GEN = { phrases, verbs, rewrite };
+}
+const inUnits = n => S.units.includes(+n);
+const unitLabel = () => { const u = S.units.slice().sort((a, b) => a - b); if (!u.length) return "No units"; const ranges = []; let a = u[0], b = u[0];
+  for (const x of u.slice(1).concat([null])) { if (x === b + 1) b = x; else { ranges.push(a === b ? `${a}` : `${a}–${b}`); a = b = x; } } return "Units " + ranges.join(", "); };
+function poolFor(kind) {
+  const ls = LESSONS.filter(l => l.id !== "alfabeto" && inUnits(l.num));
+  const all = ls.flatMap(l => l.chunks.flatMap(c => [...c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true, from: l.title + " · " + c.title })), ...c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true, from: l.title + " · " + c.title }))]));
+  const G = generated();
+  const ph = G.phrases.filter(q => inUnits(q.unit)).map(q => ({ ...q, warm: true }));
+  const rw = G.rewrite.filter(q => inUnits(q.unit)).map(q => ({ ...q, warm: true }));
+  if (kind === "choose") return all.filter(q => q.opts);
+  if (kind === "fill") return all.filter(q => q.t === "w" && !q.say);
+  if (kind === "order") return [...all.filter(q => q.t === "order"), ...ph];
+  if (kind === "rewrite") return rw;
+  if (kind === "mixed") return [...shuffle(all.filter(q => q.opts)).slice(0, 4), ...shuffle(all.filter(q => q.t === "w" && !q.say)).slice(0, 3), ...shuffle(ph).slice(0, 2), ...shuffle(rw).slice(0, 1)];
+  return all;
+}
+
 /* ---------- storage (per device) ---------- */
 const KEY = "caderno.v1";
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
-let S = Object.assign({ done: {}, mistakes: {} }, load());
+let S = Object.assign({ done: {}, mistakes: {}, units: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }, load());
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
 
 /* ---------- speech (pt-PT) ---------- */
@@ -1965,6 +2046,7 @@ function allQuestions() {
     c.quiz.forEach((q, i) => out.push(mk(l, c, q, i, 1)));
     c.quiz2.forEach((q, i) => out.push(mk(l, c, q, i, 2)));
   }));
+  const G = generated(); out.push(...G.phrases, ...G.verbs, ...G.rewrite);
   return out;
 }
 const byId = id => allQuestions().find(q => q.id === id);
@@ -1978,6 +2060,22 @@ function go(name, extra) { Object.assign(view, { name }, extra || {}); render();
 
 /* ---------- views ---------- */
 function home() {
+  const m = mistakeCount();
+  return `${topbar()}
+    <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
+    <button class="unitchip" data-go="units">${unitLabel()} · change</button>
+    ${m ? `<div class="review"><div><h3>Review</h3><p class="small muted">${m} thing${m > 1 ? "s" : ""} you got wrong. Quick fix before you move on.</p></div><button class="btn" data-go="review">Start</button></div>` : ""}
+    <div class="tiles">
+      <button class="tile-big wide lessons" data-go="lessons"><span class="ic">1–10</span><span><h3>Lições</h3><span class="small muted">Lessons by unit: explain → practice</span></span></button>
+      <button class="tile-big cards" data-go="cards"><span class="ic">Cá</span><h3>Cábulas</h3><span class="small muted">Cheat sheets, one rule per card</span></button>
+      <button class="tile-big" data-go="verbs"><span class="ic">-ar</span><h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
+      <button class="tile-big" data-go="workbook"><span class="ic">✎</span><h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
+      <button class="tile-big" data-go="test"><span class="ic">✓</span><h3>Teste</h3><span class="small muted">Exam ticket: 32 questions, 100 points</span></button>
+    </div>
+    <p class="small muted">Your progress is saved on this phone.</p>`;
+}
+
+function lessons() {
   let nextSet = false;
   const stops = COURSE.map((s, i) => {
     if (s.lesson) {
@@ -1991,12 +2089,65 @@ function home() {
     if (s.exam) return `<button class="stop exam" data-go="exam" data-lessons="${s.exam.join(",")}"><span class="num">✓</span><span class="body"><h3>${s.title}</h3><span class="small muted">${s.sub}</span></span></button>`;
     return `<div class="stop locked"><span class="num">${s.num}</span><span class="body"><h3>${s.title}</h3>${s.sub ? `<span class="small muted">${s.sub}</span>` : ""}</span></div>`;
   }).join("");
-  const m = mistakeCount();
-  return `${topbar()}
-    <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
-    ${m ? `<div class="review"><div><h3>Review</h3><p class="small muted">${m} thing${m > 1 ? "s" : ""} you got wrong. Quick fix before you move on.</p></div><button class="btn" data-go="review">Start</button></div>` : ""}
-    <div class="path">${stops}</div>
-    <p class="small muted">Your progress is saved on this phone.</p>`;
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Lições</p><h1>Lessons by unit</h1></div>
+    <div class="path">${stops}</div>`;
+}
+
+function cardHtml(c) {
+  return `<section class="cab"><h2>${c.title}</h2><div class="key">${c.key}</div>${c.body}${c.trap ? `<p class="trap"><b>Trap:</b> ${c.trap}</p>` : ""}
+    <p class="small muted">Units: ${c.units.map(u => u === 0 ? "Alphabet" : u).join(", ")}</p></section>`;
+}
+const cardText = c => (c.title + " " + c.tags + " " + c.key + " " + c.body + " " + (c.trap || "")).replace(/<[^>]+>/g, " ");
+const fold = t => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function cardRows(qstr) {
+  const f = fold(qstr || "").trim();
+  const list = CARDS.filter(c => !f || f.split(/\s+/).every(w => fold(cardText(c)).includes(w)));
+  return list.length ? list.map(c => `<button class="cardrow" data-go="card" data-card="${c.id}"><h3>${c.title}</h3><span class="k">${c.key}</span></button>`).join("")
+    : `<p class="muted">Nothing found. Try a word like “ser”, “plural” or “dele”.</p>`;
+}
+function cards() {
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Cábulas · cheat sheets</p><h1>Cábulas</h1><p class="muted">One rule per card. Search by topic or by any Portuguese word.</p></div>
+    <input id="cs" class="search" type="search" placeholder="Search: ser, plural, dele, numbers…" value="${(view.q || "").replace(/"/g, "&quot;")}" autocomplete="off" autocapitalize="none" aria-label="Search cards">
+    <div class="cardlist" id="cardlist">${cardRows(view.q)}</div>`;
+}
+function card() {
+  const c = CARDS.find(x => x.id === view.card);
+  const back = view.from === "lesson" ? ["lesson", lessonById(view.lesson).title] : ["cards", "Cábulas"];
+  return `${topbar(back[0], back[1])}${cardHtml(c)}`;
+}
+function units() {
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Settings</p><h1>My units</h1><p class="muted">Workbook, Verbos and Teste only use the units you pick here. Pick what you've covered in class.</p></div>
+    <div class="chips">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button class="chip ${inUnits(n) ? "on" : ""}" data-unit="${n}">${n}</button>`).join("")}</div>
+    <div class="row"><button class="btn ghost" data-unitset="all">All units</button><button class="btn" data-go="home">Done</button></div>`;
+}
+function verbs() {
+  const vs = VERBS.filter(v => inUnits(v[7]));
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Verbos</p><h1>Verb trainer</h1><p class="muted">You see a verb and a person. Type the form. ${vs.length} verbs from ${unitLabel().toLowerCase()}.</p></div>
+    <div class="mode-list">
+      <button class="btn" data-verbs="all">All verbs · 10 forms</button>
+      <button class="btn ghost" data-verbs="irr">Irregular only (ser, estar, ter, ler, ver…)</button>
+      <button class="btn ghost" data-verbs="reg">Regular -ar verbs only</button>
+    </div>
+    <div class="cab"><h3>The verbs</h3><p class="small">${vs.map(v => `<b>${v[0]}</b> ${v[1]}`).join(" · ")}</p></div>
+    <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
+}
+function workbook() {
+  const modes = [["mixed", "Mixed", "A bit of everything"], ["choose", "Choose", "Tap the right option"], ["fill", "Fill in", "Type a word or a short answer"],
+    ["order", "Word order", "Build the sentence from the words"], ["rewrite", "Rewrite", "Change the whole sentence"]];
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Workbook</p><h1>Workbook</h1><p class="muted">Tasks like the Caderno de Exercícios. Every set is new: 10 tasks from ${unitLabel().toLowerCase()}.</p></div>
+    <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-wb="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${poolFor(k).length} tasks</span></span></button>`).join("")}</div>
+    <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
+}
+function test() {
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Teste</p><h1>Exam ticket</h1><p class="muted">Like the school exam: 32 questions with options, from ${unitLabel().toLowerCase()}. 100 points, 50 to pass. No hints, no time limit. Answers are checked at the end. Every ticket is new.</p></div>
+    <button class="btn" data-ticket>Start a new ticket</button>
+    <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 
 function lesson() {
@@ -2007,10 +2158,12 @@ function lesson() {
       <span class="tick">${d1 ? "✓" : i + 1}</span><span class="body"><h3>${c.gram ? `<span class="gram-chip">GRAMÁTICA</span>` : ""}${c.title}</h3><span class="small muted">${c.sub}</span>
       <span class="small muted">Level 1 ${d1 ? "✓" : "–"} · Level 2 ${d2 ? "✓" : "–"}</span></span></button>`;
   }).join("");
-  return `${topbar("home", "Home")}
+  const cs = CARDS.filter(c => c.units.includes(+l.num));
+  return `${topbar("lessons", "Lições")}
     <div><p class="eyebrow">${l.label || "Lesson " + l.num}</p><h1>${l.title}</h1><p class="muted">${l.sub}</p></div>
     <div class="chunks">${items}</div>
     <button class="btn ghost" data-go="mix" data-lesson="${l.id}">Mixed check · all parts</button>
+    ${cs.length ? `<div><p class="eyebrow">Cábulas for this unit</p></div><div class="cardlist">${cs.map(c => `<button class="cardrow" data-go="card" data-card="${c.id}" data-from="lesson" data-lesson="${l.id}"><h3>${c.title}</h3><span class="k">${c.key}</span></button>`).join("")}</div>` : ""}
     <p class="small muted">Based on: ${l.source}</p>`;
 }
 
@@ -2047,7 +2200,7 @@ function quiz() {
   const bars = Q.qs.map((_, i) => `<i class="${i < Q.res.length ? (Q.res[i] ? "ok" : "no") : i === Q.i ? "cur" : ""}"></i>`).join("");
   const answered = Q.picked !== null;
   const right = Q.picked === 0;
-  const glossQ = !ASKS_MEANING.test(q.q);
+  const glossQ = !ASKS_MEANING.test(q.q) && !q.noGloss;
   let body;
   if (isWrite) {
     const esc = t => String(t).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -2087,8 +2240,8 @@ function quiz() {
         ${!answered && !Q.revealed && !isWrite ? `<button class="reveal" data-reveal>Can't hear? Show the text</button>` : ""}
         ${Q.revealed || answered ? `<p class="muted" style="text-align:center">“${gl(q.say, answered)}”</p>` : ""}` : ""}
       ${body}
-      ${!answered && tr ? (Q.trShown ? `<div class="hintbox">${tr}</div>` : `<button class="hintbtn" data-tr>Translate</button>`) : ""}
-      ${!answered && q.hint ? (Q.hintShown ? `<div class="hintbox">${q.hint}</div>` : `<button class="hintbtn" data-hint>Hint</button>`) : ""}
+      ${!answered && tr && !Q.test ? (Q.trShown ? `<div class="hintbox">${tr}</div>` : `<button class="hintbtn" data-tr>Translate</button>`) : ""}
+      ${!answered && q.hint && !Q.test ? (Q.hintShown ? `<div class="hintbox">${q.hint}</div>` : `<button class="hintbtn" data-hint>Hint</button>`) : ""}
       ${answered ? `<div class="why ${right ? "ok" : "no"}"><strong>${right ? (Q.near ? "Quase!" : "Certo!") : "Not quite"}</strong><span>${why}</span></div>
         <button class="btn" data-next>${Q.i + 1 < Q.qs.length ? "Next" : "See result"}</button>` : ""}
       ${glossQ ? `<p class="small muted">Tip: tap an underlined word to see what it means.</p>` : ""}
@@ -2100,6 +2253,7 @@ function pick(k) {
   Q.picked = k;
   const ok = k === 0;
   Q.res.push(ok);
+  if (Q.test) { (Q.answers = Q.answers || []).push(k); if (!ok) S.mistakes[q.id] = 2; save(); return next(); }
   if (ok) { if (S.mistakes[q.id]) { S.mistakes[q.id]--; if (S.mistakes[q.id] <= 0) delete S.mistakes[q.id]; } }
   else S.mistakes[q.id] = 2; // must get it right twice to clear
   save(); render();
@@ -2112,6 +2266,17 @@ function next() {
 }
 function result() {
   const ok = Q.res.filter(Boolean).length, n = Q.res.length;
+  if (Q.test) {
+    const pts = Math.round(ok / n * 100), pass = pts >= 50;
+    const wrong = Q.qs.map((q, i) => ({ q, k: Q.answers[i] })).filter(x => x.k !== 0);
+    return `${topbar("test", "Back")}
+      <div><p class="eyebrow">${Q.title}</p><p class="score">${pts}<span style="font-size:24px">/100</span></p>
+        <p><b>${pass ? "Aprovada! Passed." : "Not yet. You need 50."}</b> ${ok} of ${n} right. Mistakes go to Review.</p></div>
+      ${wrong.length ? `<div><p class="eyebrow">Your mistakes</p></div><div class="reslist">${wrong.map(({ q, k }) => `<div class="resitem">
+        <span>${q.q}</span><span class="small" style="color:var(--bad)">Your answer: ${q.opts[k]}</span>
+        <span class="small" style="color:var(--good)"><b>Right: ${q.opts[0]}</b></span><span class="small muted">${q.why}</span></div>`).join("")}</div>` : ""}
+      <div class="row"><button class="btn" data-ticket>New ticket</button><button class="btn ghost" data-go="home">Home</button></div>`;
+  }
   const missed = Q.qs.filter((_, i) => !Q.res[i]);
   const msg = ok === n ? "Perfeito! Everything right." : ok / n >= 0.7 ? "Muito bem! Missed ones go to Review." : "Worth another round. Missed ones go to Review.";
   return `${topbar(Q.back.name, "Back")}
@@ -2125,7 +2290,8 @@ function result() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  $app.innerHTML = v === "home" ? home() : v === "lesson" ? lesson() : v === "chunk" ? chunk() : v === "quiz" ? quiz() : v === "result" ? result() : home();
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test };
+  $app.innerHTML = (V[v] || home)();
 }
 
 /* ---------- typed answers ---------- */
@@ -2169,7 +2335,29 @@ $app.addEventListener("click", e => {
     const missed = Q.qs.filter((_, i) => !Q.res[i]).map(q => ({ ...q, warm: false }));
     return startQuiz(Q.title + " · retry", shuffle(missed), Q.back, null);
   }
+  if (t.dataset.unit) { const n = +t.dataset.unit; S.units = inUnits(n) ? S.units.filter(x => x !== n) : [...S.units, n]; save(); return render(); }
+  if (t.dataset.unitset) { S.units = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; save(); return render(); }
+  if (t.dataset.verbs) {
+    const k = t.dataset.verbs;
+    const pool = generated().verbs.filter(q => inUnits(q.unit) && (k === "all" || (k === "irr") === q.irr));
+    if (!pool.length) return;
+    return startQuiz("Verbos", shuffle(pool).slice(0, 10).map(q => ({ ...q })), { name: "verbs" }, null);
+  }
+  if (t.dataset.wb) {
+    const pool = poolFor(t.dataset.wb);
+    if (!pool.length) return;
+    const names = { mixed: "Mixed", choose: "Choose", fill: "Fill in", order: "Word order", rewrite: "Rewrite" };
+    return startQuiz("Workbook · " + names[t.dataset.wb], shuffle(pool).slice(0, 10), { name: "workbook" }, null);
+  }
+  if (t.hasAttribute("data-ticket")) {
+    const qs = poolFor("choose"), hard = qs.filter(q => q.lvl === 2), easy = qs.filter(q => q.lvl === 1);
+    const ticket = shuffle([...shuffle(hard).slice(0, 22), ...shuffle(easy).slice(0, 10)]).slice(0, 32);
+    if (!ticket.length) return;
+    startQuiz("Teste · " + unitLabel(), ticket, { name: "test" }, null);
+    Q.test = true; Q.answers = []; return render();
+  }
   const g = t.dataset.go; if (!g) return;
+  if (g === "card") return go("card", { card: t.dataset.card, from: t.dataset.from || "", lesson: t.dataset.lesson || view.lesson });
   if (g === "practice") {
     const lvl = +t.dataset.level || 1;
     const l = lessonById(t.dataset.lesson), idx = l.chunks.findIndex(c => c.id === t.dataset.chunk), c = l.chunks[idx];
@@ -2189,7 +2377,7 @@ $app.addEventListener("click", e => {
     const ls = LESSONS.filter(l => ids.includes(l.id));
     const hard = ls.flatMap(l => l.chunks.flatMap(c => c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true, from: l.title + " · " + c.title }))));
     const easy = ls.flatMap(l => l.chunks.flatMap(c => c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true, from: l.title + " · " + c.title }))));
-    return startQuiz(t.querySelector("h3").textContent, shuffle([...shuffle(hard).slice(0, 11), ...shuffle(easy).slice(0, 4)]), { name: "home" }, null);
+    return startQuiz(t.querySelector("h3").textContent, shuffle([...shuffle(hard).slice(0, 11), ...shuffle(easy).slice(0, 4)]), { name: "lessons" }, null);
   }
   if (g === "review") {
     const qs = Object.keys(S.mistakes).map(byId).filter(Boolean).map(q => ({ ...q, warm: true }));
@@ -2197,6 +2385,8 @@ $app.addEventListener("click", e => {
   }
   go(g, t.dataset.lesson ? { lesson: t.dataset.lesson, chunk: t.dataset.chunk } : {});
 });
+// card search: update the list only, so the keyboard stays open
+$app.addEventListener("input", e => { if (e.target.id === "cs") { view.q = e.target.value; document.getElementById("cardlist").innerHTML = cardRows(view.q); } });
 
 render();
 </script>
