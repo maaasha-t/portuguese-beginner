@@ -2100,11 +2100,10 @@ function cardOfDay() { const t = new Date(); const n = Math.floor(new Date(t.get
 
 /* ---------- views ---------- */
 function home() {
-  const m = mistakeCount(), st = streak(), today = (S.days || []).includes(dayKey()), cd = cardOfDay();
+  const m = mistakeCount(), cd = cardOfDay();
   return `${topbar()}
     <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
     <div class="homebar">
-      <span class="streak ${today ? "done" : ""}">${svgi("flame")} ${st} day${st === 1 ? "" : "s"}${today ? " · today ✓" : " · do 1 set today"}</span>
       <button class="unitchip" data-go="units">${unitLabel()} · change</button>
     </div>
     ${m ? `<button class="tile-big wide" data-go="review">${ic("review")}<span><h3>Review · ${m}</h3><span class="small muted">Things you got wrong. Get each right twice to clear it.</span></span></button>` : ""}
