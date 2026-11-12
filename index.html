@@ -158,9 +158,26 @@ a { color: var(--accent); }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tile-big { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; width: 100%; }
 .tile-big.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 14px; }
-.tile-big .ic { font-family: var(--font-display); font-weight: 800; font-size: 15px; width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
-.tile-big.lessons .ic { background: var(--tram); color: #16203a; }
-.tile-big.cards .ic { background: var(--gram-soft); color: var(--gram); }
+.ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; }
+.ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ic-lessons { background: #fdf0c4; color: #8a6400; }
+.ic-cards { background: var(--gram-soft); color: var(--gram); }
+.ic-verbs { background: #e3eafb; color: #1f47b8; }
+.ic-workbook { background: #fbe6e3; color: #b3322a; }
+.ic-test { background: #e1f3e8; color: #1d7a4a; }
+.ic-falar { background: #efe4fb; color: #6b3fb3; }
+.ic-review { background: var(--bad-soft); color: var(--bad); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic-lessons { background: #3a3014; color: #f2c230; } :root:not([data-theme="light"]) .ic-verbs { background: #22305a; color: #7d9bff; } :root:not([data-theme="light"]) .ic-workbook { background: #43201e; color: #ff8a80; } :root:not([data-theme="light"]) .ic-test { background: #173a2b; color: #5fd09a; } :root:not([data-theme="light"]) .ic-falar { background: #2e2245; color: #c4a6f2; } }
+:root[data-theme="dark"] .ic-lessons { background: #3a3014; color: #f2c230; } :root[data-theme="dark"] .ic-verbs { background: #22305a; color: #7d9bff; } :root[data-theme="dark"] .ic-workbook { background: #43201e; color: #ff8a80; } :root[data-theme="dark"] .ic-test { background: #173a2b; color: #5fd09a; } :root[data-theme="dark"] .ic-falar { background: #2e2245; color: #c4a6f2; }
+.homebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.streak { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
+.streak svg { width: 18px; height: 18px; fill: none; stroke: #e0672a; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.streak.done svg { fill: #f2a23a; }
+.segs { display: flex; gap: 6px; background: var(--line); border-radius: 12px; padding: 4px; }
+.segs button { flex: 1; border: 0; border-radius: 9px; padding: 10px; font-weight: 700; background: none; }
+.segs button.on { background: var(--surface); color: var(--accent); }
+.prompt { width: 100%; min-height: 180px; font: 13px/1.4 ui-monospace, Menlo, monospace; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--fg); }
+.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
 .tile-big h3 { font-size: 19px; }
 .unitchip { align-self: flex-start; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 14px; font-weight: 700; color: var(--accent); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -2058,21 +2075,141 @@ function topbar(backTo, backLabel) {
 const view = { name: "home" };
 function go(name, extra) { Object.assign(view, { name }, extra || {}); render(); window.scrollTo(0, 0); }
 
+const ICON = {
+  lessons: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  cards: '<rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/><path d="M7 12h6M7 16h4"/>',
+  verbs: '<path d="M5 4h1a3 3 0 0 1 3 3 3 3 0 0 1 3-3h1"/><path d="M13 20h-1a3 3 0 0 1-3-3 3 3 0 0 1-3 3H5"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M9 7v10"/>',
+  workbook: '<path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4M2 10h4M2 14h4M2 18h4"/><path d="M21.4 5.6a1 1 0 1 0-3-3l-5 5a2 2 0 0 0-.5.85l-.84 2.87a.5.5 0 0 0 .62.62l2.87-.84a2 2 0 0 0 .85-.5z"/>',
+  test: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+  falar: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  review: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  units: '<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
+};
+const ic = (k, cls) => `<span class="ic ic-${cls || k}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg></span>`;
+const svgi = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+const dayKey = (d = new Date()) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+function markDay() { S.days = S.days || []; const k = dayKey(); if (!S.days.includes(k)) { S.days.push(k); save(); } }
+function streak() {
+  const days = S.days || []; let n = 0; const d = new Date();
+  if (!days.includes(dayKey(d))) d.setDate(d.getDate() - 1);
+  while (days.includes(dayKey(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function cardOfDay() { const t = new Date(); const n = Math.floor(new Date(t.getFullYear(), t.getMonth(), t.getDate()) / 864e5); return CARDS[n % CARDS.length]; }
+
 /* ---------- views ---------- */
 function home() {
-  const m = mistakeCount();
+  const m = mistakeCount(), st = streak(), today = (S.days || []).includes(dayKey()), cd = cardOfDay();
   return `${topbar()}
     <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
-    <button class="unitchip" data-go="units">${unitLabel()} · change</button>
-    ${m ? `<div class="review"><div><h3>Review</h3><p class="small muted">${m} thing${m > 1 ? "s" : ""} you got wrong. Quick fix before you move on.</p></div><button class="btn" data-go="review">Start</button></div>` : ""}
-    <div class="tiles">
-      <button class="tile-big wide lessons" data-go="lessons"><span class="ic">1–10</span><span><h3>Lições</h3><span class="small muted">Lessons by unit: explain → practice</span></span></button>
-      <button class="tile-big cards" data-go="cards"><span class="ic">Cá</span><h3>Cábulas</h3><span class="small muted">Cheat sheets, one rule per card</span></button>
-      <button class="tile-big" data-go="verbs"><span class="ic">-ar</span><h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
-      <button class="tile-big" data-go="workbook"><span class="ic">✎</span><h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
-      <button class="tile-big" data-go="test"><span class="ic">✓</span><h3>Teste</h3><span class="small muted">Exam ticket: 32 questions, 100 points</span></button>
+    <div class="homebar">
+      <span class="streak ${today ? "done" : ""}">${svgi("flame")} ${st} day${st === 1 ? "" : "s"}${today ? " · today ✓" : " · do 1 set today"}</span>
+      <button class="unitchip" data-go="units">${unitLabel()} · change</button>
     </div>
+    ${m ? `<button class="tile-big wide" data-go="review">${ic("review")}<span><h3>Review · ${m}</h3><span class="small muted">Things you got wrong. Get each right twice to clear it.</span></span></button>` : ""}
+    <div class="tiles">
+      <button class="tile-big wide" data-go="lessons">${ic("lessons")}<span><h3>Lições</h3><span class="small muted">Lessons by unit: explain → practice</span></span></button>
+      <button class="tile-big" data-go="cards">${ic("cards")}<h3>Cábulas</h3><span class="small muted">Cheat sheets, one rule per card</span></button>
+      <button class="tile-big" data-go="verbs">${ic("verbs")}<h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
+      <button class="tile-big" data-go="workbook">${ic("workbook")}<h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
+      <button class="tile-big" data-go="test">${ic("test")}<h3>Teste</h3><span class="small muted">Exam ticket: 32 questions, 100 points</span></button>
+      <button class="tile-big wide" data-go="falar">${ic("falar")}<span><h3>Falar</h3><span class="small muted">A voice lesson with ChatGPT or Claude, made from your units and mistakes</span></span></button>
+    </div>
+    <div><p class="eyebrow">Cábula do dia</p></div>
+    <button class="cardrow" data-go="card" data-card="${cd.id}"><h3>${cd.title}</h3><span class="k">${cd.key}</span></button>
     <p class="small muted">Your progress is saved on this phone.</p>`;
+}
+
+/* ---------- Falar: prompt for a voice tutor ---------- */
+const strip = h => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+function weakSpots() {
+  return Object.keys(S.mistakes).map(byId).filter(Boolean).slice(0, 8).map(q => {
+    const right = q.t === "order" ? q.a.join(" ") : q.opts ? (q.q.includes("___") ? strip(filled(q)) : `${strip(q.q)} → ${q.opts[0]}`) : (q.q.includes("___") ? strip(filled(q)) : `${strip(q.q)} → ${q.a[0]}`);
+    return `- ${right} (${strip(q.why || "").slice(0, 90)})`;
+  });
+}
+function buildPrompt() {
+  const F = S.falar || { plan: "short", ai: "chatgpt" };
+  const ls = LESSONS.filter(l => l.id !== "alfabeto" && inUnits(l.num));
+  const focusN = Math.max(...S.units, 1), focus = ls.filter(l => +l.num === focusN || +l.num === focusN - 1);
+  const verbs = VERBS.filter(v => inUnits(v[7])).map(v => v[0]).join(", ");
+  const weak = weakSpots();
+  const unitBlock = l => `Unit ${l.num} — ${l.title.toUpperCase()}
+Grammar: ${l.chunks.filter(c => !/^pron|^Pronunciation/i.test(c.id + " " + c.title)).map(c => c.title).join("; ")}.
+Words: ${l.chunks.flatMap(c => c.words.map(w => w.pt)).filter(w => w.split(" ").length <= 3).slice(0, 18).join(", ")}.`;
+  const steps = F.plan === "full" ? [
+    "Aquecimento. 5 questions about me on the focus topics. I answer in full sentences.",
+    "Construtor de frases. 8 rounds. Say 3 or 4 words in dictionary form (a verb in the infinitive, a person, a thing, a place). I build one correct sentence, adding articles, prepositions and endings. Then ask for one change: negative, question, another person, plural, or formal.",
+    "Tradução rápida. 10 short English sentences for me to say in Portuguese, each on one grammar point of the focus units, mixed.",
+    "Os meus erros. 5 new sentences built on my weak spots below, for me to say. If there are none, use the hardest points of the focus units.",
+    "Situação. 1 role play of about 8 exchanges. You play the other person.",
+    "Fala livre. I speak for about a minute on one topic you give me. Then ask me 3 questions about it."
+  ] : [
+    "Aquecimento. 4 questions about me on the focus topics. I answer in full sentences.",
+    "Construtor de frases. 6 rounds. Say 3 or 4 words in dictionary form. I build one correct sentence, then you ask for one change: negative, question, another person, plural, or formal.",
+    "Tradução rápida. 8 short English sentences for me to say in Portuguese, mixed, including my weak spots below.",
+    "Situação. 1 role play of about 6 exchanges. You play the other person."
+  ];
+  return `You are my Portuguese speaking partner in a voice conversation. Use European Portuguese only (Portugal): never Brazilian forms, words or accent.
+
+MY LEVEL
+I study the textbook "Passaporte para Português 1" (A1/A2). I have covered: ${unitLabel().toLowerCase()}. Today's focus: units ${focus.map(l => l.num).join(" and ")}. Earlier units are background: use them freely, but drill the focus units.
+- Tense: present only. Verbs I know: ${verbs}. Regular -ar verbs of the same pattern are fine.
+- Don't use grammar from units I haven't covered.
+- One task or question at a time, then wait for my answer. Short sentences at first, longer ones when I answer quickly and correctly.
+
+FRESH MATERIAL
+Make up all sentences, names, places and numbers yourself, different every time. The lists below say what to practise; don't read them out.
+
+VOICE RULES
+- European Portuguese accent: unstressed "e" almost silent, unstressed "o" as [u], final "s" as [ʃ]. Speak a little slower than with natives.
+- Never read out lists, headings, numbers of steps or symbols.
+- Speech recognition may mishear me: correct only grammar and words you clearly heard. If unsure, ask me to repeat.
+- Give numbers in my tasks in English, so you don't say the Portuguese answer for me.
+- If I'm silent or say "Não sei", give a hint (the first word or the verb), then the answer, and move on.
+- My control phrases, react at once: "Pode repetir?" (repeat), "Mais devagar, por favor" (slower from now on), "Não percebo" (say it more simply), "Como se diz … em português?" (tell me the word), "O que significa…?" (explain in one line), "Próximo" (skip), "Em inglês, por favor" (explain in English).
+
+CORRECTING ME
+Say the corrected sentence, a one-line explanation in English, and ask me to repeat the whole sentence. At most two corrections at a time. Remember my mistakes and bring them back later in new sentences. Praise briefly ("Muito bem!"). Otherwise speak Portuguese.
+
+WHAT TO PRACTISE
+${focus.map(unitBlock).join("\n\n")}
+
+MY WEAK SPOTS (from my practice app, correct versions)
+${weak.length ? weak.join("\n") : "- None yet. Use the hardest points of the focus units."}
+
+ROLE PLAYS (choose one, different each time)
+- No avião: flight attendant offers drinks (café, chá, água com ou sem gás, sumo); I choose.
+- Na fronteira: border officer asks for my passport, the reason for my visit, how long I stay and where.
+- Num café: I order "uma bica" and "um pastel de nata", ask "Quanto é?" and pay.
+- Or a situation from the focus units.
+
+LESSON PLAN
+Exactly ${steps.length} steps, then the lesson ends. Start each step with "Passo N de ${steps.length}".
+${steps.map((t, i) => `${i + 1}. ${t}`).join("\n")}
+
+END OF THE LESSON
+After the last step, in English: my 3 repeated mistakes, each with a short rule, then 3 new Portuguese sentences on exactly those points for me to say once. Then say "Fim da aula" and stop. Don't offer to continue.`;
+}
+function falar() {
+  const F = S.falar || (S.falar = { plan: "short", ai: "chatgpt" });
+  const ai = F.ai === "claude" ? "Claude" : "ChatGPT";
+  const weak = weakSpots().length;
+  const howto = F.ai === "claude"
+    ? ["Open the Claude app and start a new chat.", "Paste the text and send it.", "Tap the voice button (the sound-wave icon) and say “Olá!”."]
+    : ["Open ChatGPT and start a new chat.", "Paste the text and send it.", "Tap the voice button (the sound-wave icon) and say “Olá!”."];
+  return `${topbar("home", "Home")}
+    <div style="display:flex;gap:12px;align-items:center">${ic("falar")}<div><p class="eyebrow">Falar</p><h1>Voice lesson</h1></div></div>
+    <p class="muted">This makes a lesson plan for an AI voice tutor: your units (${unitLabel().toLowerCase()}), the verbs you know, and ${weak ? `<b>${weak} of your Review mistakes</b>` : "your Review mistakes (none yet)"}. You speak, it corrects you in European Portuguese.</p>
+    <div class="segs"><button class="${F.ai !== "claude" ? "on" : ""}" data-fset="ai:chatgpt">ChatGPT</button><button class="${F.ai === "claude" ? "on" : ""}" data-fset="ai:claude">Claude</button></div>
+    <div class="segs"><button class="${F.plan !== "full" ? "on" : ""}" data-fset="plan:short">Short · 15 min</button><button class="${F.plan === "full" ? "on" : ""}" data-fset="plan:full">Full · 30 min</button></div>
+    <button class="btn" data-copyprompt>Copy the lesson for ${ai}</button>
+    <p class="small muted" id="copied" aria-live="polite"></p>
+    <div class="cab"><h3>Then</h3><ol class="steps">${howto.map(t => `<li>${t}</li>`).join("")}</ol>
+      <p class="small muted">During the lesson you can say: <i>Pode repetir? · Mais devagar, por favor · Não percebo · Em inglês, por favor · Próximo</i></p></div>
+    <textarea class="prompt" id="prompttext" readonly aria-label="Lesson text">${buildPrompt().replace(/</g, "&lt;")}</textarea>
+    <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 
 function lessons() {
@@ -2261,7 +2398,7 @@ function pick(k) {
 }
 function next() {
   Q.i++; Q.picked = null; Q.order = null; Q.revealed = false; Q.hintShown = false; Q.built = []; Q.trShown = false; Q.typed = ""; Q.near = false;
-  if (Q.i >= Q.qs.length) { Q.onDone && Q.onDone(); go("result"); return; }
+  if (Q.i >= Q.qs.length) { markDay(); Q.onDone && Q.onDone(); go("result"); return; }
   render(); window.scrollTo(0, 0); autoSay();
 }
 function result() {
@@ -2290,7 +2427,7 @@ function result() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar };
   $app.innerHTML = (V[v] || home)();
 }
 
@@ -2336,6 +2473,14 @@ $app.addEventListener("click", e => {
     return startQuiz(Q.title + " · retry", shuffle(missed), Q.back, null);
   }
   if (t.dataset.unit) { const n = +t.dataset.unit; S.units = inUnits(n) ? S.units.filter(x => x !== n) : [...S.units, n]; save(); return render(); }
+  if (t.dataset.fset) { const [k, v] = t.dataset.fset.split(":"); S.falar = { ...(S.falar || {}), [k]: v }; save(); return render(); }
+  if (t.hasAttribute("data-copyprompt")) {
+    const ta = document.getElementById("prompttext"), msg = document.getElementById("copied"), text = buildPrompt();
+    const done = () => { msg.textContent = "Copied. Now open the app and paste it into a new chat."; };
+    const fallback = () => { ta.focus(); ta.select(); try { document.execCommand("copy"); done(); } catch { msg.textContent = "Select the text below and copy it."; } };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch { fallback(); }
+    return;
+  }
   if (t.dataset.unitset) { S.units = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; save(); return render(); }
   if (t.dataset.verbs) {
     const k = t.dataset.verbs;
