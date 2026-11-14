@@ -1,4 +1,4 @@
-const CACHE = "caderno-6a696669e5";
+const CACHE = "caderno-81cb749f03";
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'extras.js', 'translations.js', 'extras2.js', 'cards.js', 'formas.js', 'exame.js'];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -9,6 +9,8 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
+  // GitHub sync must always go to the network
+  if (/(^|\.)github(usercontent)?\.com$/.test(url.hostname)) return;
   if (url.origin === location.origin) {
     // app files: network first (to get updates), cache when offline
     e.respondWith(fetch(e.request).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; })

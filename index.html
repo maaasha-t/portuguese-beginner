@@ -2105,7 +2105,72 @@ function poolFor(kind) {
 const KEY = "caderno.v1";
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
 let S = Object.assign({ done: {}, mistakes: {}, units: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }, load());
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
+function save() { S.ts = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} syncSoon(); }
+
+/* ---------- sync between devices: a private GitHub Gist ---------- */
+const SKEY = "caderno.sync", GFILE = "caderno-progress.json", GAPI = "https://api.github.com";
+function syncCfg() { try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch { return {}; } }
+function setSyncCfg(o) { try { localStorage.setItem(SKEY, JSON.stringify(o)); } catch {} }
+function gh(path, token, opts) {
+  return fetch(GAPI + path, Object.assign({ cache: "no-store" }, opts, {
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "Content-Type": "application/json" } }))
+    .then(r => { if (r.status === 401) throw new Error("token"); if (!r.ok) throw new Error("http " + r.status); return r.json(); });
+}
+// merge two progress states: answers and finished parts from both, settings from the newer one
+function mergeState(a, b) {
+  if (!b || typeof b !== "object") return a;
+  const newer = (b.ts || 0) > (a.ts || 0) ? b : a, out = Object.assign({}, newer);
+  out.done = Object.assign({}, b.done || {}, a.done || {});
+  out.days = [...new Set([...(a.days || []), ...(b.days || [])])].sort();
+  const tests = new Map(); [...(a.tests || []), ...(b.tests || [])].forEach(t => { const o = tests.get(t.id); if (!o || t.score > o.score) tests.set(t.id, t); });
+  out.tests = [...tests.values()].sort((x, y) => x.id - y.id).slice(-20);
+  const key = e => [e.k, e.q, e.ok, e.h, e.d, e.t].join("|"), cnt = new Map(), log = [];
+  (a.log || []).forEach(e => { cnt.set(key(e), (cnt.get(key(e)) || 0) + 1); log.push(e); });
+  const seen = new Map();
+  (b.log || []).forEach(e => { const k = key(e), n = (seen.get(k) || 0) + 1; seen.set(k, n); if (n > (cnt.get(k) || 0)) log.push(e); });
+  out.log = log.map((e, i) => [e, i]).sort((x, y) => x[0].d < y[0].d ? -1 : x[0].d > y[0].d ? 1 : x[1] - y[1]).map(x => x[0]).slice(-4000);
+  const ea = a.exam, eb = b.exam;
+  out.exam = !ea ? eb : !eb ? ea : ea.id !== eb.id ? (ea.id > eb.id ? ea : eb) : (ea.graded && !eb.graded ? ea : eb.graded && !ea.graded ? eb : newer.exam);
+  out.ts = Math.max(a.ts || 0, b.ts || 0);
+  return out;
+}
+let syncTimer = null, syncBusy = false, syncAgain = false;
+function syncSoon() { if (!syncCfg().id) return; clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, 4000); }
+function syncNow() {
+  const c = syncCfg(); if (!c.token || !c.id) return Promise.resolve(false);
+  if (syncBusy) { syncAgain = true; return Promise.resolve(false); }
+  syncBusy = true; clearTimeout(syncTimer); syncTimer = null;
+  const before = JSON.stringify(S);
+  return gh("/gists/" + c.id, c.token).then(g => {
+    const f = g.files && g.files[GFILE];
+    if (f && f.truncated) return fetch(f.raw_url, { cache: "no-store" }).then(r => r.text());
+    return f ? f.content : "";
+  }).then(text => {
+    let remote = null; try { remote = text ? JSON.parse(text) : null; } catch {}
+    const merged = remote ? mergeState(S, remote) : S, out = JSON.stringify(merged);
+    const changed = out !== before;
+    if (changed) { S = Object.assign({ done: {}, mistakes: {}, units: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }, merged); try { localStorage.setItem(KEY, out); } catch {} GEN = null; }
+    const push = out !== text ? gh("/gists/" + c.id, c.token, { method: "PATCH", body: JSON.stringify({ files: { [GFILE]: { content: out } } }) }) : Promise.resolve();
+    return push.then(() => { setSyncCfg(Object.assign(syncCfg(), { at: Date.now(), err: "" })); return changed; });
+  }).catch(e => { setSyncCfg(Object.assign(syncCfg(), { err: e.message === "token" ? "token" : navigator.onLine === false ? "offline" : "net" })); return false; })
+    .finally(() => { syncBusy = false; if (syncAgain) { syncAgain = false; syncSoon(); } const el = document.getElementById("syncline"); if (el) el.innerHTML = syncLine(); });
+}
+// after a pull, redraw only screens where nothing is being typed
+function syncAndShow() { syncNow().then(ch => { if (ch && ["home", "backup", "lessons", "lesson", "units", "cards"].includes(view.name)) render(); }); }
+function syncConnect(token) {
+  token = token.trim();
+  return gh("/gists?per_page=100", token).then(list => {
+    const g = list.find(x => x.files && x.files[GFILE]);
+    if (g) return g.id;
+    return gh("/gists", token, { method: "POST", body: JSON.stringify({ description: "Caderno de Português · progress (synced by the app)", public: false, files: { [GFILE]: { content: JSON.stringify(S) } } }) }).then(n => n.id);
+  }).then(id => { setSyncCfg({ token, id, at: 0, err: "" }); return syncNow(); });
+}
+function syncLine() {
+  const c = syncCfg(); if (!c.id) return "";
+  const t = c.at ? new Date(c.at) : null, when = t ? (dayKey(t) === dayKey() ? "today" : dayKey(t)) + " " + String(t.getHours()).padStart(2, "0") + ":" + String(t.getMinutes()).padStart(2, "0") : "not yet";
+  const err = c.err === "token" ? ` · <b style="color:var(--bad)">GitHub doesn't accept the token any more. Disconnect and connect with a new one.</b>` : c.err === "offline" ? " · offline now, will sync later" : c.err ? " · couldn't reach GitHub, will try again" : "";
+  return `Synced ${when}${err}`;
+}
 
 /* ---------- speech (pt-PT) ---------- */
 let voice = null, voiceNote = "";
@@ -2257,7 +2322,7 @@ function statusBlock() {
           <li><b style="color:var(--lite)">Easy level ✓</b>: Level 1 with 80%+ right.</li>
           <li><b style="color:var(--good)">Hard level ✓</b>: Level 2, Workbook or Teste with 80%+ right, on 2 different days, with new questions.</li>
         </ul></details>
-      <button class="unitchip" data-go="backup">Back up my progress</button>
+      <button class="unitchip" data-go="backup">${syncCfg().id ? "Sync on · backup" : "Sync & backup"}</button>
     </div>
   </details>`;
 }
@@ -2266,14 +2331,34 @@ function statusBlock() {
 const enc = o => "CADERNO1:" + btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 const dec = t => { const m = /CADERNO1:([A-Za-z0-9+/=]+)/.exec(String(t).replace(/\s+/g, "")); if (!m) throw new Error("bad"); return JSON.parse(decodeURIComponent(escape(atob(m[1])))); };
 function backup() {
+  const c = syncCfg();
+  const sync = c.id ? `<div class="exsec"><h2>✓ Sync is on</h2>
+      <p class="small muted" id="syncline">${syncLine()}</p>
+      <p class="small muted">Your progress is saved to a private Gist in your GitHub and merged on every device where sync is on. It syncs when you open the app and a few seconds after each answer. Offline it waits and syncs later.</p>
+      <button class="btn" data-syncnow>Sync now</button>
+      <button class="btn ghost" data-syncoff>Turn off on this device</button></div>`
+    : `<div class="exsec"><h2>Sync phone ↔ computer</h2>
+      <p class="small muted">Do this once on each device (phone and computer).</p>
+      <ol class="small" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+        <li><a href="https://github.com/settings/tokens/new?scopes=gist&description=Caderno%20sync" target="_blank" rel="noopener">Open GitHub → new token</a>. Sign in to your personal account.</li>
+        <li>Expiration: choose <b>No expiration</b>. Only <b>gist</b> is ticked; leave it like that.</li>
+        <li>Press <b>Generate token</b> at the bottom and copy the token (it starts with <b>ghp_</b>).</li>
+        <li>Paste it here and press Connect.</li>
+      </ol>
+      <input class="exin" id="stoken" type="password" placeholder="ghp_…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="GitHub token">
+      <button class="btn" data-syncon>Connect</button>
+      <p class="small" id="smsg" aria-live="polite"></p>
+      <p class="small muted">The token can only read and write your Gists, nothing else. It stays on this device. On the second device you can make another token the same way.</p></div>`;
   return `${topbar("home", "Home")}
-    <div><p class="eyebrow">Backup</p><h1>Back up my progress</h1>
-      <p class="muted">Your progress lives only on this phone. Copy it as one line of text and keep it in Notes or in Telegram “Saved messages”. To move it to another phone or to restore it, paste it below.</p></div>
+    <div><p class="eyebrow">Backup & sync</p><h1>My progress</h1></div>
+    ${sync}
+    <div class="exsec"><h2>Backup as text</h2>
+    <p class="small muted">Copy your progress as one line of text and keep it in Notes or in Telegram “Saved messages”. To restore it, paste it below.</p>
     <button class="btn" data-bcopy>Copy my progress</button>
     <p class="small muted" id="bmsg" aria-live="polite"></p>
     <textarea class="prompt" id="bcode" style="min-height:90px" placeholder="Paste a backup here (it starts with CADERNO1:)" aria-label="Backup text"></textarea>
     <button class="btn ghost" data-brestore>Restore from this backup</button>
-    <div id="bconfirm"></div>`;
+    <div id="bconfirm"></div></div>`;
 }
 
 /* ---------- views ---------- */
@@ -2740,6 +2825,16 @@ $app.addEventListener("click", e => {
     return startQuiz(Q.title + " · retry", shuffle(missed), Q.back, null);
   }
   if (t.dataset.unit) { const n = +t.dataset.unit; S.units = inUnits(n) ? S.units.filter(x => x !== n) : [...S.units, n]; save(); return render(); }
+  if (t.hasAttribute("data-syncon")) {
+    const tok = document.getElementById("stoken").value, msg = document.getElementById("smsg");
+    if (!/^(ghp_|github_pat_)\w{20,}/.test(tok.trim())) { msg.textContent = "This doesn't look like a GitHub token. It starts with ghp_"; return; }
+    msg.textContent = "Connecting…"; t.disabled = true;
+    syncConnect(tok).then(() => { const c = syncCfg(); if (c.err) { setSyncCfg({}); msg.textContent = c.err === "token" ? "GitHub didn't accept this token." : "Couldn't reach GitHub. Check the internet and try again."; t.disabled = false; } else render(); })
+      .catch(e => { msg.textContent = e.message === "token" ? "GitHub didn't accept this token. Check that you copied all of it and that gist is ticked." : "Couldn't reach GitHub. Check the internet and try again."; t.disabled = false; });
+    return;
+  }
+  if (t.hasAttribute("data-syncnow")) { t.textContent = "Syncing…"; syncNow().then(() => render()); return; }
+  if (t.hasAttribute("data-syncoff")) { setSyncCfg({}); return render(); }
   if (t.hasAttribute("data-bcopy")) {
     const code = enc(S), msg = document.getElementById("bmsg"), ta = document.getElementById("bcode");
     const done = () => { msg.textContent = "Copied. Paste it into Notes or Saved messages and keep it."; };
@@ -2838,6 +2933,9 @@ $app.addEventListener("toggle", e => { if (e.target.id === "statusbox") { S.stat
 $app.addEventListener("input", e => { if (e.target.id === "cs") { view.q = e.target.value; document.getElementById("cardlist").innerHTML = cardRows(view.q); } });
 
 render();
+syncAndShow();
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncAndShow(); else if (syncTimer) syncNow(); });
+
 </script>
 
 <script>
