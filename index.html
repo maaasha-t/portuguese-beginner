@@ -157,6 +157,14 @@ a { color: var(--accent); }
 .winput.ok { border-color: var(--good); background: var(--good-soft); }
 .winput.no { border-color: var(--bad); background: var(--bad-soft); }
 .accents { display: flex; flex-wrap: wrap; gap: 6px; }
+.folds { display: flex; flex-direction: column; gap: 8px; }
+.fold { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.fold > summary { padding: 14px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+.fold > summary::after { content: "▾"; color: var(--muted); }
+.fold[open] > summary::after { content: "▴"; }
+.fold > .cab { border: 0; margin: 0; padding-top: 0; }
+.fold .cab > h2 { display: none; }
+.tbl td b { white-space: nowrap; }
 .rule { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 1.45; }
 .rule ul { margin: 2px 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
 .rule .pt { font-weight: 700; }
@@ -2561,6 +2569,7 @@ function units() {
     <div class="chips">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button class="chip ${inUnits(n) ? "on" : ""}" data-unit="${n}">${n}</button>`).join("")}</div>
     <div class="row"><button class="btn ghost" data-unitset="all">All units</button><button class="btn" data-go="home">Done</button></div>`;
 }
+const foldBox = (title, html) => `<details class="fold"><summary>${title}</summary>${html}</details>`;
 function verbs() {
   const vs = VERBS.filter(v => inUnits(v[7]));
   return `${topbar("home", "Home")}
@@ -2570,7 +2579,19 @@ function verbs() {
       <button class="btn ghost" data-verbs="irr">Irregular only (ser, estar, ter, ler, ver…)</button>
       <button class="btn ghost" data-verbs="reg">Regular -ar verbs only</button>
     </div>
-    <div class="cab"><h3>The verbs</h3><p class="small">${vs.map(v => `<b>${v[0]}</b> ${v[1]}`).join(" · ")}</p></div>
+    <p class="eyebrow">Cheat sheets · tap to open</p>
+    <div class="folds">
+      ${foldBox("Regular verbs: the endings", cardHtml(CARDS.find(c => c.id === "regular")))}
+      ${foldBox("List of regular verbs", `<section class="cab"><p class="small">${vs.filter(v => !v[8]).map(v => `<b>${v[0]}</b> ${v[1]}${v[0] === "chamar-se" ? " (+ me, te, se)" : ""}`).join(" · ")}</p><p class="small muted">All of them: take off -ar and add -o, -as, -a, -amos, -am.</p></section>`)}
+      ${foldBox("Irregular verbs: the tables", cardHtml(CARDS.find(c => c.id === "irregular")))}
+      ${foldBox("List of irregular verbs", `<section class="cab"><p class="small">${vs.filter(v => v[8]).map(v => `<b>${v[0]}</b> ${v[1]}`).join(" · ")}</p><p class="small muted">No pattern: learn each one by heart.</p></section>`)}
+      ${foldBox("Chamar-se: my name is", cardHtml(CARDS.find(c => c.id === "chamarse")))}
+      ${foldBox("Ser or estar?", cardHtml(CARDS.find(c => c.id === "serestar")))}
+      ${foldBox("Gender and number: adjectives", cardHtml(CARDS.find(c => c.id === "adjetivos")))}
+      ${foldBox("Making plurals", cardHtml(CARDS.find(c => c.id === "plural")))}
+      ${foldBox("Articles and gender", cardHtml(CARDS.find(c => c.id === "artigos")))}
+      ${foldBox("My, your, his: possessives", cardHtml(CARDS.find(c => c.id === "possessivos")))}
+    </div>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 function workbook() {
@@ -2613,6 +2634,12 @@ function exItem(s, si, it, ii, graded) {
     ${graded ? `<div class="exfix">${it.r === "ok" ? `<span>✓${it.ovr ? " (you marked it)" : ""}</span>` : `<span>${it.r === "near" ? "≈ Check the accents:" : "✗"}</span> <b>${esc(right)}</b>${it.a.length > 1 && it.r !== "near" ? `<span class="small muted">also: ${esc(it.a.slice(1, 3).join(" · "))}</span>` : ""}`}
       <button data-say="${esc(exSay(s.key, it))}">▶ listen</button>
       ${it.r !== "ok" ? `<button data-exok="${id}">Mine is right too</button>` : ""}</div>` : ""}</div>`;
+}
+// one or two lines about the verb itself (Verbos)
+function verbRule(v) {
+  if (v[0] === "chamar-se") return `<b>chamar (regular -ar) + “self”: me, te, se. Both parts match the person.</b><span><span class="pt">eu chamo-me · tu chamas-te · ele chama-se</span></span>`;
+  if (v[8]) return `<b>${v[0]} is irregular: no pattern, learn the table by heart.</b>`;
+  return `<b>${v[0]} is regular -ar: take off -ar and add -o, -as, -a, -amos, -am.</b><span><span class="pt">${v[0].slice(0, -2)}o · ${v[0].slice(0, -2)}as · ${v[0].slice(0, -2)}a · ${v[0].slice(0, -2)}amos · ${v[0].slice(0, -2)}am</span></span>`;
 }
 function exSay(key, it) {
   const r = it.a[0];
@@ -2741,7 +2768,8 @@ function quiz() {
   if (tr) why = `<span class="pt">${gl(filled(q), true)}</span> <span class="muted">= ${tr}</span><br>${why}`;
   const said = answered ? answerSentence(q) : "";
   if (said) why += `<button class="hintbtn" style="margin-top:6px" data-say="${said.replace(/"/g, "&quot;")}">${icon.play} Hear it again</button>`;
-  const rule = RULE[reviewTopic(q.id)] || (q.hint ? `<span>${q.hint}</span>` : "");
+  const vm = /^verb\.([^.]+)\./.exec(q.id || ""), vrow = vm && VERBS.find(v => v[0] === vm[1]);
+  const rule = vrow ? verbRule(vrow) : RULE[reviewTopic(q.id)] || (q.hint ? `<span>${q.hint}</span>` : "");
   if (!right && rule) why += `<div class="rule"><span class="eyebrow">Rule</span>${rule}</div>`;
   return `${topbar(Q.back.name, "Stop")}
     <div class="progress">${bars}</div>
