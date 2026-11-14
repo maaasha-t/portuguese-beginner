@@ -2255,15 +2255,24 @@ function cardOfDay() { const t = new Date(); const n = Math.floor(new Date(t.get
 /* ---------- status: answer log → topic colours ---------- */
 // Topic = one part of a unit ("u3.estar"). Every answer is logged with its day and difficulty.
 const topicOf = id => { const m = /^(u\d+|alfabeto)\.([a-z0-9]+)\./.exec(id || ""); return m ? m[1] + "." + m[2] : null; };
+// Verbos questions ("verb.ter.2") belong to the topic where the verb is taught
+const reviewTopic = id => { const t = topicOf(id); if (t) return t; const m = /^verb\.([^.]+)\./.exec(id || ""); if (!m) return null;
+  return m[1] === "chamar-se" ? "u1.apresentar" : typeof WHO_REST !== "undefined" && WHO_REST[m[1]] ? WHO_REST[m[1]][1] : null; };
 function logAnswer(q, ok) {
-  const k = topicOf(q.id); if (!k) return;
+  const k = reviewTopic(q.id); if (!k) return;
   const hard = q.lvl === 2 || (Q && (Q.src === "wb" || Q.test)) ? 1 : 0;
   S.log = S.log || [];
   S.log.push({ k, q: q.id, ok: ok ? 1 : 0, h: hard, d: dayKey(), t: Q && Q.test ? Q.testId : 0 });
   if (S.log.length > 4000) S.log = S.log.slice(-4000);
 }
 const ST_ORDER = ["red", "yellow", "lite", "dark", "none"];
+// open Review items keep a topic red until they are cleared
 function topicStatus(lid, cid) {
+  const k = lid + "." + cid, base = topicStatusLog(lid, cid);
+  const review = Object.keys(S.mistakes || {}).filter(id => reviewTopic(id) === k).length;
+  return review && base.s !== "red" ? { ...base, s: "red", review, wrong10: base.wrong10 || 0, testWrong: base.testWrong || 0, lastWrongIdx: base.lastWrongIdx ?? -1 } : { ...base, review };
+}
+function topicStatusLog(lid, cid) {
   const k = lid + "." + cid, all = (S.log || []).filter(e => e.k === k);
   const l1done = S.done[k];
   if (!all.length) return { s: l1done ? "lite" : "none", wrong10: 0, testWrong: 0 };
@@ -2295,7 +2304,7 @@ function allTopics() {
 const shortDay = d => { const [y, m, dd] = d.split("-"); return `${+dd} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m - 1]}`; };
 function statusBlock() {
   const T = allTopics(), cnt = s => T.filter(t => t.s === s).length;
-  const red = T.filter(t => t.s === "red").sort((a, b) => b.testWrong - a.testWrong || b.wrong10 - a.wrong10 || b.lastWrongIdx - a.lastWrongIdx);
+  const red = T.filter(t => t.s === "red").sort((a, b) => b.testWrong - a.testWrong || b.wrong10 - a.wrong10 || (b.review || 0) - (a.review || 0) || b.lastWrongIdx - a.lastWrongIdx);
   const yellow = T.filter(t => t.s === "yellow");
   const tests = (S.tests || []).slice().reverse();
   const lastT = tests[0];
@@ -2304,7 +2313,7 @@ function statusBlock() {
   const line = !anyLog ? "Start with Lições. Your status builds up as you practise."
     : `${lastT ? `Last Teste: ${lastT.score}/100 · ${lastT.score >= 50 ? "passed" : "not passed"}. ` : ""}${red.length ? `Start with <b>${red[0].c.title}</b>.` : yellow.length ? `Check <b>${yellow[0].c.title}</b> again on another day.` : "Keep going with the next lesson."}`;
   const pills = `<div class="pills"><span class="pill p-bad">${cnt("red")} mistakes</span><span class="pill p-warn">${cnt("yellow")} after mistakes</span><span class="pill p-lite">${cnt("lite")} easy level ✓</span><span class="pill p-good">${cnt("dark")} hard level ✓</span><span class="pill p-none">${cnt("none")} not started</span></div>`;
-  const reason = t => t.testWrong >= 2 ? `${t.testWrong} mistakes in Testes this week` : `${t.wrong10} of the last 10 answers wrong`;
+  const reason = t => t.testWrong < 2 && t.wrong10 < 3 && t.review ? `${t.review} in Review, not fixed yet` : t.testWrong >= 2 ? `${t.testWrong} mistakes in Testes this week` : `${t.wrong10} of the last 10 answers wrong`;
   const goList = red.slice(0, 3).map((t, i) => `<div class="go"><span class="n">${i + 1}</span><span class="t"><h3>${t.c.title}</h3><span class="why">Unit ${t.l.num} · ${reason(t)}</span></span><button class="act" data-go="chunk" data-lesson="${t.l.id}" data-chunk="${t.c.id}">Open</button></div>`).join("");
   const yList = yellow.slice(0, 5).map(t => `<div class="go warn"><span class="n">·</span><span class="t"><h3>${t.c.title}</h3><span class="why">Unit ${t.l.num} · right after mistakes, but ${t.lastWrongDay === dayKey() ? "only today" : "not yet on new questions"}. Check again on another day.</span></span><button class="act" data-go="chunk" data-lesson="${t.l.id}" data-chunk="${t.c.id}">Open</button></div>`).join("");
   const days = new Set((S.tests || []).filter(x => x.score >= 70).map(x => x.d));
