@@ -1,5 +1,5 @@
-const CACHE = "caderno-b6c73e3ee9";
-const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'extras.js', 'translations.js', 'extras2.js', 'cards.js', 'formas.js'];
+const CACHE = "caderno-6a696669e5";
+const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'extras.js', 'translations.js', 'extras2.js', 'cards.js', 'formas.js', 'exame.js'];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });

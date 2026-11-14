@@ -157,6 +157,23 @@ a { color: var(--accent); }
 .winput.ok { border-color: var(--good); background: var(--good-soft); }
 .winput.no { border-color: var(--bad); background: var(--bad-soft); }
 .accents { display: flex; flex-wrap: wrap; gap: 6px; }
+.exsec { display: flex; flex-direction: column; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.exsec h2 { font-size: 18px; line-height: 1.3; display: flex; gap: 10px; align-items: flex-start; }
+.exl { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: var(--surface); font-size: 15px; }
+.exen { background: none; border: 0; padding: 0; color: var(--accent); font-size: 13px; font-weight: 700; align-self: flex-start; }
+.exit { display: flex; flex-direction: column; gap: 6px; }
+.exit label { font-size: 17px; line-height: 1.35; }
+.exn { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 4px; }
+.exin { width: 100%; font: inherit; font-size: 18px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg); }
+.exin.ok { border-color: var(--good); background: var(--good-soft); }
+.exin.near { border-color: var(--warn); }
+.exin.bad { border-color: var(--bad); background: var(--bad-soft); }
+.exfix { font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.exfix b { color: var(--good); }
+.exfix button { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; font-size: 13px; color: var(--muted); }
+.exbar .accents { flex-wrap: nowrap; overflow-x: auto; }
+.exbar .accents button { flex: none; }
+.exbar { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
 .accents button { min-width: 40px; padding: 8px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 18px; }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tile-big { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; width: 100%; }
@@ -264,6 +281,7 @@ a { color: var(--accent); }
 <script src="extras2.js"></script>
 <script src="cards.js"></script>
 <script src="formas.js"></script>
+<script src="exame.js"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2274,7 +2292,7 @@ function home() {
       <button class="tile-big" data-go="verbs">${ic("verbs")}<h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
       <button class="tile-big" data-go="formas">${ic("formas")}<h3>Formas</h3><span class="small muted">Endings: gender, plural, verbs. Typing only</span></button>
       <button class="tile-big" data-go="workbook">${ic("workbook")}<h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
-      <button class="tile-big wide" data-go="test">${ic("test")}<span><h3>Teste</h3><span class="small muted">Exam ticket: 32 questions, 100 points</span></span></button>
+      <button class="tile-big wide" data-go="test">${ic("test")}<span><h3>Teste</h3><span class="small muted">Exame: typing only, like the real one · or a ticket with options</span></span></button>
       <!-- Falar (voice lesson prompt) is built but hidden: backlog, see README -->
     </div>
     <div><p class="eyebrow">Cábula do dia</p></div>
@@ -2455,10 +2473,66 @@ function formas() {
 }
 
 function test() {
+  const E = S.exam, open = E && !E.graded;
   return `${topbar("home", "Home")}
-    <div><p class="eyebrow">Teste</p><h1>Exam ticket</h1><p class="muted">Like the school exam: 32 questions with options, from ${unitLabel().toLowerCase()}. 100 points, 50 to pass. No hints, no time limit. Answers are checked at the end. Every ticket is new.</p></div>
-    <button class="btn" data-ticket>Start a new ticket</button>
+    <div><p class="eyebrow">Teste</p><h1>Exam practice</h1></div>
+    <button class="tile-big wide" data-exnew>${ic("test")}<span><h3>Exame · typing only</h3><span class="small muted">Like the real exam: 8 tasks A–H, instructions in Portuguese, no options, no example. You write everything. Every sheet is new. From ${unitLabel().toLowerCase()}.</span></span></button>
+    ${open ? `<button class="btn ghost" data-go="exame">Continue the unfinished sheet</button>` : ""}
+    <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up: 32 questions with choices. 100 points, 50 to pass.</span></span></button>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
+}
+
+function exItem(s, si, it, ii, graded) {
+  const id = si + "." + ii, cls = graded ? (it.r === "ok" ? "ok" : it.r === "near" ? "near" : "bad") : "";
+  const esc = t => String(t).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const right = it.a[0];
+  return `<div class="exit"><label for="ex${id}"><span class="exn">${ii + 1}.</span> ${esc(it.p)}</label>
+    <input id="ex${id}" class="exin ${cls}" data-ex="${id}" value="${esc(it.ans)}" ${graded ? "disabled" : ""} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next">
+    ${graded ? `<div class="exfix">${it.r === "ok" ? `<span>✓${it.ovr ? " (you marked it)" : ""}</span>` : `<span>${it.r === "near" ? "≈ Check the accents:" : "✗"}</span> <b>${esc(right)}</b>${it.a.length > 1 && it.r !== "near" ? `<span class="small muted">also: ${esc(it.a.slice(1, 3).join(" · "))}</span>` : ""}`}
+      <button data-say="${esc(exSay(s.key, it))}">▶ listen</button>
+      ${it.r !== "ok" ? `<button data-exok="${id}">Mine is right too</button>` : ""}</div>` : ""}</div>`;
+}
+function exSay(key, it) {
+  const r = it.a[0];
+  if (["verb", "serestar", "prep"].includes(key)) return it.p.replace(/\s*\([^)]*\)/, "").replace("___", r);
+  if (key === "whose") return it.p.replace(/\s*\([^)]*\)/, "") + " " + r;
+  return r;
+}
+function exScore(E) {
+  const all = E.sections.flatMap(s => s.items), pts = all.reduce((n, it) => n + (it.r === "ok" ? 1 : it.r === "near" ? 0.5 : 0), 0);
+  return Math.round(pts / all.length * 100);
+}
+function exame() {
+  const E = S.exam; if (!E) return test();
+  const g = E.graded, sc = g ? exScore(E) : 0;
+  const weak = g ? [...new Set(E.sections.flatMap(s => s.items.filter(it => it.r !== "ok").map(it => it.topic)))] : [];
+  const tname = k => { const [lid, cid] = k.split("."); const l = lessonById(lid), c = l && l.chunks.find(c => c.id === cid); return c ? `${l.num ? "U" + l.num : l.title} · ${c.title}` : k; };
+  const filled = E.sections.flatMap(s => s.items).filter(it => it.ans.trim()).length, total = E.sections.flatMap(s => s.items).length;
+  return `${topbar("test", "Teste")}
+    <div><p class="eyebrow">Exame · ${E.units}</p><h1>${g ? "Resultado" : "Exame"}</h1>
+      ${g ? "" : `<p class="muted">Write everything yourself. Start sentences with a capital letter if you like; the end mark (. ?) is optional. Answers are checked when you hand in. Tap EN under a task if you really can't read it.</p>`}</div>
+    ${g ? `<div class="exsec"><div class="score">${sc}<span style="font-size:24px"> / 100</span></div>
+      <p>${sc >= 85 ? "Excellent, you're ready." : sc >= 70 ? "Good. Look at the topics below once more." : sc >= 50 ? "Pass, but work on the topics below before the exam." : "Not yet. Go through the topics below, then take a new sheet in a few days."}</p>
+      ${weak.length ? `<p class="eyebrow">Go back to</p><ul class="small">${weak.map(k => `<li>${tname(k)}</li>`).join("")}</ul>` : ""}
+      <div class="row"><button class="btn" data-exnew>New sheet</button><button class="btn ghost" data-go="home">Home</button></div></div>` : ""}
+    ${E.sections.map((s, si) => `<section class="exsec"><h2><span class="exl">${s.letter}</span><span>${s.instr}</span></h2>
+      <button class="exen" data-exen="${si}">EN</button>${E.en && E.en[si] ? `<p class="small muted">${s.en}</p>` : ""}
+      ${s.items.map((it, ii) => exItem(s, si, it, ii, g)).join("")}</section>`).join("")}
+    ${g ? "" : `<div class="exbar"><div class="accents">${ACC.map(ch => `<button type="button" class="acc" data-acc="${ch}">${ch}</button>`).join("")}</div>
+      <button class="btn" data-exsubmit>Entregar · hand in (${filled}/${total})</button></div>`}`;
+}
+function exGrade() {
+  const E = S.exam; if (!E || E.graded) return;
+  S.log = S.log || [];
+  E.sections.forEach(s => s.items.forEach(it => {
+    it.r = judge(it.ans, it.a);
+    S.log.push({ k: it.topic, q: it.topic + ".EX." + s.key, ok: it.r === "bad" ? 0 : 1, h: 1, d: dayKey(), t: E.id });
+  }));
+  if (S.log.length > 4000) S.log = S.log.slice(-4000);
+  E.graded = true;
+  const weak = [...new Set(E.sections.flatMap(s => s.items.filter(it => it.r !== "ok").map(it => it.topic)))].slice(0, 6);
+  S.tests = [...(S.tests || []), { id: E.id, d: dayKey(), score: exScore(E), units: E.units, weak, kind: "exame" }].slice(-20);
+  markDay(); save();
 }
 
 function lesson() {
@@ -2608,7 +2682,7 @@ function result() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame };
   $app.innerHTML = (V[v] || home)();
 }
 
@@ -2623,16 +2697,28 @@ function checkTyped() {
   pick(r === "bad" ? 1 : 0);
   if (Q.near) { S.mistakes[q.id] = 1; save(); }
 }
-$app.addEventListener("input", e => { if (e.target.id === "wa" && Q) Q.typed = e.target.value; });
+$app.addEventListener("input", e => { if (e.target.id === "wa" && Q) Q.typed = e.target.value; if (e.target.dataset && e.target.dataset.ex) exInput(e.target); });
+function exInput(el) {
+  const [si, ii] = el.dataset.ex.split(".").map(Number), E = S.exam; if (!E || E.graded) return;
+  E.sections[si].items[ii].ans = el.value; save();
+  const b = document.querySelector("[data-exsubmit]"); if (b) { const all = E.sections.flatMap(s => s.items); b.textContent = `Entregar · hand in (${all.filter(it => it.ans.trim()).length}/${all.length})`; }
+}
+// Enter in an exam field jumps to the next field
+$app.addEventListener("keydown", e => {
+  if (!e.target.classList || !e.target.classList.contains("exin") || e.key !== "Enter") return;
+  e.preventDefault(); const ins = [...document.querySelectorAll(".exin")], n = ins[ins.indexOf(e.target) + 1]; if (n) n.focus(); else e.target.blur();
+});
 $app.addEventListener("keydown", e => { if (e.target.id === "wa" && e.key === "Enter") { e.preventDefault(); checkTyped(); } });
 // accent buttons: insert at the cursor without closing the phone keyboard
 $app.addEventListener("pointerdown", e => {
   const b = e.target.closest(".acc"); if (!b) return;
   e.preventDefault();
-  const el = document.getElementById("wa"); if (!el || el.disabled) return;
+  const act = document.activeElement, el = act && act.classList.contains("exin") ? act : document.getElementById(view.name === "exame" ? "__" : "wa");
+  if (!el || el.disabled) return;
   const a = el.selectionStart ?? el.value.length, z = el.selectionEnd ?? a;
   el.value = el.value.slice(0, a) + b.dataset.acc + el.value.slice(z);
-  el.focus(); el.setSelectionRange(a + 1, a + 1); Q.typed = el.value;
+  el.focus(); el.setSelectionRange(a + 1, a + 1);
+  if (el.dataset.ex) exInput(el); else Q.typed = el.value;
 });
 
 /* ---------- events ---------- */
@@ -2695,6 +2781,20 @@ $app.addEventListener("click", e => {
     const names = { mixed: "Mixed", choose: "Choose", fill: "Fill in", order: "Word order", rewrite: "Rewrite" };
     startQuiz("Workbook · " + names[t.dataset.wb], shuffle(pool).slice(0, 10), { name: "workbook" }, null);
     Q.src = "wb"; return;
+  }
+  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: makeExam(S.units), graded: false }; save(); return go("exame"); }
+  if (t.dataset.exen !== undefined) { const E = S.exam; E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
+  if (t.hasAttribute("data-exsubmit")) {
+    const all = S.exam.sections.flatMap(s => s.items), empty = all.filter(it => !it.ans.trim()).length;
+    if (empty && !t.dataset.sure) { t.dataset.sure = 1; t.textContent = `${empty} empty. Tap again to hand in anyway`; return; }
+    exGrade(); return go("exame");
+  }
+  if (t.dataset.exok) {
+    const [si, ii] = t.dataset.exok.split(".").map(Number), E = S.exam, it = E.sections[si].items[ii];
+    it.r = "ok"; it.ovr = true;
+    const e2 = (S.log || []).filter(e => e.t === E.id && e.k === it.topic && !e.ok)[0]; if (e2) e2.ok = 1;
+    const tt = (S.tests || []).find(x => x.id === E.id); if (tt) tt.score = exScore(E);
+    save(); const y = window.scrollY; render(); window.scrollTo(0, y); return;
   }
   if (t.hasAttribute("data-ticket")) {
     const qs = poolFor("choose"), hard = qs.filter(q => q.lvl === 2), easy = qs.filter(q => q.lvl === 1);
