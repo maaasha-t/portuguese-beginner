@@ -2019,6 +2019,15 @@ function answerSentence(q) {
 const ACC = ["á", "à", "â", "ã", "ç", "é", "ê", "í", "ó", "ô", "õ", "ú"];
 const normA = t => String(t).toLowerCase().replace(/[‐‑–—]/g, "-").replace(/[.!?¿¡,;:]+$/g, "").replace(/\s+/g, " ").trim();
 const flatA = t => normA(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/-/g, " ");
+// words that appear in lower case somewhere in the course (so they are not names)
+let LOWER = null;
+function lowerWords() {
+  if (LOWER) return LOWER; LOWER = new Set();
+  const add = t => String(t || "").replace(/<[^>]+>/g, " ").split(/[\s.,!?;:()“”"«»/…]+/).forEach(w => { if (/^[a-záàâãçéêíóôõú]/.test(w)) LOWER.add(w); });
+  LESSONS.forEach(l => l.chunks.forEach(c => { c.words.forEach(w => add(w.pt)); [...c.quiz, ...c.quiz2].forEach(q => { add(q.q); (q.opts || []).forEach(add); (Array.isArray(q.a) ? q.a : [q.a]).forEach(add); }); }));
+  return LOWER;
+}
+const STARTERS = new Set("quais qual quantos quantas quanto quanta onde como quando porque quem este esta estes estas esse essa esses essas aquele aquela aqueles aquelas isto isso aquilo tenho tens temos moro moras falo falas gosto gostas trabalho trabalhas estou estás estamos somos desculpe obrigado obrigada muito muita também hoje amanhã olá adeus tudo eles elas você vocês nós não sim agora aqui ali então mas".split(" "));
 function judge(given, answers) {
   const g = normA(given);
   if (!g) return "bad";
@@ -2703,8 +2712,13 @@ function quiz() {
       ${answered ? "" : `<div class="accents">${ACC.map(ch => `<button type="button" class="acc" data-acc="${ch}">${ch}</button>`).join("")}</div>
         <button class="btn" data-wcheck>Check</button>`}`;
   } else if (isOrder) {
-    const built = Q.built.map((k, pos) => `<button class="tile" data-unbuild="${pos}">${answered ? gl(q.a[k], true) : q.a[k]}</button>`).join("");
-    const pool = Q.order.map(k => `<button class="tile ${Q.built.includes(k) ? "used" : ""}" data-tile="${k}">${q.a[k]}</button>`).join("");
+    // no give-aways: tiles have no end punctuation and no capital letter at the start (names keep theirs)
+    const tl = k => { let w = String(q.a[k]).replace(/^[¿¡“"]+|[.,!?;:”"]+$/g, "");
+      const lw = w.charAt(0).toLowerCase() + w.slice(1);
+      if (lw !== w && !(typeof XPROPER !== "undefined" && XPROPER.has(w)) && (lowerWords().has(lw) || STARTERS.has(lw))) w = lw;
+      return w || q.a[k]; };
+    const built = Q.built.map((k, pos) => `<button class="tile" data-unbuild="${pos}">${answered ? gl(q.a[k], true) : tl(k)}</button>`).join("");
+    const pool = Q.order.map(k => `<button class="tile ${Q.built.includes(k) ? "used" : ""}" data-tile="${k}">${tl(k)}</button>`).join("");
     body = `<div class="built ${answered ? (right ? "ok" : "no") : ""}">${built || `<span class="muted small">Tap the words in the right order</span>`}</div>
       ${answered ? "" : `<div class="pool">${pool}</div>`}
       ${!answered && Q.built.length === q.a.length ? `<button class="btn" data-check>Check</button>` : ""}`;
