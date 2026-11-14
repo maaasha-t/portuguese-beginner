@@ -33,6 +33,7 @@
   --bad: #b3322a;
   --bad-soft: #fbe6e3;
   --gram: #5d7f24;
+  --warn: #9a6a00; --warn-soft: #fdf0c4; --lite: #5fae3c; --lite-soft: #eaf6dc;
   --gram-soft: #eef4e2;
   --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --font-body: "Atkinson Hyperlegible", -apple-system, system-ui, sans-serif;
@@ -43,11 +44,13 @@
     --accent: #7d9bff; --accent-soft: #22305a; --tram: #f2c230;
     --good: #5fd09a; --good-soft: #173a2b; --bad: #ff8a80; --bad-soft: #43201e;
     --gram: #a9cf6a; --gram-soft: #24301a;
+    --warn: #f2c230; --warn-soft: #3a3014; --lite: #a9d98a; --lite-soft: #24301a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --gram: #a9cf6a; --gram-soft: #24301a;
+  --warn: #f2c230; --warn-soft: #3a3014; --lite: #a9d98a; --lite-soft: #24301a;
   --bg: #0f1422; --surface: #182036; --fg: #e8ecf6; --muted: #9aa5c2; --line: #2a3452;
   --accent: #7d9bff; --accent-soft: #22305a; --tram: #f2c230;
   --good: #5fd09a; --good-soft: #173a2b; --bad: #ff8a80; --bad-soft: #43201e;
@@ -204,6 +207,33 @@ a { color: var(--accent); }
 .reslist { display: flex; flex-direction: column; gap: 10px; }
 .resitem { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
 @media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
+.status { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.status summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.status summary::-webkit-details-marker { display: none; }
+.sumtop { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sumtop h2 { font-size: 20px; }
+.chev { color: var(--accent); font-weight: 700; font-size: 14px; white-space: nowrap; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; }
+.p-bad { background: var(--bad-soft); color: var(--bad); } .p-warn { background: var(--warn-soft); color: var(--warn); }
+.p-lite { background: var(--lite-soft); color: var(--lite); } .p-good { background: var(--good); color: var(--surface); } .p-none { background: var(--line); color: var(--muted); }
+.stbody { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.go { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--bad-soft); }
+.go.warn { background: var(--warn-soft); }
+.go .n { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; background: var(--surface); }
+.go .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.go .why { font-size: 13px; color: var(--muted); }
+.go .act { flex: none; align-self: center; border: 0; border-radius: 10px; padding: 8px 10px; font-weight: 700; font-size: 14px; background: var(--accent); color: var(--surface); }
+.thist { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.tscore { font-family: var(--font-display); font-weight: 800; font-size: 24px; font-variant-numeric: tabular-nums; }
+.ugrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.ucell { border-radius: 10px; padding: 6px 4px; text-align: center; font-size: 12px; border: 1px solid var(--line); background: var(--surface); }
+.ucell b { display: block; font-family: var(--font-display); font-size: 16px; }
+.ubar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 4px; display: flex; }
+.ubar i { display: block; height: 100%; } .ubar .dk { background: var(--good); } .ubar .lt { background: var(--lite); } .ubar .yw { background: var(--warn); } .ubar .rd { background: var(--bad); }
+.g2 { color: var(--good); font-weight: 700; } .g1 { color: var(--lite); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--muted); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; }
 .task { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0; }
 .gw { border-bottom: 2px dotted var(--accent); cursor: pointer; }
 .gltip { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 528px; margin: 0 auto; background: var(--fg); color: var(--bg); border-radius: 12px; padding: 12px 16px; font-size: 17px; z-index: 10; }
@@ -2098,11 +2128,113 @@ function streak() {
 }
 function cardOfDay() { const t = new Date(); const n = Math.floor(new Date(t.getFullYear(), t.getMonth(), t.getDate()) / 864e5); return CARDS[n % CARDS.length]; }
 
+/* ---------- status: answer log → topic colours ---------- */
+// Topic = one part of a unit ("u3.estar"). Every answer is logged with its day and difficulty.
+const topicOf = id => { const m = /^(u\d+|alfabeto)\.([a-z0-9]+)\./.exec(id || ""); return m ? m[1] + "." + m[2] : null; };
+function logAnswer(q, ok) {
+  const k = topicOf(q.id); if (!k) return;
+  const hard = q.lvl === 2 || (Q && (Q.src === "wb" || Q.test)) ? 1 : 0;
+  S.log = S.log || [];
+  S.log.push({ k, q: q.id, ok: ok ? 1 : 0, h: hard, d: dayKey(), t: Q && Q.test ? Q.testId : 0 });
+  if (S.log.length > 4000) S.log = S.log.slice(-4000);
+}
+const ST_ORDER = ["red", "yellow", "lite", "dark", "none"];
+function topicStatus(lid, cid) {
+  const k = lid + "." + cid, all = (S.log || []).filter(e => e.k === k);
+  const l1done = S.done[k];
+  if (!all.length) return { s: l1done ? "lite" : "none", wrong10: 0, testWrong: 0 };
+  const last10 = all.slice(-10), wrong10 = last10.filter(e => !e.ok).length;
+  const weekAgo = Date.now() - 7 * 864e5;
+  const recentTests = new Set((S.tests || []).filter(x => x.id >= weekAgo).map(x => x.id));
+  const testWrong = all.filter(e => e.t && recentTests.has(e.t) && !e.ok).length;
+  let lw = -1; all.forEach((e, i) => { if (!e.ok) lw = i; });
+  const wrongQs = new Set(all.filter(e => !e.ok).map(e => e.q));
+  const info = { wrong10, testWrong, lastWrongDay: lw >= 0 ? all[lw].d : null, lastWrongIdx: lw };
+  if (lw >= 0) {
+    const after = all.slice(lw + 1), wDay = all[lw].d;
+    const laterOk = after.filter(e => e.ok && e.d > wDay);
+    if (wrong10 >= 3 || (testWrong >= 2 && !laterOk.length) || !after.length) return { s: "red", ...info };
+    const recovered = laterOk.length >= 3 && new Set(laterOk.filter(e => !wrongQs.has(e.q)).map(e => e.q)).size >= 2;
+    if (!recovered) return { s: "yellow", ...info };
+  }
+  const hardE = all.filter(e => e.h), hard10 = hardE.slice(-10);
+  const hardDays = new Set(hardE.filter(e => e.ok).map(e => e.d));
+  const newHard = new Set(hardE.filter(e => e.ok && !wrongQs.has(e.q)).map(e => e.q));
+  if (hard10.length >= 4 && hard10.filter(e => e.ok).length / hard10.length >= 0.8 && hardDays.size >= 2 && newHard.size >= 2) return { s: "dark", ...info };
+  const easy10 = all.filter(e => !e.h).slice(-10);
+  if (l1done || (easy10.length >= 4 && easy10.filter(e => e.ok).length / easy10.length >= 0.8)) return { s: "lite", ...info };
+  return { s: "none", started: true, ...info };
+}
+function allTopics() {
+  return LESSONS.filter(l => l.id !== "alfabeto").flatMap(l => l.chunks.map(c => ({ l, c, ...topicStatus(l.id, c.id) })));
+}
+const shortDay = d => { const [y, m, dd] = d.split("-"); return `${+dd} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m - 1]}`; };
+function statusBlock() {
+  const T = allTopics(), cnt = s => T.filter(t => t.s === s).length;
+  const red = T.filter(t => t.s === "red").sort((a, b) => b.testWrong - a.testWrong || b.wrong10 - a.wrong10 || b.lastWrongIdx - a.lastWrongIdx);
+  const yellow = T.filter(t => t.s === "yellow");
+  const tests = (S.tests || []).slice().reverse();
+  const lastT = tests[0];
+  const anyLog = (S.log || []).length || Object.keys(S.done).length;
+  const title = red.length ? `Go back to ${Math.min(red.length, 3)} topic${red.length > 1 ? "s" : ""}` : yellow.length ? `Check ${yellow.length} topic${yellow.length > 1 ? "s" : ""} again later` : anyLog ? "Nothing to fix right now" : "Your status";
+  const line = !anyLog ? "Start with Lições. Your status builds up as you practise."
+    : `${lastT ? `Last Teste: ${lastT.score}/100 · ${lastT.score >= 50 ? "passed" : "not passed"}. ` : ""}${red.length ? `Start with <b>${red[0].c.title}</b>.` : yellow.length ? `Check <b>${yellow[0].c.title}</b> again on another day.` : "Keep going with the next lesson."}`;
+  const pills = `<div class="pills"><span class="pill p-bad">${cnt("red")} mistakes</span><span class="pill p-warn">${cnt("yellow")} after mistakes</span><span class="pill p-lite">${cnt("lite")} easy level ✓</span><span class="pill p-good">${cnt("dark")} hard level ✓</span><span class="pill p-none">${cnt("none")} not started</span></div>`;
+  const reason = t => t.testWrong >= 2 ? `${t.testWrong} mistakes in Testes this week` : `${t.wrong10} of the last 10 answers wrong`;
+  const goList = red.slice(0, 3).map((t, i) => `<div class="go"><span class="n">${i + 1}</span><span class="t"><h3>${t.c.title}</h3><span class="why">Unit ${t.l.num} · ${reason(t)}</span></span><button class="act" data-go="chunk" data-lesson="${t.l.id}" data-chunk="${t.c.id}">Open</button></div>`).join("");
+  const yList = yellow.slice(0, 5).map(t => `<div class="go warn"><span class="n">·</span><span class="t"><h3>${t.c.title}</h3><span class="why">Unit ${t.l.num} · right after mistakes, but ${t.lastWrongDay === dayKey() ? "only today" : "not yet on new questions"}. Check again on another day.</span></span><button class="act" data-go="chunk" data-lesson="${t.l.id}" data-chunk="${t.c.id}">Open</button></div>`).join("");
+  const days = new Set((S.tests || []).filter(x => x.score >= 70).map(x => x.d));
+  const ready = days.size >= 2 && !red.length;
+  const hist = tests.slice(0, 4).map((x, i) => `<div class="thist"><span><h3>${shortDay(x.d)} · ${x.units}</h3><span class="small muted">${x.score >= 50 ? "Passed" : "Not passed"}${x.weak && x.weak.length ? " · weakest: " + x.weak.join(", ") : ""}${tests[i + 1] && tests[i + 1].d === x.d ? " · same day as the one before" : ""}</span></span><span class="tscore" style="color:var(${x.score >= 50 ? "--good" : "--bad"})">${x.score}</span></div>`).join("");
+  const units = LESSONS.filter(l => l.id !== "alfabeto").map(l => {
+    const ts = T.filter(t => t.l === l), n = ts.length, c = s => ts.filter(t => t.s === s).length;
+    const any = ts.some(t => t.s !== "none");
+    const cls = c("red") ? "bad" : c("yellow") ? "warn" : "";
+    const seg = (s, k) => c(s) ? `<i class="${k}" style="width:${c(s) / n * 100}%"></i>` : "";
+    return `<button class="ucell ${cls}" data-go="lesson" data-lesson="${l.id}"><b>${l.num}</b>${any ? `<span class="g2">${c("dark")}</span>·<span class="g1">${c("lite")}</span>` : "–"}<div class="ubar">${seg("dark", "dk")}${seg("lite", "lt")}${seg("yellow", "yw")}${seg("red", "rd")}</div></button>`;
+  }).join("");
+  return `<details class="status" id="statusbox" ${S.statusOpen ? "open" : ""}>
+    <summary><div class="sumtop"><h2>${title}</h2><span class="chev">${S.statusOpen ? "Hide ▴" : "Details ▾"}</span></div>${pills}<span class="small muted">${line}</span></summary>
+    <div class="stbody">
+      ${goList ? `<p class="eyebrow">🔴 Mistakes · go back first</p>${goList}` : ""}
+      ${yList ? `<p class="eyebrow">🟡 After mistakes · check again later</p>${yList}` : ""}
+      ${hist ? `<p class="eyebrow">Teste history</p>${hist}` : ""}
+      <p class="small muted">${ready ? "✓ Ready for the real exam: 2 Testes on different days with 70+, and nothing is red." : "Ready for the real exam when you pass 2 Testes on different days with 70+, and nothing is red."}</p>
+      <p class="eyebrow">Units</p>
+      <div class="ugrid">${units}</div>
+      <div class="legend"><span><span class="dot" style="background:var(--good)"></span>hard level ✓</span><span><span class="dot" style="background:var(--lite)"></span>easy level ✓</span><span><span class="dot" style="background:var(--warn)"></span>after mistakes</span><span><span class="dot" style="background:var(--bad)"></span>mistakes</span></div>
+      <details class="small"><summary class="muted" style="padding:0">How the colours work</summary>
+        <ul style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+          <li><b style="color:var(--bad)">Mistakes</b>: 3+ wrong in your last 10 answers on the topic, or 2+ wrong in this week's Testes.</li>
+          <li><b style="color:var(--warn)">After mistakes</b>: right again, but only the same day or on the same questions.</li>
+          <li><b style="color:var(--lite)">Easy level ✓</b>: Level 1 with 80%+ right.</li>
+          <li><b style="color:var(--good)">Hard level ✓</b>: Level 2, Workbook or Teste with 80%+ right, on 2 different days, with new questions.</li>
+        </ul></details>
+      <button class="unitchip" data-go="backup">Back up my progress</button>
+    </div>
+  </details>`;
+}
+
+/* ---------- backup ---------- */
+const enc = o => "CADERNO1:" + btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const dec = t => { const m = /CADERNO1:([A-Za-z0-9+/=]+)/.exec(String(t).replace(/\s+/g, "")); if (!m) throw new Error("bad"); return JSON.parse(decodeURIComponent(escape(atob(m[1])))); };
+function backup() {
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Backup</p><h1>Back up my progress</h1>
+      <p class="muted">Your progress lives only on this phone. Copy it as one line of text and keep it in Notes or in Telegram “Saved messages”. To move it to another phone or to restore it, paste it below.</p></div>
+    <button class="btn" data-bcopy>Copy my progress</button>
+    <p class="small muted" id="bmsg" aria-live="polite"></p>
+    <textarea class="prompt" id="bcode" style="min-height:90px" placeholder="Paste a backup here (it starts with CADERNO1:)" aria-label="Backup text"></textarea>
+    <button class="btn ghost" data-brestore>Restore from this backup</button>
+    <div id="bconfirm"></div>`;
+}
+
 /* ---------- views ---------- */
 function home() {
   const m = mistakeCount(), cd = cardOfDay();
   return `${topbar()}
     <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
+    ${statusBlock()}
     <div class="homebar">
       <button class="unitchip" data-go="units">${unitLabel()} · change</button>
     </div>
@@ -2389,6 +2521,7 @@ function pick(k) {
   Q.picked = k;
   const ok = k === 0;
   Q.res.push(ok);
+  logAnswer(q, ok);
   if (Q.test) { (Q.answers = Q.answers || []).push(k); if (!ok) S.mistakes[q.id] = 2; save(); return next(); }
   if (ok) { if (S.mistakes[q.id]) { S.mistakes[q.id]--; if (S.mistakes[q.id] <= 0) delete S.mistakes[q.id]; } }
   else S.mistakes[q.id] = 2; // must get it right twice to clear
@@ -2404,6 +2537,12 @@ function result() {
   const ok = Q.res.filter(Boolean).length, n = Q.res.length;
   if (Q.test) {
     const pts = Math.round(ok / n * 100), pass = pts >= 50;
+    if (!Q.saved) {
+      Q.saved = true;
+      const wc = {}; Q.qs.forEach((q, i) => { if (Q.answers[i] !== 0) { const k = topicOf(q.id); if (k) wc[k] = (wc[k] || 0) + 1; } });
+      const weak = Object.entries(wc).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => { const [lid, cid] = k.split("."); const c = lessonById(lid).chunks.find(x => x.id === cid); return c ? c.title : k; });
+      S.tests = [...(S.tests || []), { id: Q.testId, d: dayKey(), score: pts, units: unitLabel().toLowerCase(), weak }].slice(-20); save();
+    }
     const wrong = Q.qs.map((q, i) => ({ q, k: Q.answers[i] })).filter(x => x.k !== 0);
     return `${topbar("test", "Back")}
       <div><p class="eyebrow">${Q.title}</p><p class="score">${pts}<span style="font-size:24px">/100</span></p>
@@ -2426,7 +2565,7 @@ function result() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup };
   $app.innerHTML = (V[v] || home)();
 }
 
@@ -2472,6 +2611,21 @@ $app.addEventListener("click", e => {
     return startQuiz(Q.title + " · retry", shuffle(missed), Q.back, null);
   }
   if (t.dataset.unit) { const n = +t.dataset.unit; S.units = inUnits(n) ? S.units.filter(x => x !== n) : [...S.units, n]; save(); return render(); }
+  if (t.hasAttribute("data-bcopy")) {
+    const code = enc(S), msg = document.getElementById("bmsg"), ta = document.getElementById("bcode");
+    const done = () => { msg.textContent = "Copied. Paste it into Notes or Saved messages and keep it."; };
+    const fb = () => { ta.value = code; ta.focus(); ta.select(); try { document.execCommand("copy"); done(); } catch { msg.textContent = "Select the text above and copy it."; } };
+    try { navigator.clipboard.writeText(code).then(done, fb); } catch { fb(); }
+    return;
+  }
+  if (t.hasAttribute("data-brestore")) {
+    const box = document.getElementById("bconfirm");
+    try { const o = dec(document.getElementById("bcode").value); view.pending = o;
+      box.innerHTML = `<div class="go"><span class="t"><h3>Replace the progress on this phone?</h3><span class="why">Backup has ${Object.keys(o.done || {}).length} parts done and ${(o.log || []).length} answers. What's on this phone now will be replaced.</span></span><button class="act" data-bok>Replace</button></div>`;
+    } catch { box.innerHTML = `<p class="small" style="color:var(--bad)">This doesn't look like a backup. It should start with CADERNO1:</p>`; }
+    return;
+  }
+  if (t.hasAttribute("data-bok")) { S = Object.assign({ done: {}, mistakes: {}, units: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }, view.pending); save(); GEN = null; return go("home"); }
   if (t.dataset.fset) { const [k, v] = t.dataset.fset.split(":"); S.falar = { ...(S.falar || {}), [k]: v }; save(); return render(); }
   if (t.hasAttribute("data-copyprompt")) {
     const ta = document.getElementById("prompttext"), msg = document.getElementById("copied"), text = buildPrompt();
@@ -2491,14 +2645,15 @@ $app.addEventListener("click", e => {
     const pool = poolFor(t.dataset.wb);
     if (!pool.length) return;
     const names = { mixed: "Mixed", choose: "Choose", fill: "Fill in", order: "Word order", rewrite: "Rewrite" };
-    return startQuiz("Workbook · " + names[t.dataset.wb], shuffle(pool).slice(0, 10), { name: "workbook" }, null);
+    startQuiz("Workbook · " + names[t.dataset.wb], shuffle(pool).slice(0, 10), { name: "workbook" }, null);
+    Q.src = "wb"; return;
   }
   if (t.hasAttribute("data-ticket")) {
     const qs = poolFor("choose"), hard = qs.filter(q => q.lvl === 2), easy = qs.filter(q => q.lvl === 1);
     const ticket = shuffle([...shuffle(hard).slice(0, 22), ...shuffle(easy).slice(0, 10)]).slice(0, 32);
     if (!ticket.length) return;
     startQuiz("Teste · " + unitLabel(), ticket, { name: "test" }, null);
-    Q.test = true; Q.answers = []; return render();
+    Q.test = true; Q.testId = Date.now(); Q.answers = []; return render();
   }
   const g = t.dataset.go; if (!g) return;
   if (g === "card") return go("card", { card: t.dataset.card, from: t.dataset.from || "", lesson: t.dataset.lesson || view.lesson });
@@ -2529,6 +2684,8 @@ $app.addEventListener("click", e => {
   }
   go(g, t.dataset.lesson ? { lesson: t.dataset.lesson, chunk: t.dataset.chunk } : {});
 });
+// remember whether the status block is open
+$app.addEventListener("toggle", e => { if (e.target.id === "statusbox") { S.statusOpen = e.target.open; save(); const c = e.target.querySelector(".chev"); if (c) c.textContent = e.target.open ? "Hide ▴" : "Details ▾"; } }, true);
 // card search: update the list only, so the keyboard stays open
 $app.addEventListener("input", e => { if (e.target.id === "cs") { view.q = e.target.value; document.getElementById("cardlist").innerHTML = cardRows(view.q); } });
 
