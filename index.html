@@ -169,9 +169,10 @@ a { color: var(--accent); }
 .ic-workbook { background: #fbe6e3; color: #b3322a; }
 .ic-test { background: #e1f3e8; color: #1d7a4a; }
 .ic-falar { background: #efe4fb; color: #6b3fb3; }
+.ic-formas { background: #dff3f1; color: #157a72; }
 .ic-review { background: var(--bad-soft); color: var(--bad); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic-lessons { background: #3a3014; color: #f2c230; } :root:not([data-theme="light"]) .ic-verbs { background: #22305a; color: #7d9bff; } :root:not([data-theme="light"]) .ic-workbook { background: #43201e; color: #ff8a80; } :root:not([data-theme="light"]) .ic-test { background: #173a2b; color: #5fd09a; } :root:not([data-theme="light"]) .ic-falar { background: #2e2245; color: #c4a6f2; } }
-:root[data-theme="dark"] .ic-lessons { background: #3a3014; color: #f2c230; } :root[data-theme="dark"] .ic-verbs { background: #22305a; color: #7d9bff; } :root[data-theme="dark"] .ic-workbook { background: #43201e; color: #ff8a80; } :root[data-theme="dark"] .ic-test { background: #173a2b; color: #5fd09a; } :root[data-theme="dark"] .ic-falar { background: #2e2245; color: #c4a6f2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic-formas { background: #143532; color: #6fd6cb; } :root:not([data-theme="light"]) .ic-lessons { background: #3a3014; color: #f2c230; } :root:not([data-theme="light"]) .ic-verbs { background: #22305a; color: #7d9bff; } :root:not([data-theme="light"]) .ic-workbook { background: #43201e; color: #ff8a80; } :root:not([data-theme="light"]) .ic-test { background: #173a2b; color: #5fd09a; } :root:not([data-theme="light"]) .ic-falar { background: #2e2245; color: #c4a6f2; } }
+:root[data-theme="dark"] .ic-formas { background: #143532; color: #6fd6cb; } :root[data-theme="dark"] .ic-lessons { background: #3a3014; color: #f2c230; } :root[data-theme="dark"] .ic-verbs { background: #22305a; color: #7d9bff; } :root[data-theme="dark"] .ic-workbook { background: #43201e; color: #ff8a80; } :root[data-theme="dark"] .ic-test { background: #173a2b; color: #5fd09a; } :root[data-theme="dark"] .ic-falar { background: #2e2245; color: #c4a6f2; }
 .homebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .streak { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
 .streak svg { width: 18px; height: 18px; fill: none; stroke: #e0672a; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -262,6 +263,7 @@ a { color: var(--accent); }
 <script src="translations.js"></script>
 <script src="extras2.js"></script>
 <script src="cards.js"></script>
+<script src="formas.js"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2039,6 +2041,32 @@ function generated() {
   return GEN = { phrases, verbs, rewrite };
 }
 const inUnits = n => S.units.includes(+n);
+const FORM_LABEL = ["masculine singular", "feminine singular", "masculine plural", "feminine plural"];
+function formasPool(mode) {
+  const out = [];
+  const adj = () => ADJ.forEach(a => { if (!inUnits(a[5])) return; [1, 2, 3].forEach(i => {
+    if (i === 1 && a[1] === a[0]) return;
+    out.push({ t: "w", id: `${a[6]}.F.adj.${a[0]}.${i}`, lvl: 2, from: "Formas", task: "Write the form.", noGloss: true,
+      q: `<b>${a[0]}</b> (${a[4]}) → <b>${FORM_LABEL[i]}</b>`, a: [a[i]], hint: FORM_RULE[a[7]],
+      why: `<span class="small">${a[0]} · ${a[1]} · ${a[2]} · ${a[3]}</span><br><span class="small muted">${FORM_RULE[a[7]]}</span>`, sayAfter: a[i] });
+  }); });
+  const nouns = () => NOUNS.forEach(n => { if (!inUnits(n[3])) return;
+    out.push({ t: "w", id: `${n[4]}.F.pl.${n[0].split(" ")[1]}`, lvl: 2, from: "Formas", task: "Write the plural, with the article.", noGloss: true,
+      q: `<b>${n[0]}</b> (${n[2]}) → <b>plural</b>`, a: [n[1], n[1].split(" ").slice(1).join(" ")], hint: n[5], why: `<span class="small muted">${n[5]}</span>`, sayAfter: n[1] }); });
+  const phrases = () => PHRASES.forEach((x, i) => { if (!inUnits(x[4])) return;
+    out.push({ t: "w", id: `${x[5]}.F.ph.${i}`, lvl: 2, from: "Formas", task: "Rewrite the whole phrase. Every word has to agree.", noGloss: true,
+      q: `<b>${x[0]}</b> → <b>${x[1]}</b>`, a: x[2], hint: "Every word next to the noun echoes its ending: article, possessive, adjective.", why: `<span class="muted">= ${x[3]}</span>`, sayAfter: x[2][0] }); });
+  const who = () => VERBS.forEach(v => { const r = WHO_REST[v[0]]; if (!r || !inUnits(v[7])) return;
+    shuffle(WHO_SUBJ).slice(0, 4).forEach(([subj, pi, note]) => { if (!v[2 + pi]) return;
+      out.push({ t: "w", id: `${r[1]}.F.who.${v[0]}.${pi}.${subj.length}`, lvl: 2, from: "Formas", task: "Who is it? Then write the verb form.", noGloss: true,
+        q: `${subj} ___ ${r[0]}. <span class="muted">(${v[0]})</span>`, a: [v[2 + pi]], hint: `${subj} = ${note}. ${v[8] ? "Irregular verb: check the Cábula." : "-ar: o, as, a, amos, am."}`,
+        why: `<span class="small">${subj} = ${note} → <b>${v[2 + pi]}</b></span><br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${r[0]}.` }); }); });
+  if (mode === "adj" || mode === "mixed") adj();
+  if (mode === "nouns" || mode === "mixed") nouns();
+  if (mode === "phrases" || mode === "mixed") phrases();
+  if (mode === "who" || mode === "mixed") who();
+  return out;
+}
 const unitLabel = () => { const u = S.units.slice().sort((a, b) => a - b); if (!u.length) return "No units"; const ranges = []; let a = u[0], b = u[0];
   for (const x of u.slice(1).concat([null])) { if (x === b + 1) b = x; else { ranges.push(a === b ? `${a}` : `${a}–${b}`); a = b = x; } } return "Units " + ranges.join(", "); };
 function poolFor(kind) {
@@ -2112,6 +2140,7 @@ const ICON = {
   workbook: '<path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4M2 10h4M2 14h4M2 18h4"/><path d="M21.4 5.6a1 1 0 1 0-3-3l-5 5a2 2 0 0 0-.5.85l-.84 2.87a.5.5 0 0 0 .62.62l2.87-.84a2 2 0 0 0 .85-.5z"/>',
   test: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
   falar: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  formas: '<path d="M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04L16.3 8.9a.7.7 0 0 1-.57 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/>',
   review: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
   flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
   units: '<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
@@ -2243,8 +2272,9 @@ function home() {
       <button class="tile-big wide" data-go="lessons">${ic("lessons")}<span><h3>Lições</h3><span class="small muted">Lessons by unit: explain → practice</span></span></button>
       <button class="tile-big" data-go="cards">${ic("cards")}<h3>Cábulas</h3><span class="small muted">Cheat sheets, one rule per card</span></button>
       <button class="tile-big" data-go="verbs">${ic("verbs")}<h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
+      <button class="tile-big" data-go="formas">${ic("formas")}<h3>Formas</h3><span class="small muted">Endings: gender, plural, verbs. Typing only</span></button>
       <button class="tile-big" data-go="workbook">${ic("workbook")}<h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
-      <button class="tile-big" data-go="test">${ic("test")}<h3>Teste</h3><span class="small muted">Exam ticket: 32 questions, 100 points</span></button>
+      <button class="tile-big wide" data-go="test">${ic("test")}<span><h3>Teste</h3><span class="small muted">Exam ticket: 32 questions, 100 points</span></span></button>
       <!-- Falar (voice lesson prompt) is built but hidden: backlog, see README -->
     </div>
     <div><p class="eyebrow">Cábula do dia</p></div>
@@ -2411,6 +2441,19 @@ function workbook() {
     <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-wb="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${poolFor(k).length} tasks</span></span></button>`).join("")}</div>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
+function formas() {
+  const modes = [["mixed", "Mixed", "A bit of everything"], ["adj", "Him, her, them", "bonito → feminine plural: bonitas"],
+    ["nouns", "Plurals", "o jornal → os jornais"], ["phrases", "Whole phrases", "o meu livro novo → os meus livros novos"],
+    ["who", "Who is it?", "O Rui e a Ana ___ (trabalhar) → trabalham"]];
+  return `${topbar("home", "Home")}
+    <div style="display:flex;gap:12px;align-items:center">${ic("formas")}<div><p class="eyebrow">Formas</p><h1>Endings trainer</h1></div></div>
+    <p class="muted">Gender, number and verb endings. You always type the answer yourself. 10 tasks per set, from ${unitLabel().toLowerCase()}.</p>
+    <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-fm="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${formasPool(k).length} tasks</span></span></button>`).join("")}</div>
+    <p class="eyebrow">Cábulas to keep open</p>
+    <div class="cardlist">${["adjetivos", "plural", "possessivos", "regular", "irregular"].map(id => CARDS.find(c => c.id === id)).map(c => `<button class="cardrow" data-go="card" data-card="${c.id}"><h3>${c.title}</h3><span class="k">${c.key}</span></button>`).join("")}</div>
+    <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
+}
+
 function test() {
   return `${topbar("home", "Home")}
     <div><p class="eyebrow">Teste</p><h1>Exam ticket</h1><p class="muted">Like the school exam: 32 questions with options, from ${unitLabel().toLowerCase()}. 100 points, 50 to pass. No hints, no time limit. Answers are checked at the end. Every ticket is new.</p></div>
@@ -2565,7 +2608,7 @@ function result() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas };
   $app.innerHTML = (V[v] || home)();
 }
 
@@ -2640,6 +2683,11 @@ $app.addEventListener("click", e => {
     const pool = generated().verbs.filter(q => inUnits(q.unit) && (k === "all" || (k === "irr") === q.irr));
     if (!pool.length) return;
     return startQuiz("Verbos", shuffle(pool).slice(0, 10).map(q => ({ ...q })), { name: "verbs" }, null);
+  }
+  if (t.dataset.fm) {
+    const pool = formasPool(t.dataset.fm); if (!pool.length) return;
+    const names = { mixed: "Mixed", adj: "Him, her, them", nouns: "Plurals", phrases: "Whole phrases", who: "Who is it?" };
+    return startQuiz("Formas · " + names[t.dataset.fm], shuffle(pool).slice(0, 10), { name: "formas" }, null);
   }
   if (t.dataset.wb) {
     const pool = poolFor(t.dataset.wb);
