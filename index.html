@@ -2369,6 +2369,7 @@ function home() {
     ${statusBlock()}
     <div class="homebar">
       <button class="unitchip" data-go="units">${unitLabel()} · change</button>
+      <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync phone ↔ computer"}</button>
     </div>
     ${m ? `<button class="tile-big wide" data-go="review">${ic("review")}<span><h3>Review · ${m}</h3><span class="small muted">Things you got wrong. Get each right twice to clear it.</span></span></button>` : ""}
     <div class="tiles">
