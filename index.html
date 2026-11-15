@@ -2640,7 +2640,7 @@ function cardHtml(c, opts) {
   const see = (CARD_SEE[c.id] || []).map(cardById).filter(Boolean);
   return `<section class="cab cat-${cardCat(c.id)}"><h2>${c.title}</h2><div class="key">${c.key}</div>${c.body}${c.trap ? `<p class="trap"><b>Trap:</b> ${c.trap}</p>` : ""}
     ${see.length ? `<div class="seeal"><span class="small muted">Related:</span>${see.map(x => `<button class="seechip cat-${cardCat(x.id)}" data-go="card" data-card="${x.id}"${opts && opts.from ? ` data-from="${opts.from}"` : ""}>${x.title}</button>`).join("")}</div>` : ""}
-    <p class="small muted">Units: ${c.units.map(u => u === 0 ? "Alphabet" : u).join(", ")}</p></section>`;
+    ${opts && opts.page ? "" : `<p class="small muted">Units: ${c.units.map(u => u === 0 ? "Alphabet" : u).join(", ")}</p>`}</section>`;
 }
 const cardText = c => (c.title + " " + c.tags + " " + c.key + " " + c.body + " " + (c.trap || "")).replace(/<[^>]+>/g, " ");
 const fold = t => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -2666,7 +2666,7 @@ function card() {
   return `${topbar(back[0], back[1])}
     <div class="cnav"><button data-go="card" data-card="${prev.id}"${from}><span class="arr">‹</span><span>${prev.title}</span></button>
       <button data-go="card" data-card="${next.id}"${from}><span>${next.title}</span><span class="arr">›</span></button></div>
-    ${cardHtml(c, view.from === "lesson" ? { from: "lesson" } : null)}`;
+    ${cardHtml(c, { page: true, from: view.from === "lesson" ? "lesson" : "" })}`;
 }
 function units() {
   return `${topbar("home", "Home")}
