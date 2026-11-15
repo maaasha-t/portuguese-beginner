@@ -2784,7 +2784,7 @@ function quiz() {
   const said = answered ? answerSentence(q) : "";
   if (said) why += `<button class="hintbtn" style="margin-top:6px" data-say="${said.replace(/"/g, "&quot;")}">${icon.play} Hear it again</button>`;
   const vm = /^verb\.([^.]+)\./.exec(q.id || ""), vrow = vm && VERBS.find(v => v[0] === vm[1]);
-  const rule = vrow ? verbRule(vrow) : RULE[reviewTopic(q.id)] || (q.hint ? `<span>${q.hint}</span>` : "");
+  const rule = vrow ? "" : RULE[reviewTopic(q.id)] || (q.hint ? `<span>${q.hint}</span>` : "");
   if (!right && rule) why += `<div class="rule"><span class="eyebrow">Rule</span>${rule}</div>`;
   return `${topbar(Q.back.name, "Stop")}
     <div class="progress">${bars}</div>
