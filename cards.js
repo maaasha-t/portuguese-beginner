@@ -24,15 +24,21 @@ const CARDS = [
     ["eu", "chamo", "<b>-me</b>", "my name is"], ["tu", "chamas", "<b>-te</b>", "your name is"], ["ele / ela / você", "chama", "<b>-se</b>", "his / her / your name is"]]) +
     `<p>Questions: <i>Como te chamas?</i> (to a friend) · <i>Como se chama?</i> (polite). In a question the little word jumps before the verb.</p>`,
   trap: "Don't mix the persons: tu → chamas-te, not chamas-se." },
-{ id: "serestar", title: "Ser or estar?", units: [3, 10], tags: "ser estar to be permanent temporary doctor place",
-  key: "Ser = what it IS. Estar = how or where it is NOW.",
-  body: `<div class="two"><div class="box"><h3>ser · DOCTOR</h3><ul>
-    <li><b>D</b>escription: <i>é alta</i></li><li><b>O</b>rigin: <i>sou de Kiev</i></li><li><b>C</b>haracteristic: <i>é simpático</i></li>
-    <li><b>T</b>ime: <i>são três horas</i></li><li><b>O</b>ccupation: <i>sou médica</i></li><li><b>R</b>elation: <i>é a minha irmã</i></li></ul></div>
-    <div class="box"><h3>estar · PLACE</h3><ul>
-    <li><b>P</b>osition: <i>está sentada</i></li><li><b>L</b>ocation: <i>estou em casa</i></li><li><b>A</b>ction now: <i>estou a ler</i></li>
-    <li><b>C</b>ondition: <i>está cansado</i></li><li><b>E</b>motion: <i>estou com fome</i></li></ul></div></div>`,
-  trap: "Where a city or country is → ser or ficar: Lisboa é / fica em Portugal." },
+{ id: "serestar", title: "Ser or estar?", units: [3, 10], tags: "ser estar to be permanent temporary now how where",
+  key: "Both = “to be”. ser: what it IS, always. estar: how or where it is NOW.",
+  body: `<div class="use"><div class="uh u-ser">ser · always, who or what</div>
+    <div class="ur"><span class="uw">origin, job</span><span><b>Sou de Kyiv. Sou médica.</b> I'm from Kyiv. I'm a doctor.</span></div>
+    <div class="ur"><span class="uw">looks, character</span><span><b>Ela é alta.</b> She's tall.</span></div>
+    <div class="ur"><span class="uw">who it is</span><span><b>É a minha irmã.</b> It's my sister.</span></div>
+    <div class="ur"><span class="uw">time</span><span><b>São três horas.</b> It's 3 o'clock.</span></div></div>
+  <div class="use"><div class="uh u-estar">estar · now, can change</div>
+    <div class="ur"><span class="uw">place now</span><span><b>Estou em casa.</b> I'm at home.</span></div>
+    <div class="ur"><span class="uw">feeling</span><span><b>Estou cansada.</b> I'm tired.</span></div>
+    <div class="ur"><span class="uw">doing now</span><span><b>Estou a ler.</b> I'm reading.</span></div></div>
+  <div class="use"><div class="uh u-both">same word, new meaning</div>
+    <div class="ur"><span class="uw">always</span><span><b>Ela é bonita.</b> She's pretty.</span></div>
+    <div class="ur"><span class="uw">today</span><span><b>Ela está bonita.</b> She looks pretty today.</span></div></div>`,
+  trap: "Where a city is → ser or ficar, not estar: Lisboa é / fica em Portugal." },
 { id: "contracoes", title: "Little words that merge", units: [2, 5, 7, 8], tags: "contractions de em do da no na num numa disto nisto prepositions articles",
   key: "Preposition + o / a / os / as = one word. Always. Never “em o”.",
   body: tbl(["", "o", "a", "os", "as", "um / uma", "isto"], [
