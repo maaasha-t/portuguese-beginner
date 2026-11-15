@@ -2103,7 +2103,7 @@ function formasPool(mode) {
     shuffle(WHO_SUBJ).slice(0, 4).forEach(([subj, pi, note]) => { if (!v[2 + pi]) return;
       out.push({ t: "w", id: `${r[1]}.F.who.${v[0]}.${pi}.${subj.length}`, lvl: 2, from: "Formas", task: "Who is it? Then write the verb form.", noGloss: true,
         q: `${subj} ___ ${r[0]}. <span class="muted">(${v[0]})</span>`, a: [v[2 + pi]], hint: `${subj} = ${note}. ${v[8] ? "Irregular verb: check the Cábula." : "-ar: o, as, a, amos, am."}`,
-        why: `<span class="small">${subj} = ${note} → <b>${v[2 + pi]}</b></span><br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${r[0]}.` }); }); });
+        why: `<span class="muted">= ${whoEn(subj, pi, v[0], r[0], false)}</span><br><span class="small">${subj} = ${note} → <b>${v[2 + pi]}</b></span><br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${r[0]}.` }); }); });
   if (mode === "adj" || mode === "mixed") adj();
   if (mode === "nouns" || mode === "mixed") nouns();
   if (mode === "phrases" || mode === "mixed") phrases();
@@ -2585,19 +2585,41 @@ function units() {
     <div class="chips">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button class="chip ${inUnits(n) ? "on" : ""}" data-unit="${n}">${n}</button>`).join("")}</div>
     <div class="row"><button class="btn ghost" data-unitset="all">All units</button><button class="btn" data-go="home">Done</button></div>`;
 }
+// English translation of a "who is it?" sentence
+const EN_SUBJ = { "Eu": "I", "Tu": "you", "A Ana": "Ana", "O senhor": "you (sir)", "Você": "you", "O meu pai": "my father", "Nós": "we", "A Rita e eu": "Rita and I",
+  "O Rui e a Ana": "Rui and Ana", "Vocês": "you all", "Os meus pais": "my parents", "Elas": "they" };
+const EN_VERB = { ser: "be", estar: "be", ter: "have", falar: "speak", morar: "live", ficar: "stay", gostar: "like", trabalhar: "work", estudar: "study",
+  viajar: "travel", ganhar: "earn", usar: "wear", ler: "read", ver: "watch", dançar: "dance", cozinhar: "cook" };
+const EN_REST = { "de Portugal": "from Portugal", "de Lisboa": "from Lisbon", "do Brasil": "from Brazil", "da Ucrânia": "from Ukraine", "em casa": "at home",
+  "no escritório": "in the office", "em Lisboa agora": "in Lisbon now", "com fome": "hungry", "com frio": "cold", "dois irmãos": "two brothers",
+  "um carro novo": "a new car", "olhos azuis": "blue eyes", "muito trabalho": "a lot of work", "o jornal": "the newspaper", "muitos livros": "a lot of books",
+  "em português": "in Portuguese", "televisão": "TV", "filmes à noite": "films at night", "o mapa": "the map", "inglês": "English", "em Lisboa": "in Lisbon",
+  "em casa hoje": "at home today", "de café": "coffee", "num escritório": "in an office", "português": "Portuguese", "muito": "a lot", "bem": "well",
+  "óculos": "glasses", "salsa": "salsa" };
+function whoEn(subj, pi, inf, rest, neg) {
+  const S0 = EN_SUBJ[subj] || subj, b = EN_VERB[inf], you = /^you/.test(S0), third = pi === 2 && !you;
+  let v;
+  if (b === "be") v = pi === 0 ? (neg ? "am not" : "am") : third ? (neg ? "isn't" : "is") : (neg ? "aren't" : "are");
+  else if (neg) v = (third ? "doesn't " : "don't ") + b;
+  else v = !third ? b : b === "have" ? "has" : /y$/.test(b) && !/ay$/.test(b) ? b.slice(0, -1) + "ies" : /(ch|sh|s|x)$/.test(b) ? b + "es" : b + "s";
+  const r = EN_REST[rest] !== undefined ? EN_REST[rest] : rest;
+  const out = `${S0} ${v} ${r}`.trim();
+  return out.charAt(0).toUpperCase() + out.slice(1) + ".";
+}
 // Level 2: the verb inside a sentence; you work out the person yourself
 const VREST = {
   ser: ["de Portugal", "de Lisboa", "do Brasil", "da Ucrânia"], estar: ["em casa", "no escritório", "em Lisboa agora", "com fome", "com frio"],
   ter: ["dois irmãos", "um carro novo", "olhos azuis", "muito trabalho"], ler: ["o jornal", "muitos livros", "em português"], ver: ["televisão", "filmes à noite", "o mapa"],
 };
-const CHAMAR = [["Eu", 0, "eu", "Ana."], ["Tu", 1, "tu", "Rita?"], ["A minha irmã", 2, "she → ela", "Sofia."], ["O meu pai", 2, "he → ele", "Rui."], ["Você", 2, "você → like ele", "Pedro?"], ["O professor", 2, "he → ele", "Tiago."]];
+const CHAMAR = [["Eu", 0, "eu", "Ana.", "My name is Ana."], ["Tu", 1, "tu", "Rita?", "Is your name Rita?"], ["A minha irmã", 2, "she → ela", "Sofia.", "My sister's name is Sofia."],
+  ["O meu pai", 2, "he → ele", "Rui.", "My father's name is Rui."], ["Você", 2, "você → like ele", "Pedro?", "Is your name Pedro?"], ["O professor", 2, "he → ele", "Tiago.", "The teacher's name is Tiago."]];
 function verbSentences(ok) {
   const out = [];
   VERBS.filter(ok).forEach(v => {
     if (v[0] === "chamar-se") {
-      CHAMAR.forEach(([subj, pi, note, name], j) => out.push({ t: "w", id: `verb.${v[0]}.S.${pi}.${j}`, lvl: 2, unit: v[7], from: "Verbos", task: "Who is it? Then write the verb form.", noGloss: true,
+      CHAMAR.forEach(([subj, pi, note, name, en], j) => out.push({ t: "w", id: `verb.${v[0]}.S.${pi}.${j}`, lvl: 2, unit: v[7], from: "Verbos", task: "Who is it? Then write the verb form.", noGloss: true,
         q: `${subj} ___ ${name} <span class="muted">(chamar-se)</span>`, a: [v[2 + pi]], hint: `${subj} = ${note}`,
-        why: `<span class="small">${subj} = ${note} → <b>${v[2 + pi]}</b></span><br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${name}` }));
+        why: `<span class="muted">= ${en}</span><br><span class="small">${subj} = ${note} → <b>${v[2 + pi]}</b></span><br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${name}` }));
       return;
     }
     const rests = VREST[v[0]] || (WHO_REST[v[0]] ? [WHO_REST[v[0]][0]] : null); if (!rests) return;
@@ -2607,7 +2629,7 @@ function verbSentences(ok) {
       const drop = ["Eu", "Tu", "Nós"].includes(subj) && j % 2 === 1;
       const q = drop ? `${neg ? "Não " : ""}___ ${rest}. <span class="muted">(${subj.toLowerCase()} · ${v[0]})</span>` : `${subj} ${neg}___ ${rest}. <span class="muted">(${v[0]})</span>`;
       out.push({ t: "w", id: `verb.${v[0]}.S.${pi}.${j}`, lvl: 2, unit: v[7], from: "Verbos", task: "Who is it? Then write the verb form.", noGloss: true,
-        q, a: [form], hint: `${subj} = ${note}`, why: `<span class="small">${subj} = ${note} → <b>${form}</b></span><br>${verbTable(v, pi)}`,
+        q, a: [form], hint: `${subj} = ${note}`, why: `<span class="muted">= ${whoEn(drop ? subj : subj, pi, v[0], rest, !!neg)}</span><br><span class="small">${subj} = ${note} → <b>${form}</b></span><br>${verbTable(v, pi)}`,
         sayAfter: `${drop ? "" : subj + " "}${neg}${form} ${rest}.`.replace(/^n/, "N").replace(/^./, c => c.toUpperCase()) });
     });
   });
