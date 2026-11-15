@@ -58,7 +58,24 @@
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.5; }
-.wrap { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 48px; display: flex; flex-direction: column; gap: 18px; }
+.wrap { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 48px; }
+.main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.side { display: none; }
+@media (min-width: 980px) {
+  .wrap { max-width: 1160px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; padding-inline: 32px; }
+  .main { max-width: 760px; width: 100%; }
+  .side { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; padding-top: 8px; }
+  .sbrand { display: flex; flex-direction: column; padding: 0 10px 14px; }
+  .sbrand b { font-family: var(--font-display); font-size: 22px; }
+  .sitem { display: flex; align-items: center; gap: 10px; background: none; border: 0; border-radius: 10px; padding: 8px 10px; font-weight: 700; color: var(--fg); text-align: left; width: 100%; font-size: 16px; }
+  .sitem .ic { width: 32px; height: 32px; border-radius: 9px; }
+  .sitem:hover { background: var(--surface); }
+  .sitem.on { background: var(--accent-soft); color: var(--accent); }
+  .sfoot { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 14px; padding: 14px 10px 0; border-top: 1px solid var(--line); }
+  .homebtn { display: none; }
+  .main > .tiles, .main > .homebar { display: none; }
+  .tiles { grid-template-columns: repeat(3, 1fr); }
+}
 h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
 h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
 h2 { font-size: 23px; font-weight: 800; }
@@ -201,6 +218,8 @@ a { color: var(--accent); }
 .ic-falar { background: #efe4fb; color: #6b3fb3; }
 .ic-formas { background: #dff3f1; color: #157a72; }
 .ic-review { background: var(--bad-soft); color: var(--bad); }
+.ic-home { background: var(--accent-soft); color: var(--accent); }
+.ic svg { width: 60%; height: 60%; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic-formas { background: #143532; color: #6fd6cb; } :root:not([data-theme="light"]) .ic-lessons { background: #3a3014; color: #f2c230; } :root:not([data-theme="light"]) .ic-verbs { background: #22305a; color: #7d9bff; } :root:not([data-theme="light"]) .ic-workbook { background: #43201e; color: #ff8a80; } :root:not([data-theme="light"]) .ic-test { background: #173a2b; color: #5fd09a; } :root:not([data-theme="light"]) .ic-falar { background: #2e2245; color: #c4a6f2; } }
 :root[data-theme="dark"] .ic-formas { background: #143532; color: #6fd6cb; } :root[data-theme="dark"] .ic-lessons { background: #3a3014; color: #f2c230; } :root[data-theme="dark"] .ic-verbs { background: #22305a; color: #7d9bff; } :root[data-theme="dark"] .ic-workbook { background: #43201e; color: #ff8a80; } :root[data-theme="dark"] .ic-test { background: #173a2b; color: #5fd09a; } :root[data-theme="dark"] .ic-falar { background: #2e2245; color: #c4a6f2; }
 .homebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -2085,29 +2104,38 @@ function generated() {
 }
 const inUnits = n => S.units.includes(+n);
 const FORM_LABEL = ["masculine singular", "feminine singular", "masculine plural", "feminine plural"];
-function formasPool(mode) {
-  const out = [];
-  const adj = () => ADJ.forEach(a => { if (!inUnits(a[5])) return; [1, 2, 3].forEach(i => {
-    if (i === 1 && a[1] === a[0]) return;
-    out.push({ t: "w", id: `${a[6]}.F.adj.${a[0]}.${i}`, lvl: 2, from: "Formas", task: "Write the form.", noGloss: true,
-      q: `<b>${a[0]}</b> (${a[4]}) → <b>${FORM_LABEL[i]}</b>`, a: [a[i]], hint: FORM_RULE[a[7]],
-      why: `<span class="small">${a[0]} · ${a[1]} · ${a[2]} · ${a[3]}</span><br><span class="small muted">${FORM_RULE[a[7]]}</span>`, sayAfter: a[i] });
-  }); });
-  const nouns = () => NOUNS.forEach(n => { if (!inUnits(n[3])) return;
-    out.push({ t: "w", id: `${n[4]}.F.pl.${n[0].split(" ")[1]}`, lvl: 2, from: "Formas", task: "Write the plural, with the article.", noGloss: true,
-      q: `<b>${n[0]}</b> (${n[2]}) → <b>plural</b>`, a: [n[1], n[1].split(" ").slice(1).join(" ")], hint: n[5], why: `<span class="small muted">${n[5]}</span>`, sayAfter: n[1] }); });
-  const phrases = () => PHRASES.forEach((x, i) => { if (!inUnits(x[4])) return;
-    out.push({ t: "w", id: `${x[5]}.F.ph.${i}`, lvl: 2, from: "Formas", task: "Rewrite the whole phrase. Every word has to agree.", noGloss: true,
-      q: `<b>${x[0]}</b> → <b>${x[1]}</b>`, a: x[2], hint: "Every word next to the noun echoes its ending: article, possessive, adjective.", why: `<span class="muted">= ${x[3]}</span>`, sayAfter: x[2][0] }); });
-  const who = () => VERBS.forEach(v => { const r = WHO_REST[v[0]]; if (!r || !inUnits(v[7])) return;
-    shuffle(WHO_SUBJ).slice(0, 4).forEach(([subj, pi, note]) => { if (!v[2 + pi]) return;
-      out.push({ t: "w", id: `${r[1]}.F.who.${v[0]}.${pi}.${subj.length}`, lvl: 2, from: "Formas", task: "Who is it? Then write the verb form.", noGloss: true,
-        q: `${subj} ___ ${r[0]}. <span class="muted">(${v[0]})</span>`, a: [v[2 + pi]], hint: `${subj} = ${note}. ${v[8] ? "Irregular verb: check the Cábula." : "-ar: o, as, a, amos, am."}`,
-        why: `<span class="muted">= ${whoEn(subj, pi, v[0], r[0], false)}</span><br><span class="small">${subj} = ${note} → <b>${v[2 + pi]}</b></span><br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${r[0]}.` }); }); });
+function formasPool(mode, lvl) {
+  lvl = lvl || S.formLvl || 1;
+  const out = [], L = lvl === 2 ? 2 : 1;
+  const adjQ = (a, from, to, k) => out.push({ t: "w", id: `${a[6]}.F${L}.adj.${a[0]}.${from}${to}`, lvl: L, from: "Formas", task: "Write the form.", noGloss: true,
+    q: `<b>${a[from]}</b> (${a[4]}) → <b>${FORM_LABEL[to]}</b>`, a: [a[to]], hint: FORM_RULE[a[7]],
+    why: `<span class="small">${a[0]} · ${a[1]} · ${a[2]} · ${a[3]}</span><br><span class="small muted">${FORM_RULE[a[7]]}</span>`, sayAfter: a[to] });
+  // Level 1: one change at a time. Level 2: two changes at once, and backwards.
+  const adj = () => ADJ.forEach(a => { if (!inUnits(a[5])) return;
+    if (L === 1) { if (a[1] !== a[0]) adjQ(a, 0, 1); adjQ(a, 0, 2); }
+    else { adjQ(a, 0, 3); if (a[3] !== a[0]) adjQ(a, 3, 0); if (a[1] !== a[2]) adjQ(a, 1, 2); } });
+  const AGREE = ADJ.filter(a => ["o", "e", "l"].includes(a[7]) && a[5] <= 7 && a[6] !== "u6.profissoes" && a[6] !== "u3.nac");
+  const nouns = () => NOUNS.forEach((n, i) => { if (!inUnits(n[3])) return;
+    if (L === 1) { out.push({ t: "w", id: `${n[4]}.F.pl.${n[0].split(" ")[1]}`, lvl: 1, from: "Formas", task: "Write the plural, with the article.", noGloss: true,
+      q: `<b>${n[0]}</b> (${n[2]}) → <b>plural</b>`, a: [n[1], n[1].split(" ").slice(1).join(" ")], hint: n[5], why: `<span class="small muted">${n[5]}</span>`, sayAfter: n[1] }); return; }
+    const g = n[0].startsWith("a ") ? 1 : 0, a = AGREE[(i * 7) % AGREE.length], w = n[0].split(" ").slice(1).join(" "), wp = n[1].split(" ").slice(1).join(" ");
+    out.push({ t: "w", id: `${n[4]}.F2.pl.${w}`, lvl: 2, from: "Formas", task: "Write the plural. The noun and the adjective both change.", noGloss: true,
+      q: `<b>${n[0]} ${a[g]}</b> → <b>plural</b>`, a: [`${n[1]} ${a[g + 2]}`], hint: `${n[5]} Adjective: ${FORM_RULE[a[7]]}`,
+      why: `<span class="small muted">${n[5]} · ${a[g]} → ${a[g + 2]}</span>`, sayAfter: `${n[1]} ${a[g + 2]}` }); });
+  const POSS1 = [["meu", "minha", "meus", "minhas"], ["teu", "tua", "teus", "tuas"], ["nosso", "nossa", "nossos", "nossas"]];
+  const phrases = () => {
+    if (L === 1) NOUNS.forEach((n, i) => { if (!inUnits(Math.max(5, n[3]))) return;
+      const g = n[0].startsWith("a ") ? 1 : 0, p = POSS1[i % 3], w = n[0].split(" ").slice(1).join(" "), wp = n[1].split(" ").slice(1).join(" ");
+      out.push({ t: "w", id: `u5.possessivos.F1.ph.${w}`, lvl: 1, from: "Formas", task: "Write it in the plural. The article and the possessive change too.", noGloss: true,
+        q: `<b>${n[0].split(" ")[0]} ${p[g]} ${w}</b> → <b>plural</b>`, a: [`${g ? "as" : "os"} ${p[g + 2]} ${wp}`], hint: "o meu → os meus, a minha → as minhas. Then the noun.",
+        why: `<span class="small muted">${g ? "a" : "o"} ${p[g]} → ${g ? "as" : "os"} ${p[g + 2]} · ${n[5]}</span>`, sayAfter: `${g ? "as" : "os"} ${p[g + 2]} ${wp}` }); });
+    else PHRASES.forEach((x, i) => { if (!inUnits(x[4])) return;
+      out.push({ t: "w", id: `${x[5]}.F.ph.${i}`, lvl: 2, from: "Formas", task: "Rewrite the whole phrase. Every word has to agree.", noGloss: true,
+        q: `<b>${x[0]}</b> → <b>${x[1]}</b>`, a: x[2], hint: "Every word next to the noun echoes its ending: article, possessive, adjective.", why: `<span class="muted">= ${x[3]}</span>`, sayAfter: x[2][0] }); });
+  };
   if (mode === "adj" || mode === "mixed") adj();
   if (mode === "nouns" || mode === "mixed") nouns();
   if (mode === "phrases" || mode === "mixed") phrases();
-  if (mode === "who" || mode === "mixed") who();
   return out;
 }
 const unitLabel = () => { const u = S.units.slice().sort((a, b) => a - b); if (!u.length) return "No units"; const ranges = []; let a = u[0], b = u[0];
@@ -2274,6 +2302,7 @@ const ICON = {
   falar: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
   formas: '<path d="M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04L16.3 8.9a.7.7 0 0 1-.57 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/>',
   review: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
   units: '<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
 };
@@ -2436,14 +2465,12 @@ function home() {
       <button class="tile-big wide" data-go="lessons">${ic("lessons")}<span><h3>Lições</h3><span class="small muted">Lessons by unit: explain → practice</span></span></button>
       <button class="tile-big" data-go="cards">${ic("cards")}<h3>Cábulas</h3><span class="small muted">Cheat sheets, one rule per card</span></button>
       <button class="tile-big" data-go="verbs">${ic("verbs")}<h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
-      <button class="tile-big" data-go="formas">${ic("formas")}<h3>Formas</h3><span class="small muted">Endings: gender, plural, verbs. Typing only</span></button>
+      <button class="tile-big" data-go="formas">${ic("formas")}<h3>Formas</h3><span class="small muted">Gender and number. Typing only, 2 levels</span></button>
       <button class="tile-big" data-go="workbook">${ic("workbook")}<h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
       <button class="tile-big wide" data-go="test">${ic("test")}<span><h3>Teste</h3><span class="small muted">Exame: typing only, like the real one · or a ticket with options</span></span></button>
       <!-- Falar (voice lesson prompt) is built but hidden: backlog, see README -->
     </div>
-    <div><p class="eyebrow">Cábula do dia</p></div>
-    <button class="cardrow" data-go="card" data-card="${cd.id}"><h3>${cd.title}</h3><span class="k">${cd.key}</span></button>
-    <p class="small muted">Your progress is saved on this phone.</p>`;
+`;
 }
 
 /* ---------- Falar: prompt for a voice tutor ---------- */
@@ -2682,15 +2709,24 @@ function workbook() {
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 function formas() {
-  const modes = [["mixed", "Mixed", "A bit of everything"], ["adj", "Him, her, them", "bonito → feminine plural: bonitas"],
-    ["nouns", "Plurals", "o jornal → os jornais"], ["phrases", "Whole phrases", "o meu livro novo → os meus livros novos"],
-    ["who", "Who is it?", "O Rui e a Ana ___ (trabalhar) → trabalham"]];
+  const L = S.formLvl === 2 ? 2 : 1;
+  const modes = L === 1
+    ? [["mixed", "Mixed", "A bit of everything"], ["adj", "Him, her, them", "one change: bonito → feminine: bonita"], ["nouns", "Plurals", "o jornal → os jornais"], ["phrases", "My, your, our", "o meu livro → os meus livros"]]
+    : [["mixed", "Mixed", "A bit of everything"], ["adj", "Him, her, them", "two changes: bonito → feminine plural: bonitas"], ["nouns", "Plurals", "o hotel caro → os hotéis caros"], ["phrases", "Whole phrases", "o meu amigo simpático → a minha amiga simpática"]];
   return `${topbar("home", "Home")}
-    <div style="display:flex;gap:12px;align-items:center">${ic("formas")}<div><p class="eyebrow">Formas</p><h1>Endings trainer</h1></div></div>
-    <p class="muted">Gender, number and verb endings. You always type the answer yourself. 10 tasks per set, from ${unitLabel().toLowerCase()}.</p>
-    <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-fm="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${formasPool(k).length} tasks</span></span></button>`).join("")}</div>
-    <p class="eyebrow">Cábulas to keep open</p>
-    <div class="cardlist">${["adjetivos", "plural", "possessivos", "regular", "irregular"].map(id => CARDS.find(c => c.id === id)).map(c => `<button class="cardrow" data-go="card" data-card="${c.id}"><h3>${c.title}</h3><span class="k">${c.key}</span></button>`).join("")}</div>
+    <div style="display:flex;gap:12px;align-items:center">${ic("formas")}<div><p class="eyebrow">Formas</p><h1>Gender and number</h1></div></div>
+    <div class="segs" role="group" aria-label="Level">
+      <button class="${L === 1 ? "on" : ""}" data-flvl="1">Level 1 · one change</button>
+      <button class="${L === 2 ? "on" : ""}" data-flvl="2">Level 2 · several changes</button></div>
+    <p class="small muted">${L === 1 ? "One thing changes: feminine OR plural, one word or a short pair." : "Several things change at once: feminine plural, noun + adjective, whole phrases."} You always type the answer. 10 tasks per set, from ${unitLabel().toLowerCase()}.</p>
+    <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-fm="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${formasPool(k, L).length} tasks</span></span></button>`).join("")}</div>
+    <p class="eyebrow">Cheat sheets · tap to open</p>
+    <div class="folds">
+      ${foldBox("Gender and number: adjectives", cardHtml(CARDS.find(c => c.id === "adjetivos")))}
+      ${foldBox("Making plurals", cardHtml(CARDS.find(c => c.id === "plural")))}
+      ${foldBox("Articles and gender", cardHtml(CARDS.find(c => c.id === "artigos")))}
+      ${foldBox("My, your, his: possessives", cardHtml(CARDS.find(c => c.id === "possessivos")))}
+    </div>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 
@@ -2914,11 +2950,26 @@ function result() {
     </div>`;
 }
 
+// desktop only (wide screens): menu on the left
+function sideNav() {
+  const cur = view.name === "quiz" || view.name === "result" ? (Q && Q.back ? Q.back.name : "home") : view.name;
+  const sec = { lesson: "lessons", chunk: "lessons", card: "cards", exame: "test" }[cur] || cur;
+  const m = mistakeCount();
+  const item = (k, label, icn) => `<button class="sitem ${sec === k ? "on" : ""}" data-go="${k}">${ic(icn || k)}<span>${label}</span></button>`;
+  return `<nav class="side" aria-label="Menu">
+    <div class="sbrand"><b>Caderno</b><span class="small muted">Passaporte 1 · A1–A2</span></div>
+    ${item("home", "Home")}
+    ${m ? `<button class="sitem" data-go="review">${ic("review")}<span>Review · ${m}</span></button>` : ""}
+    ${item("lessons", "Lições")}${item("cards", "Cábulas")}${item("verbs", "Verbos")}${item("formas", "Formas")}${item("workbook", "Workbook")}${item("test", "Teste")}
+    <div class="sfoot"><button class="unitchip" data-go="units">${unitLabel()} · change</button>
+    <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync phone ↔ computer"}</button></div>
+  </nav>`;
+}
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
   const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame };
-  $app.innerHTML = (V[v] || home)();
+  $app.innerHTML = `${sideNav()}<div class="main">${(V[v] || home)()}</div>`;
 }
 
 /* ---------- typed answers ---------- */
@@ -3036,11 +3087,13 @@ $app.addEventListener("click", e => {
     if (!pool.length) return;
     return startQuiz("Verbos", shuffle(pool).slice(0, 10).map(q => ({ ...q })), { name: "verbs" }, null);
   }
+  if (t.dataset.flvl) { S.formLvl = +t.dataset.flvl; save(); return render(); }
   if (t.dataset.fm) {
     const pool = formasPool(t.dataset.fm); if (!pool.length) return;
-    const names = { mixed: "Mixed", adj: "Him, her, them", nouns: "Plurals", phrases: "Whole phrases", who: "Who is it?" };
-    return startQuiz("Formas · " + names[t.dataset.fm], shuffle(pool).slice(0, 10), { name: "formas" }, null);
+    const names = { mixed: "Mixed", adj: "Him, her, them", nouns: "Plurals", phrases: S.formLvl === 2 ? "Whole phrases" : "My, your, our" };
+    return startQuiz(`Formas · Level ${S.formLvl === 2 ? 2 : 1} · ${names[t.dataset.fm]}`, shuffle(pool).slice(0, 10), { name: "formas" }, null);
   }
+
   if (t.dataset.wb) {
     const pool = poolFor(t.dataset.wb);
     if (!pool.length) return;
