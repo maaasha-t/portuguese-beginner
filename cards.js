@@ -27,7 +27,7 @@ const CARDS = [
 { id: "serestar", title: "Ser or estar?", units: [3, 10], tags: "ser estar to be permanent temporary now how where",
   key: "Both = “to be”. ser: what it IS, always. estar: how or where it is NOW.",
   body: `<div class="use"><div class="uh u-ser">ser · always, who or what</div>
-    <div class="ur"><span class="uw">origin, job</span><span><b>Sou de Kyiv. Sou médica.</b> I'm from Kyiv. I'm a doctor.</span></div>
+    <div class="ur"><span class="uw">origin, job</span><span><b>Sou de Lisboa. Sou médica.</b> I'm from Lisbon. I'm a doctor.</span></div>
     <div class="ur"><span class="uw">looks, character</span><span><b>Ela é alta.</b> She's tall.</span></div>
     <div class="ur"><span class="uw">who it is</span><span><b>É a minha irmã.</b> It's my sister.</span></div>
     <div class="ur"><span class="uw">time</span><span><b>São três horas.</b> It's 3 o'clock.</span></div></div>
