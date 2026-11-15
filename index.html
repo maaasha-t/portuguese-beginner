@@ -2670,10 +2670,6 @@ function verbs() {
       ${foldBox("List of irregular verbs", `<section class="cab"><p class="small">${vs.filter(v => v[8]).map(v => `<b>${v[0]}</b> ${v[1]}`).join(" · ")}</p><p class="small muted">No pattern: learn each one by heart.</p></section>`)}
       ${foldBox("Chamar-se: my name is", cardHtml(CARDS.find(c => c.id === "chamarse")))}
       ${foldBox("Ser or estar?", cardHtml(CARDS.find(c => c.id === "serestar")))}
-      ${foldBox("Gender and number: adjectives", cardHtml(CARDS.find(c => c.id === "adjetivos")))}
-      ${foldBox("Making plurals", cardHtml(CARDS.find(c => c.id === "plural")))}
-      ${foldBox("Articles and gender", cardHtml(CARDS.find(c => c.id === "artigos")))}
-      ${foldBox("My, your, his: possessives", cardHtml(CARDS.find(c => c.id === "possessivos")))}
     </div>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
