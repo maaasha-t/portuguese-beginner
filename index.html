@@ -2571,6 +2571,19 @@ function units() {
     <div class="chips">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button class="chip ${inUnits(n) ? "on" : ""}" data-unit="${n}">${n}</button>`).join("")}</div>
     <div class="row"><button class="btn ghost" data-unitset="all">All units</button><button class="btn" data-go="home">Done</button></div>`;
 }
+// pick your own verbs: learn one or two at a time
+function verbPicker(vs) {
+  const pick = (S.verbPick || []).filter(n => vs.some(v => v[0] === n)), on = n => pick.includes(n);
+  const chip = v => `<button class="chip ${on(v[0]) ? "on" : ""}" data-vpick="${v[0]}">${v[0]}</button>`;
+  const sel = vs.filter(v => on(v[0]));
+  const table = sel.length ? tbl(["", ...sel.map(v => v[0])], PERSONS.map((p, i) => [p, ...sel.map(v => v[2 + i] || "–")])) : "";
+  return `<section class="exsec"><h2>Pick the verbs you want</h2>
+    <p class="small muted">Learning one by one is easier. Pick one verb, look at the table, then practise it. Add the next verb when this one feels easy.</p>
+    <p class="eyebrow">Irregular</p><div class="chips">${vs.filter(v => v[8]).map(chip).join("")}</div>
+    <p class="eyebrow">Regular -ar</p><div class="chips">${vs.filter(v => !v[8]).map(chip).join("")}</div>
+    ${table ? `<div class="cab">${table}</div>` : ""}
+    <button class="btn" data-verbs="pick" ${sel.length ? "" : "disabled"}>${sel.length ? `Practise ${sel.map(v => v[0]).join(", ")}` : "Pick at least one verb"}</button></section>`;
+}
 const foldBox = (title, html) => `<details class="fold"><summary>${title}</summary>${html}</details>`;
 function verbs() {
   const vs = VERBS.filter(v => inUnits(v[7]));
@@ -2581,6 +2594,7 @@ function verbs() {
       <button class="btn ghost" data-verbs="irr">Irregular only (ser, estar, ter, ler, ver…)</button>
       <button class="btn ghost" data-verbs="reg">Regular -ar verbs only</button>
     </div>
+    ${verbPicker(vs)}
     <p class="eyebrow">Cheat sheets · tap to open</p>
     <div class="folds">
       ${foldBox("Regular verbs: the endings", cardHtml(CARDS.find(c => c.id === "regular")))}
@@ -2938,8 +2952,16 @@ $app.addEventListener("click", e => {
     return;
   }
   if (t.dataset.unitset) { S.units = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; save(); return render(); }
+  if (t.dataset.vpick) { const n = t.dataset.vpick, p = S.verbPick || []; S.verbPick = p.includes(n) ? p.filter(x => x !== n) : [...p, n]; save(); const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if (t.dataset.verbs) {
     const k = t.dataset.verbs;
+    if (k === "pick") {
+      const pick = S.verbPick || [], pool = generated().verbs.filter(q => pick.includes(q.id.split(".")[1]) && inUnits(q.unit));
+      if (!pool.length) return;
+      // one verb: first in order (eu → eles), then mixed; several verbs: mixed
+      const qs = pick.length === 1 ? [...pool, ...shuffle(pool)] : shuffle(pool).slice(0, Math.max(10, Math.min(pool.length, 15)));
+      return startQuiz("Verbos · " + pick.join(", "), qs.map(q => ({ ...q })), { name: "verbs" }, null);
+    }
     const pool = generated().verbs.filter(q => inUnits(q.unit) && (k === "all" || (k === "irr") === q.irr));
     if (!pool.length) return;
     return startQuiz("Verbos", shuffle(pool).slice(0, 10).map(q => ({ ...q })), { name: "verbs" }, null);
