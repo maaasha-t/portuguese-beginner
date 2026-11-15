@@ -207,6 +207,14 @@ a { color: var(--accent); }
 .exbar { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
 .accents button { min-width: 40px; padding: 8px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 18px; }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hlist { grid-template-columns: 1fr; gap: 6px; }
+.hrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px 8px 8px; }
+.hrow .ic { width: 38px; height: 38px; border-radius: 10px; }
+.ht { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.25; }
+.ht b { font-family: var(--font-display); font-size: 17px; }
+.ht span { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hgo { color: var(--muted); font-size: 22px; line-height: 1; }
+.hrev { border-color: var(--bad); }
 .tile-big { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; width: 100%; }
 .tile-big.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 14px; }
 .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; }
@@ -223,7 +231,8 @@ a { color: var(--accent); }
 .ic svg { width: 60%; height: 60%; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic-formas { background: #143532; color: #6fd6cb; } :root:not([data-theme="light"]) .ic-lessons { background: #3a3014; color: #f2c230; } :root:not([data-theme="light"]) .ic-verbs { background: #22305a; color: #7d9bff; } :root:not([data-theme="light"]) .ic-workbook { background: #43201e; color: #ff8a80; } :root:not([data-theme="light"]) .ic-test { background: #173a2b; color: #5fd09a; } :root:not([data-theme="light"]) .ic-falar { background: #2e2245; color: #c4a6f2; } }
 :root[data-theme="dark"] .ic-formas { background: #143532; color: #6fd6cb; } :root[data-theme="dark"] .ic-lessons { background: #3a3014; color: #f2c230; } :root[data-theme="dark"] .ic-verbs { background: #22305a; color: #7d9bff; } :root[data-theme="dark"] .ic-workbook { background: #43201e; color: #ff8a80; } :root[data-theme="dark"] .ic-test { background: #173a2b; color: #5fd09a; } :root[data-theme="dark"] .ic-falar { background: #2e2245; color: #c4a6f2; }
-.homebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.homebar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.homebar .unitchip { font-size: 13px; padding: 5px 11px; }
 .streak { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
 .streak svg { width: 18px; height: 18px; fill: none; stroke: #e0672a; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .streak.done svg { fill: #f2a23a; }
@@ -286,13 +295,13 @@ a { color: var(--accent); }
 .resitem { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
 @media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
 .status { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
-.status summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.status summary { list-style: none; cursor: pointer; padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 6px; }
 .status summary::-webkit-details-marker { display: none; }
 .sumtop { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.sumtop h2 { font-size: 20px; }
+.sumtop h2 { font-size: 18px; }
 .chev { color: var(--accent); font-weight: 700; font-size: 14px; white-space: nowrap; }
-.pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.pill { border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; }
+.pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.pill { border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .p-bad { background: var(--bad-soft); color: var(--bad); } .p-warn { background: var(--warn-soft); color: var(--warn); }
 .p-lite { background: var(--lite-soft); color: var(--lite); } .p-good { background: var(--good); color: var(--surface); } .p-none { background: var(--line); color: var(--muted); }
 .stbody { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -2406,7 +2415,7 @@ function statusBlock() {
   const title = red.length ? `Go back to ${Math.min(red.length, 3)} topic${red.length > 1 ? "s" : ""}` : yellow.length ? `Check ${yellow.length} topic${yellow.length > 1 ? "s" : ""} again later` : anyLog ? "Nothing to fix right now" : "Your status";
   const line = !anyLog ? "Start with Lições. Your status builds up as you practise."
     : `${lastT ? `Last Teste: ${lastT.score}/100 · ${lastT.score >= 50 ? "passed" : "not passed"}. ` : ""}${red.length ? `Start with <b>${red[0].c.title}</b>.` : yellow.length ? `Check <b>${yellow[0].c.title}</b> again on another day.` : "Keep going with the next lesson."}`;
-  const pills = `<div class="pills"><span class="pill p-bad">${cnt("red")} mistakes</span><span class="pill p-warn">${cnt("yellow")} after mistakes</span><span class="pill p-lite">${cnt("lite")} easy level ✓</span><span class="pill p-good">${cnt("dark")} hard level ✓</span><span class="pill p-none">${cnt("none")} not started</span></div>`;
+  const pills = `<div class="pills"><span class="pill p-bad">${cnt("red")} mistakes</span><span class="pill p-warn">${cnt("yellow")} after mistakes</span><span class="pill p-lite">${cnt("lite")} easy ✓</span><span class="pill p-good">${cnt("dark")} hard ✓</span><span class="pill p-none">${cnt("none")} not started</span></div>`;
   const reason = t => t.testWrong < 2 && t.wrong10 < 3 && t.review ? `${t.review} in Review, not fixed yet` : t.testWrong >= 2 ? `${t.testWrong} mistakes in Testes this week` : `${t.wrong10} of the last 10 answers wrong`;
   const goList = red.slice(0, 3).map((t, i) => `<div class="go"><span class="n">${i + 1}</span><span class="t"><h3>${t.c.title}</h3><span class="why">Unit ${t.l.num} · ${reason(t)}</span></span><button class="act" data-go="chunk" data-lesson="${t.l.id}" data-chunk="${t.c.id}">Open</button></div>`).join("");
   const yList = yellow.slice(0, 5).map(t => `<div class="go warn"><span class="n">·</span><span class="t"><h3>${t.c.title}</h3><span class="why">Unit ${t.l.num} · right after mistakes, but ${t.lastWrongDay === dayKey() ? "only today" : "not yet on new questions"}. Check again on another day.</span></span><button class="act" data-go="chunk" data-lesson="${t.l.id}" data-chunk="${t.c.id}">Open</button></div>`).join("");
@@ -2486,16 +2495,16 @@ function home() {
     ${statusBlock()}
     <div class="homebar">
       <button class="unitchip" data-go="units">${unitLabel()} · change</button>
-      <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync phone ↔ computer"}</button>
+      <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync ↔"}</button>
     </div>
-    ${m ? `<button class="tile-big wide" data-go="review">${ic("review")}<span><h3>Review · ${m}</h3><span class="small muted">Things you got wrong. Get each right twice to clear it.</span></span></button>` : ""}
-    <div class="tiles">
-      <button class="tile-big wide" data-go="lessons">${ic("lessons")}<span><h3>Lições</h3><span class="small muted">Lessons by unit: explain → practice</span></span></button>
-      <button class="tile-big" data-go="cards">${ic("cards")}<h3>Cábulas</h3><span class="small muted">Cheat sheets, one rule per card</span></button>
-      <button class="tile-big" data-go="verbs">${ic("verbs")}<h3>Verbos</h3><span class="small muted">Type the right verb form</span></button>
-      <button class="tile-big" data-go="formas">${ic("formas")}<h3>Formas</h3><span class="small muted">Gender and number. Typing only, 2 levels</span></button>
-      <button class="tile-big" data-go="workbook">${ic("workbook")}<h3>Workbook</h3><span class="small muted">New mixed sets every time</span></button>
-      <button class="tile-big wide" data-go="test">${ic("test")}<span><h3>Teste</h3><span class="small muted">Exame: typing only, like the real one · or a ticket with options</span></span></button>
+    ${m ? `<button class="hrow hrev" data-go="review">${ic("review")}<span class="ht"><b>Review · ${m}</b><span>Your mistakes. Right twice → cleared</span></span><span class="hgo">›</span></button>` : ""}
+    <div class="tiles hlist">
+      <button class="hrow" data-go="lessons">${ic("lessons")}<span class="ht"><b>Lições</b><span>Lessons by unit: explain → practice</span></span><span class="hgo">›</span></button>
+      <button class="hrow" data-go="cards">${ic("cards")}<span class="ht"><b>Cábulas</b><span>Cheat sheets, one rule each</span></span><span class="hgo">›</span></button>
+      <button class="hrow" data-go="verbs">${ic("verbs")}<span class="ht"><b>Verbos</b><span>Verb forms, 2 levels</span></span><span class="hgo">›</span></button>
+      <button class="hrow" data-go="formas">${ic("formas")}<span class="ht"><b>Formas</b><span>Gender and number, 2 levels</span></span><span class="hgo">›</span></button>
+      <button class="hrow" data-go="workbook">${ic("workbook")}<span class="ht"><b>Workbook</b><span>Mixed tasks, new every time</span></span><span class="hgo">›</span></button>
+      <button class="hrow" data-go="test">${ic("test")}<span class="ht"><b>Teste</b><span>Exam practice: typing or options</span></span><span class="hgo">›</span></button>
       <!-- Falar (voice lesson prompt) is built but hidden: backlog, see README -->
     </div>
 `;
