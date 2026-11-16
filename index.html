@@ -215,6 +215,14 @@ a { color: var(--accent); }
 .ht span { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hgo { color: var(--muted); font-size: 22px; line-height: 1; }
 .hrev { border-color: var(--bad); }
+.sbar { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--muted); font-size: 15px; text-align: left; }
+.sbar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.slist { display: flex; flex-direction: column; gap: 6px; }
+.srow { display: flex; gap: 10px; align-items: flex-start; text-align: left; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; }
+.sunit { flex: none; min-width: 38px; text-align: center; font-weight: 800; font-size: 13px; border-radius: 8px; padding: 3px 6px; background: var(--accent-soft); color: var(--accent); }
+.st { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.st b { font-size: 16px; line-height: 1.3; }
+mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2px; }
 .tile-big { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; width: 100%; }
 .tile-big.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 14px; }
 .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; }
@@ -2499,12 +2507,79 @@ function backup() {
     <div id="bconfirm"></div></div>`;
 }
 
+/* ---------- search across all lessons and cheat sheets ---------- */
+// extra search words for each topic (English + Portuguese grammar terms)
+const SEARCH_TAGS = {
+  "alfabeto.letras": "alphabet alfabeto letters letras spelling pronunciation", "alfabeto.cg": "pronunciation pronúncia sounds c g ç", "alfabeto.h": "pronunciation pronúncia sounds h ch lh nh",
+  "alfabeto.s": "pronunciation pronúncia sounds s z x", "alfabeto.r": "pronunciation pronúncia sounds r rr", "alfabeto.vogais": "pronunciation pronúncia vowels vogais accents acentos nasal",
+  "u1.cumprimentar": "greetings cumprimentos formal informal tu você hello", "u1.apresentar": "ser chamar-se verb verbo irregular irregulares to be name introduce pronouns pronomes",
+  "u1.numeros": "numbers números numeros counting phone", "u1.dias": "days week dias semana calendar", "u1.despedir": "goodbye despedidas até", "u1.pronuncia": "pronunciation pronúncia stress acento syllables",
+  "u2.paises": "countries países paises articles artigos the", "u2.deonde": "de contractions contrações do da origin from ser verb irregular", "u2.ondefica": "em contractions contrações no na where location ficar",
+  "u2.num21": "numbers números numeros tens", "u2.pron2": "pronunciation pronúncia stress", "u3.nac": "nationalities nacionalidades gender género feminine masculine plural agreement",
+  "u3.linguas": "languages línguas regular verbs verbos regulares -ar conjugation conjugação present presente falar morar", "u3.estar": "ser estar verb verbo irregular irregulares to be now location",
+  "u3.num1000": "numbers números numeros hundreds", "u3.pron3": "pronunciation pronúncia nasal", "u4.objetos": "objects objetos gender género articles artigos plural nouns nomes um uma",
+  "u4.isto": "demonstratives demonstrativos this that isto isso aquilo", "u4.cores": "colours colors cores adjectives agreement gender plural", "u4.aula": "classroom aula phrases instructions",
+  "u4.pron4": "pronunciation pronúncia questions intonation", "u4.artigos": "articles artigos definite indefinite o a um uma the gender", "u5.ter": "ter to have verb verbo irregular irregulares",
+  "u5.ondeesta": "estar where location em contractions contrações", "u5.possessivos": "possessives possessivos my your his her meu minha teu seu dele dela", "u5.aqui": "here there aqui aí ali place demonstratives",
+  "u5.pron5": "pronunciation pronúncia r rr", "u6.profissoes": "jobs professions profissões gender feminine masculine", "u6.soletrar": "spelling soletrar alphabet letters", "u6.andar": "ordinals ordinais floors numbers números",
+  "u6.dados": "personal details form ficha quanto age idade questions", "u6.pron6": "pronunciation pronúncia", "u7.adjetivos": "adjectives adjetivos opposites contrários",
+  "u7.concordancia": "adjectives adjetivos agreement concordância gender plural bom mau muito bastante", "u7.gostar": "gostar de like verb verbo regular contractions contrações",
+  "u7.cidades": "reading leitura cities cidades description", "u7.pron7": "pronunciation pronúncia", "u7.contracoes": "contractions contrações de em disto nisto daqui polite",
+  "u8.locais": "workplaces num numa contractions contrações em um", "u8.rotina": "routine work regular verbs verbos regulares -ar conjugation por", "u8.nuria": "reading leitura routine adverbs",
+  "u8.muito": "muito pouco agreement concordância much many", "u8.opiniao": "opinion opinião acho que porque", "u9.familia": "family família plural",
+  "u9.poss2": "possessives possessivos plural dele dela deles", "u9.este": "demonstratives demonstrativos this that este esse aquele agreement", "u9.pron9": "pronunciation pronúncia",
+  "u10.aparencia": "appearance aparência ser ter usar description adjectives", "u10.fome": "estar com feelings hungry fome ser estar", "u10.gostos": "hobbies gostar de ler ver verb verbo irregular irregulares",
+  "u10.qual": "qual quais questions perguntas which what o que", "u10.pron10": "pronunciation pronúncia x",
+};
+let SIDX = null;
+const plain = h => String(h || "").replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, " ").replace(/\s+/g, " ").trim();
+function searchIndex() {
+  if (SIDX) return SIDX;
+  SIDX = [];
+  LESSONS.forEach(l => l.chunks.forEach(c => SIDX.push({ kind: "lesson", l, c, head: `${c.title} ${c.sub || ""} ${l.title} ${SEARCH_TAGS[l.id + "." + c.id] || ""}`,
+    body: `${plain(c.explain)} ${c.words.map(w => w.pt + " " + w.en).join(" · ")} ${(c.gram ? "grammar gramática " : "")}${RULE[l.id + "." + c.id] ? plain(RULE[l.id + "." + c.id]) : ""}` })));
+  CARDS.forEach(c => SIDX.push({ kind: "card", card: c, head: `${c.title} ${c.tags}`, body: `${plain(c.key)} ${plain(c.body)} ${plain(c.trap)}` }));
+  SIDX.forEach(x => { x.fh = fold(x.head); x.fb = fold(x.body); });
+  return SIDX;
+}
+function snippet(body, word) {
+  const f = fold(body), i = f.indexOf(word); if (i < 0) return "";
+  const a = Math.max(0, i - 45), z = Math.min(body.length, i + word.length + 60);
+  const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return (a ? "…" : "") + esc(body.slice(a, i)) + "<mark>" + esc(body.slice(i, i + word.length)) + "</mark>" + esc(body.slice(i + word.length, z)) + (z < body.length ? "…" : "");
+}
+function searchRows(q) {
+  const words = fold(q || "").trim().split(/\s+/).filter(w => w.length > 1);
+  if (!words.length) return `<p class="small muted">Type a topic, a grammar word or a Portuguese word: <i>irregular, plural, ser, possessive, numbers, gostar</i>.</p>`;
+  const hits = searchIndex().map(x => {
+    if (!words.every(w => x.fh.includes(w) || x.fb.includes(w))) return null;
+    const score = words.reduce((n, w) => n + (x.fh.includes(w) ? 10 : 0) + Math.min(5, x.fb.split(w).length - 1), 0);
+    return { x, score };
+  }).filter(Boolean).sort((a, b) => b.score - a.score);
+  if (!hits.length) return `<p class="muted">Nothing found for “${q.replace(/</g, "&lt;")}”. Try another word.</p>`;
+  const lessons = hits.filter(h => h.x.kind === "lesson"), cardsH = hits.filter(h => h.x.kind === "card");
+  const units = [...new Set(lessons.map(h => +h.x.l.num || 0))].sort((a, b) => a - b).map(n => n ? "U" + n : "Alphabet");
+  const w0 = words.find(w => true);
+  const lrow = ({ x }) => { const sn = x.fh.includes(w0) ? "" : snippet(x.body, w0);
+    return `<button class="srow" data-go="chunk" data-lesson="${x.l.id}" data-chunk="${x.c.id}"><span class="sunit">${x.l.num ? "U" + x.l.num : "ABC"}</span><span class="st"><b>${x.c.gram ? `<span class="gram-chip">GRAMÁTICA</span>` : ""}${x.c.title}</b><span class="small muted">${x.l.title}</span>${sn ? `<span class="small">${sn}</span>` : ""}</span></button>`; };
+  const crow = ({ x }) => `<button class="srow" data-go="card" data-card="${x.card.id}"><span class="sunit cat-${cardCat(x.card.id)}" style="background:var(--cc);color:#fff">Cáb</span><span class="st"><b>${x.card.title}</b><span class="small muted">${x.card.key}</span></span></button>`;
+  return `${lessons.length ? `<p class="eyebrow">Lessons · ${lessons.length} · in ${units.join(", ")}</p><div class="slist">${lessons.slice(0, 30).map(lrow).join("")}</div>` : ""}
+    ${cardsH.length ? `<p class="eyebrow">Cábulas · ${cardsH.length}</p><div class="slist">${cardsH.map(crow).join("")}</div>` : ""}`;
+}
+function search() {
+  return `${topbar("home", "Home")}
+    <div><p class="eyebrow">Search</p><h1>Find a topic</h1></div>
+    <input id="gs" class="search" type="search" placeholder="irregular, plural, ser, numbers…" value="${(view.q2 || "").replace(/"/g, "&quot;")}" autocomplete="off" autocapitalize="none" aria-label="Search lessons and cheat sheets">
+    <div id="sresults" class="main" style="gap:10px">${searchRows(view.q2)}</div>`;
+}
+
 /* ---------- views ---------- */
 function home() {
   const m = mistakeCount(), cd = cardOfDay();
   return `${topbar()}
     <div><p class="eyebrow">Passaporte para Português 1 · A1–A2</p><h1>Caderno de Português</h1></div>
     ${statusBlock()}
+    <button class="sbar" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search lessons and grammar</button>
     <div class="homebar">
       <button class="unitchip" data-go="units">${unitLabel()} · change</button>
       <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync ↔"}</button>
@@ -3037,6 +3112,7 @@ function sideNav() {
   return `<nav class="side" aria-label="Menu">
     <div class="sbrand"><b>Caderno</b><span class="small muted">Passaporte 1 · A1–A2</span></div>
     ${item("home", "Home")}
+    <button class="sitem ${sec === "search" ? "on" : ""}" data-go="search"><span class="ic ic-home"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span>Search</span></button>
     ${m ? `<button class="sitem" data-go="review">${ic("review")}<span>Review · ${m}</span></button>` : ""}
     ${item("lessons", "Lições")}${item("cards", "Cábulas")}${item("verbs", "Verbos")}${item("formas", "Formas")}${item("workbook", "Workbook")}${item("test", "Teste")}
     <div class="sfoot"><button class="unitchip" data-go="units">${unitLabel()} · change</button>
@@ -3046,7 +3122,8 @@ function sideNav() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame, search };
+  if (v === "search") setTimeout(() => { const el = document.getElementById("gs"); if (el && !el.value) el.focus(); }, 0);
   $app.innerHTML = `${sideNav()}<div class="main">${(V[v] || home)()}</div>`;
 }
 
@@ -3233,6 +3310,7 @@ $app.addEventListener("click", e => {
 // remember whether the status block is open
 $app.addEventListener("toggle", e => { if (e.target.id === "statusbox") { S.statusOpen = e.target.open; save(); const c = e.target.querySelector(".chev"); if (c) c.textContent = e.target.open ? "Hide ▴" : "Details ▾"; } }, true);
 // card search: update the list only, so the keyboard stays open
+$app.addEventListener("input", e => { if (e.target.id === "gs") { view.q2 = e.target.value; document.getElementById("sresults").innerHTML = searchRows(view.q2); } });
 $app.addEventListener("input", e => { if (e.target.id === "cs") { view.q = e.target.value; document.getElementById("cardlist").innerHTML = cardRows(view.q); } });
 
 render();
