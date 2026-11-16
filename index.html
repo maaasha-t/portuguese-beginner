@@ -2177,11 +2177,23 @@ function formasPool(mode, lvl) {
 }
 const unitLabel = () => { const u = S.units.slice().sort((a, b) => a - b); if (!u.length) return "No units"; const ranges = []; let a = u[0], b = u[0];
   for (const x of u.slice(1).concat([null])) { if (x === b + 1) b = x; else { ranges.push(a === b ? `${a}` : `${a}–${b}`); a = b = x; } } return "Units " + ranges.join(", "); };
-function poolFor(kind) {
+// Workbook Level 2: word order without the English, just the words
+function noTranslation(q) {
+  const m = /[“"]([^”"]+)[”"]/.exec(q.q || ""), en = m ? m[1] : "";
+  const isQ = /\?$/.test(q.a[q.a.length - 1] || "");
+  return { ...q, q: `Put the words in order${isQ ? " to make a question" : ""}.`, task: "", why: `${en ? `<span class="muted">= ${en}</span><br>` : ""}${q.why || ""}`, noGloss: true };
+}
+function poolFor(kind, lvl) {
   const ls = LESSONS.filter(l => l.id !== "alfabeto" && inUnits(l.num));
-  const all = ls.flatMap(l => l.chunks.flatMap(c => [...c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true, from: l.title + " · " + c.title })), ...c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true, from: l.title + " · " + c.title }))]));
+  let all = ls.flatMap(l => l.chunks.flatMap(c => [...c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true, from: l.title + " · " + c.title })), ...c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true, from: l.title + " · " + c.title }))]));
+  if (lvl === 1 || lvl === 2) { const byL = all.filter(q => q.lvl === lvl); if (byL.length) all = byL; }
   const G = generated();
-  const ph = G.phrases.filter(q => inUnits(q.unit)).map(q => ({ ...q, warm: true }));
+  let ph = G.phrases.filter(q => inUnits(q.unit)).map(q => ({ ...q, warm: true }));
+  if (lvl === 2) {
+    // without English, two sentences in one task can't be solved: keep one-sentence tasks only
+    const one = q => q.t !== "order" || !q.a.slice(0, -1).some(w => /[.?!]$/.test(w));
+    all = all.filter(one).map(q => q.t === "order" ? noTranslation(q) : q); ph = ph.filter(one).map(noTranslation);
+  }
   const rw = G.rewrite.filter(q => inUnits(q.unit)).map(q => ({ ...q, warm: true }));
   if (kind === "choose") return all.filter(q => q.opts);
   if (kind === "fill") return all.filter(q => q.t === "w" && !q.say);
@@ -2767,7 +2779,11 @@ function workbook() {
     ["order", "Word order", "Build the sentence from the words"], ["rewrite", "Rewrite", "Change the whole sentence"]];
   return `${topbar("home", "Home")}
     <div><p class="eyebrow">Workbook</p><h1>Workbook</h1><p class="muted">Tasks like the Caderno de Exercícios. Every set is new: 10 tasks from ${unitLabel().toLowerCase()}.</p></div>
-    <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-wb="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${poolFor(k).length} tasks</span></span></button>`).join("")}</div>
+    <div class="segs" role="group" aria-label="Level">
+      <button class="${(S.wbLvl || 1) === 1 ? "on" : ""}" data-wblvl="1">Level 1 · with help</button>
+      <button class="${S.wbLvl === 2 ? "on" : ""}" data-wblvl="2">Level 2 · harder</button></div>
+    <p class="small muted">${S.wbLvl === 2 ? "Harder tasks. Word order has no English: only the mixed-up words, like on the exam." : "Easier tasks. Word order shows the English meaning."}</p>
+    <div class="mode-list">${modes.map(([k, t, d]) => `<button class="chunk" data-wb="${k}"><span class="body"><h3>${t}</h3><span class="small muted">${d} · ${poolFor(k, S.wbLvl || 1).length} tasks</span></span></button>`).join("")}</div>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 function formas() {
@@ -3156,12 +3172,13 @@ $app.addEventListener("click", e => {
     return startQuiz(`Formas · Level ${S.formLvl === 2 ? 2 : 1} · ${names[t.dataset.fm]}`, shuffle(pool).slice(0, 10), { name: "formas" }, null);
   }
 
+  if (t.dataset.wblvl) { S.wbLvl = +t.dataset.wblvl; save(); return render(); }
   if (t.dataset.wb) {
-    const pool = poolFor(t.dataset.wb);
+    const L = S.wbLvl === 2 ? 2 : 1, pool = poolFor(t.dataset.wb, L);
     if (!pool.length) return;
     const names = { mixed: "Mixed", choose: "Choose", fill: "Fill in", order: "Word order", rewrite: "Rewrite" };
-    startQuiz("Workbook · " + names[t.dataset.wb], shuffle(pool).slice(0, 10), { name: "workbook" }, null);
-    Q.src = "wb"; return;
+    startQuiz(`Workbook · Level ${L} · ${names[t.dataset.wb]}`, shuffle(pool).slice(0, 10), { name: "workbook" }, null);
+    Q.src = L === 2 ? "wb" : "wb1"; return;
   }
   if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: makeExam(S.units), graded: false }; save(); return go("exame"); }
   if (t.dataset.exen !== undefined) { const E = S.exam; E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
