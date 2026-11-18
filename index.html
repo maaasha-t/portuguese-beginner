@@ -236,6 +236,18 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 .ic-formas { background: #dff3f1; color: #157a72; }
 .ic-review { background: var(--bad-soft); color: var(--bad); }
 .ic-home { background: var(--accent-soft); color: var(--accent); }
+.ic-words { background: #efe4fb; color: #6b3fb3; }
+.pwbar { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pwbar div { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.pwbar i { display: block; height: 100%; background: var(--accent); }
+.pwcard { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; }
+.pwword { font-family: var(--font-display); font-size: 30px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.pwline { font-family: Georgia, "Times New Roman", serif; font-size: 25px; line-height: 1.55; color: var(--accent); margin: 0; }
+.pwin { font: inherit; color: var(--fg); background: var(--bg); border: 0; border-bottom: 2px solid var(--accent); border-radius: 6px 6px 0 0; padding: 0 6px; max-width: 100%; }
+.pwin.ok { border-color: var(--good); background: var(--good-soft); } .pwin.near { border-color: var(--warn); } .pwin.no { border-color: var(--bad); background: var(--bad-soft); }
+.pwhint { display: flex; flex-direction: column; gap: 3px; border-top: 1px solid var(--line); padding-top: 10px; font-size: 16px; }
+.pwplay { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: var(--accent); flex: none; }
+.pwplay svg { width: 14px; height: 14px; }
 .ic svg { width: 60%; height: 60%; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic-formas { background: #143532; color: #6fd6cb; } :root:not([data-theme="light"]) .ic-lessons { background: #3a3014; color: #f2c230; } :root:not([data-theme="light"]) .ic-verbs { background: #22305a; color: #7d9bff; } :root:not([data-theme="light"]) .ic-workbook { background: #43201e; color: #ff8a80; } :root:not([data-theme="light"]) .ic-test { background: #173a2b; color: #5fd09a; } :root:not([data-theme="light"]) .ic-falar { background: #2e2245; color: #c4a6f2; } }
 :root[data-theme="dark"] .ic-formas { background: #143532; color: #6fd6cb; } :root[data-theme="dark"] .ic-lessons { background: #3a3014; color: #f2c230; } :root[data-theme="dark"] .ic-verbs { background: #22305a; color: #7d9bff; } :root[data-theme="dark"] .ic-workbook { background: #43201e; color: #ff8a80; } :root[data-theme="dark"] .ic-test { background: #173a2b; color: #5fd09a; } :root[data-theme="dark"] .ic-falar { background: #2e2245; color: #c4a6f2; }
@@ -360,6 +372,8 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 <script src="formas.js"></script>
 <script src="exame.js"></script>
 <script src="rules.js"></script>
+<script src="palavras_data.js"></script>
+<script src="palavras.js"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2233,6 +2247,11 @@ function mergeState(a, b) {
   out.done = Object.assign({}, b.done || {}, a.done || {});
   out.mistakes = Object.assign({}, b.mistakes || {}, a.mistakes || {});
   out.mq = Object.assign({}, b.mq || {}, a.mq || {});
+  // words: per word keep the higher counters from both devices
+  const wa = a.words || {}, wb = b.words || {}; out.words = {};
+  new Set([...Object.keys(wa), ...Object.keys(wb)]).forEach(k => { const x = wa[k] || {}, y = wb[k] || {}, m = {};
+    ["c", "w", "l2", "l3"].forEach(f => { const v = Math.max(x[f] || 0, y[f] || 0); if (v) m[f] = v; });
+    if (x.k || y.k) m.k = 1; const d = [x.d, y.d].filter(Boolean).sort().pop(); if (d) m.d = d; out.words[k] = m; });
   out.days = [...new Set([...(a.days || []), ...(b.days || [])])].sort();
   const tests = new Map(); [...(a.tests || []), ...(b.tests || [])].forEach(t => { const o = tests.get(t.id); if (!o || t.score > o.score) tests.set(t.id, t); });
   out.tests = [...tests.values()].sort((x, y) => x.id - y.id).slice(-20);
@@ -2359,6 +2378,7 @@ const ICON = {
   falar: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
   formas: '<path d="M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04L16.3 8.9a.7.7 0 0 1-.57 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/>',
   review: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  words: '<path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H9l-5 3z"/><path d="M8 8h8M8 12h5"/>',
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
   units: '<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
@@ -2586,6 +2606,7 @@ function home() {
     </div>
     ${m ? `<button class="hrow hrev" data-go="review">${ic("review")}<span class="ht"><b>Review · ${m}</b><span>Your mistakes. Right twice → cleared</span></span><span class="hgo">›</span></button>` : ""}
     <div class="tiles hlist">
+      <button class="hrow" data-go="palavras">${ic("words")}<span class="ht"><b>Palavras</b><span>All words from the book, 3 levels</span></span><span class="hgo">›</span></button>
       <button class="hrow" data-go="lessons">${ic("lessons")}<span class="ht"><b>Lições</b><span>Lessons by unit: explain → practice</span></span><span class="hgo">›</span></button>
       <button class="hrow" data-go="cards">${ic("cards")}<span class="ht"><b>Cábulas</b><span>Cheat sheets, one rule each</span></span><span class="hgo">›</span></button>
       <button class="hrow" data-go="verbs">${ic("verbs")}<span class="ht"><b>Verbos</b><span>Verb forms, 2 levels</span></span><span class="hgo">›</span></button>
@@ -3114,7 +3135,7 @@ function sideNav() {
     ${item("home", "Home")}
     <button class="sitem ${sec === "search" ? "on" : ""}" data-go="search"><span class="ic ic-home"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span>Search</span></button>
     ${m ? `<button class="sitem" data-go="review">${ic("review")}<span>Review · ${m}</span></button>` : ""}
-    ${item("lessons", "Lições")}${item("cards", "Cábulas")}${item("verbs", "Verbos")}${item("formas", "Formas")}${item("workbook", "Workbook")}${item("test", "Teste")}
+    ${item("palavras", "Palavras", "words")}${item("lessons", "Lições")}${item("cards", "Cábulas")}${item("verbs", "Verbos")}${item("formas", "Formas")}${item("workbook", "Workbook")}${item("test", "Teste")}
     <div class="sfoot"><button class="unitchip" data-go="units">${unitLabel()} · change</button>
     <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync phone ↔ computer"}</button></div>
   </nav>`;
@@ -3122,7 +3143,8 @@ function sideNav() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame, search };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame, search, palavras, palq };
+  if (v === "palq") setTimeout(() => { const el = document.getElementById("pwa"); if (el && !el.disabled) el.focus(); }, 0);
   if (v === "search") setTimeout(() => { const el = document.getElementById("gs"); if (el && !el.value) el.focus(); }, 0);
   $app.innerHTML = `${sideNav()}<div class="main">${(V[v] || home)()}</div>`;
 }
@@ -3144,6 +3166,7 @@ function exInput(el) {
   E.sections[si].items[ii].ans = el.value; save();
   const b = document.querySelector("[data-exsubmit]"); if (b) { const all = E.sections.flatMap(s => s.items); b.textContent = `Entregar · hand in (${all.filter(it => it.ans.trim()).length}/${all.length})`; }
 }
+$app.addEventListener("keydown", e => { if (e.target.id === "pwa" && e.key === "Enter") { e.preventDefault(); if (PW && (PW.state === "right" || PW.state === "near")) return; pwCheck(); } });
 // Enter in an exam field jumps to the next field
 $app.addEventListener("keydown", e => {
   if (!e.target.classList || !e.target.classList.contains("exin") || e.key !== "Enter") return;
@@ -3154,12 +3177,12 @@ $app.addEventListener("keydown", e => { if (e.target.id === "wa" && e.key === "E
 $app.addEventListener("pointerdown", e => {
   const b = e.target.closest(".acc"); if (!b) return;
   e.preventDefault();
-  const act = document.activeElement, el = act && act.classList.contains("exin") ? act : document.getElementById(view.name === "exame" ? "__" : "wa");
+  const act = document.activeElement, el = act && (act.classList.contains("exin") || act.id === "pwa") ? act : document.getElementById(view.name === "exame" ? "__" : view.name === "palq" ? "pwa" : "wa");
   if (!el || el.disabled) return;
   const a = el.selectionStart ?? el.value.length, z = el.selectionEnd ?? a;
   el.value = el.value.slice(0, a) + b.dataset.acc + el.value.slice(z);
   el.focus(); el.setSelectionRange(a + 1, a + 1);
-  if (el.dataset.ex) exInput(el); else Q.typed = el.value;
+  if (el.dataset.ex) exInput(el); else if (el.id === "pwa") { if (PW) PW.typed = el.value; } else if (Q) Q.typed = el.value;
 });
 
 /* ---------- events ---------- */
@@ -3249,6 +3272,7 @@ $app.addEventListener("click", e => {
     return startQuiz(`Formas · Level ${S.formLvl === 2 ? 2 : 1} · ${names[t.dataset.fm]}`, shuffle(pool).slice(0, 10), { name: "formas" }, null);
   }
 
+  if (Object.keys(t.dataset).some(k => k.startsWith("pw"))) return pwClick(t);
   if (t.dataset.wblvl) { S.wbLvl = +t.dataset.wblvl; save(); return render(); }
   if (t.dataset.wb) {
     const L = S.wbLvl === 2 ? 2 : 1, pool = poolFor(t.dataset.wb, L);
