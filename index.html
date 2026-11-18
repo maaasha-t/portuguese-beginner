@@ -215,6 +215,7 @@ a { color: var(--accent); }
 .ht span { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hgo { color: var(--muted); font-size: 22px; line-height: 1; }
 .hrev { border-color: var(--bad); }
+.exbox { display: flex; flex-wrap: wrap; gap: 6px 14px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-weight: 700; }
 .listenrow { display: flex; gap: 8px; } .listenrow .btn { width: auto; flex: 1; padding: 10px 14px; } #listenstop { flex: 0 0 auto; }
 .reading { background: var(--accent-soft); border-radius: 8px; box-shadow: 0 0 0 4px var(--accent-soft); }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; font: inherit; font-size: 13px; }
@@ -2959,6 +2960,7 @@ function exame() {
       <div class="row"><button class="btn" data-exnew>New sheet</button><button class="btn ghost" data-go="home">Home</button></div></div>` : ""}
     ${E.sections.map((s, si) => `<section class="exsec"><h2><span class="exl">${s.letter}</span><span>${s.instr}</span></h2>
       <button class="exen" data-exen="${si}">EN</button>${E.en && E.en[si] ? `<p class="small muted">${s.en}</p>` : ""}
+      ${s.box ? `<div class="exbox">${s.box.map(w => `<span>${w}</span>`).join("")}</div>` : ""}
       ${s.items.map((it, ii) => exItem(s, si, it, ii, g)).join("")}</section>`).join("")}
     ${g ? "" : `<div class="exbar"><div class="accents">${ACC.map(ch => `<button type="button" class="acc" data-acc="${ch}">${ch}</button>`).join("")}</div>
       <button class="btn" data-exsubmit>Entregar · hand in (${filled}/${total})</button></div>`}`;
