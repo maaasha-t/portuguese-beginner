@@ -148,7 +148,7 @@ const EXTRA = {
   { q: "A minha mãe ___ em Coimbra. (morar)", opts: ["mora", "moro", "moram"], why: "ela → mora." },
   { q: "Tu ___ espanhol? (falar)", opts: ["falas", "fala", "falo"], why: "tu → falas." },
   { q: "O Tom e eu ___ inglês. (falar)", opts: ["falamos", "falam", "falo"], why: "Tom + eu = nós → falamos." },
-  { q: "Que língua falam os angolanos?", opts: ["Português.", "Angolano.", "Espanhol."], why: "Portuguese is Angola's official language." },
+  { t: "w", q: "Write in Portuguese: “We speak English and a little French.”", a: ["Falamos inglês e um pouco de francês.", "Nós falamos inglês e um pouco de francês."], why: "nós → falamos. um pouco DE + language. Languages start with a small letter." },
   { t: "order", q: "Put the words in order: “I speak a little German.”", a: ["Falo", "um", "pouco", "de", "alemão."], why: "um pouco de + language." },
   { q: "“Ela só fala russo” means…", opts: ["She only speaks Russian.", "She speaks Russian well.", "She also speaks Russian."], why: "só = only." },
 ]},
