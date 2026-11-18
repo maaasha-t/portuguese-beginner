@@ -63,9 +63,23 @@ function pwStart(lvl) {
 }
 // words that look alike in meaning: never offered as wrong options for each other (too confusing)
 const PW_GROUPS = [["este/esta", "esse/essa", "aquele", "isto", "isso", "aquilo", "aqui", "aí", "ali"],
-  ["meu/minha", "teu/tua", "seu/sua", "nosso", "vosso", "dele/dela", "deles/delas"], ["eu", "tu", "você", "ele/ela", "nós", "vocês"],
-  ["Não percebo!", "Não compreendo!", "Não sei."], ["Muito gosto!", "Muito prazer!"], ["Olá!", "Bom dia!", "Boa tarde!", "Boa noite!"],
-  ["Até amanhã!", "Até logo!", "Até já!", "Até à próxima!", "Adeus!"], ["lindo", "bonito", "giro"], ["mulher, a", "senhora, a"]];
+  ["Não percebo!", "Não compreendo!"], ["Muito gosto!", "Muito prazer!"], ["Até logo!", "Até já!"], ["lindo", "bonito", "giro"], ["mulher, a", "senhora, a"]];
+// small words of the same kind are the wrong options for each other (dele → meu, nosso, tu…), so the answer is not obvious
+const PW_KINDS = {
+  person: "eu|tu|você|ele/ela|nós|vocês|meu/minha|teu/tua|seu/sua|dele/dela|deles/delas|nosso|vosso",
+  point: "este/esta|esse/essa|aquele|isto|isso|aquilo|aqui|aí|ali",
+  ask: "qual|quanto|o que|que|quem|onde|como|Porquê?|Como?",
+  link: "até|com|em|mas|ou|porque|sem|cerca de|fora (de)|perto (de)|longe",
+  how: "agora|ainda|já|só|também|muito|pouco|bastante|normalmente|felizmente|infelizmente|nada|não|se calhar|às vezes|um pouco (de)",
+  hello: "Olá!|Bom dia!|Boa tarde!|Boa noite!|Adeus!|Até amanhã!|Até logo!|Até já!|Até à próxima!|Tudo bem?|Como está?|Estás bom/boa?",
+  polite: "Desculpe!|por favor|Obrigado!|Muito gosto!|Muito prazer!|Aqui está!|Que pena!|Boa estadia!|Boas férias!|Mais alguma coisa?",
+  class: "Não compreendo!|Não percebo!|Não sei.|Como se diz...?|Como se escreve?|O que significa?",
+  feel: "estar com calor|estar com fome|estar com frio|estar com sede|estar com sono|estar pronto",
+  amount: "por dia|por semana|em média|de altura média|à noite|água com gás",
+};
+const PW_KIND = {};
+Object.entries(PW_KINDS).forEach(([k, v]) => v.split("|").forEach(x => { if (!PW_KIND[x]) PW_KIND[x] = k; }));
+const pwKind = w => PW_KIND[w.w] || w.pos || "";
 const pwGroup = w => PW_GROUPS.findIndex(g => g.includes(w.w) || g.includes(w.w + ", " + w.art));
 const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").split(/[^a-zа-яё]+/i).filter(x => x.length > 2));
 function pwOptions(w) {
@@ -73,10 +87,11 @@ function pwOptions(w) {
   const pool = WORDS.filter(x => x.id !== w.id && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
   // harder: wrong options are the same part of speech, from the same or nearby units
   const un = u => u === "P1" ? 4.5 : u === "P2" ? 8.5 : +u;
-  const pos = x => x.pos || "", near = x => Math.abs(un(x.u) - un(w.u));
-  const same = pool.filter(x => pos(x) === pos(w));
+  const near = x => Math.abs(un(x.u) - un(w.u));
+  const same = pool.filter(x => pwKind(x) === pwKind(w));
   const tier = f => shuffle(same.filter(f));
-  const opts = [...tier(x => x.u === w.u), ...tier(x => x.u !== w.u && near(x) <= 2), ...tier(x => near(x) > 2), ...shuffle(pool)].filter((x, i, a) => a.findIndex(y => pwTr(y) === pwTr(x)) === i).slice(0, 3);
+  const opts = [...tier(x => x.u === w.u), ...tier(x => x.u !== w.u && near(x) <= 2), ...tier(x => near(x) > 2),
+    ...shuffle(pool.filter(x => (x.pos || "") === (w.pos || ""))), ...shuffle(pool)].filter((x, i, a) => a.findIndex(y => pwTr(y) === pwTr(x)) === i).slice(0, 3);
   return shuffle([w, ...opts]);
 }
 
