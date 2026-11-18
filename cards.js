@@ -24,21 +24,22 @@ const CARDS = [
     ["eu", "chamo", "<b>-me</b>", "my name is"], ["tu", "chamas", "<b>-te</b>", "your name is"], ["ele / ela / você", "chama", "<b>-se</b>", "his / her / your name is"]]) +
     `<p>Questions: <i>Como te chamas?</i> (to a friend) · <i>Como se chama?</i> (polite). In a question the little word jumps before the verb.</p>`,
   trap: "Don't mix the persons: tu → chamas-te, not chamas-se." },
-{ id: "serestar", title: "Ser or estar?", units: [3, 10], tags: "ser estar to be permanent temporary now how where",
-  key: "ser = what it IS, always. estar = how or where it is NOW.",
+{ id: "serestar", title: "Ser or estar?", units: [3, 10], tags: "ser estar to be permanent temporary now how where polite formal você o senhor a senhora you",
+  key: "ser = what it IS. estar = how or where it is NOW.",
   body: `<div class="use"><div class="uh u-ser">ser · always, who or what</div>
     <div class="ur"><span class="uw">origin, job</span><span><b>Sou de Lisboa. Sou médica.</b> I'm from Lisbon. I'm a doctor.</span></div>
-    <div class="ur"><span class="uw">looks, character</span><span><b>Ela é alta.</b> She's tall.</span></div>
-    <div class="ur"><span class="uw">who it is</span><span><b>É a minha irmã.</b> It's my sister.</span></div>
-    <div class="ur"><span class="uw">time</span><span><b>São três horas.</b> It's 3 o'clock.</span></div></div>
+    <div class="ur"><span class="uw">looks</span><span><b>Ela é alta.</b> She's tall.</span></div>
+</div>
+  <div class="use"><div class="uh u-pol">polite “you” = é, without você</div>
+    <div class="ur"><span class="uw">to a stranger</span><span><b>Desculpe, é o Rui?</b> Excuse me, are you Rui?</span></div>
+    <div class="ur"><span class="uw">friend / him</span><span><b>És o Rui?</b> Are you Rui? · <b>Ele é o Rui?</b> Is he Rui?</span></div></div>
   <div class="use"><div class="uh u-estar">estar · now, can change</div>
     <div class="ur"><span class="uw">place now</span><span><b>Estou em casa.</b> I'm at home.</span></div>
     <div class="ur"><span class="uw">feeling</span><span><b>Estou cansada.</b> I'm tired.</span></div>
     <div class="ur"><span class="uw">doing now</span><span><b>Estou a ler.</b> I'm reading.</span></div></div>
   <div class="use"><div class="uh u-both">same word, new meaning</div>
-    <div class="ur"><span class="uw">always</span><span><b>Ela é bonita.</b> She's pretty.</span></div>
-    <div class="ur"><span class="uw">today</span><span><b>Ela está bonita.</b> She looks pretty today.</span></div></div>`,
-  trap: "Cities: where the city is (it never moves) → ser / ficar: <i>Lisboa fica em Portugal.</i> Where YOU are now → estar: <i>Estou em Lisboa.</i>" },
+    <div class="ur"><span class="uw">always / today</span><span><b>Ela é bonita</b> = she's pretty. <b>Ela está bonita</b> = she looks pretty today.</span></div></div>`,
+  trap: "Cities never move → ser / ficar: <i>Lisboa fica em Portugal.</i> You now → estar: <i>Estou em Lisboa.</i>" },
 { id: "contracoes", title: "Little words that merge", units: [2, 5, 7, 8], tags: "contractions de em do da no na num numa disto nisto prepositions articles",
   key: "Preposition + o / a / os / as = one word. Always. Never “em o”.",
   body: tbl(["", "o", "a", "os", "as", "um / uma", "isto"], [
