@@ -13,7 +13,9 @@ const RULE = {
     "Thank you depends on who speaks: a man says <span class=\"pt\">obrigado</span>, a woman says <span class=\"pt\">obrigada</span>."),
   "u1.apresentar": R("Saying your name:", [P("Chamo-me Maria.", "My name is Maria (no “a” before the name)"), P("Sou a Maria.", "I'm Maria (with “a” for a woman, “o” for a man)"),
     P("Como te chamas?", "What's your name? (to a friend)"), P("Como se chama?", "What's your name? (polite)")],
-    "The verb ser: <span class=\"pt\">eu sou</span> (I am), <span class=\"pt\">tu és</span> (you are), <span class=\"pt\">ele é, ela é, você é</span> (he is, she is, you are)."),
+    "The verb ser: <span class=\"pt\">eu sou</span> (I am), <span class=\"pt\">tu és</span> (you are), <span class=\"pt\">ele é, ela é, você é</span> (he is, she is, you are). " +
+    "A question with <span class=\"pt\">é</span> and no <span class=\"pt\">ele/ela</span>, said to someone, means polite “you”: <span class=\"pt\">Desculpe, é o Rui?</span> = Excuse me, are you Rui? " +
+    "Don't mix <span class=\"pt\">sou</span> (I am) and <span class=\"pt\">sei</span> (I know): <span class=\"pt\">Quem é ele? — Não sei.</span> = I don't know."),
   "u1.numeros": R("11 to 15 have their own names:", [P("onze", "11"), P("doze", "12"), P("treze", "13"), P("catorze", "14"), P("quinze", "15")],
     "16 to 19 are “ten and six” glued together: <span class=\"pt\">dezasseis</span> (16), <span class=\"pt\">dezassete</span> (17), <span class=\"pt\">dezoito</span> (18), <span class=\"pt\">dezanove</span> (19)."),
   "u1.dias": R("Days are counted from Sunday, which is day 1:", [P("domingo", "Sunday (day 1)"), P("segunda-feira", "Monday (day 2)"), P("terça-feira", "Tuesday (day 3)"), P("quarta-feira", "Wednesday (day 4)"), P("quinta-feira", "Thursday (day 5)"), P("sexta-feira", "Friday (day 6)"), P("sábado", "Saturday")]),
