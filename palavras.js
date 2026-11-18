@@ -44,8 +44,16 @@ function pwStart(lvl) {
   PW = { lvl, cards, i: 0, done: 0, total: cards.length, state: "ask", right: 0, again: new Set(), opts: null };
   go("palq");
 }
+// words that look alike in meaning: never offered as wrong options for each other (too confusing)
+const PW_GROUPS = [["este/esta", "esse/essa", "aquele", "isto", "isso", "aquilo", "aqui", "aí", "ali"],
+  ["meu/minha", "teu/tua", "seu/sua", "nosso", "vosso", "dele/dela", "deles/delas"], ["eu", "tu", "você", "ele/ela", "nós", "vocês"],
+  ["Não percebo!", "Não compreendo!", "Não sei."], ["Muito gosto!", "Muito prazer!"], ["Olá!", "Bom dia!", "Boa tarde!", "Boa noite!"],
+  ["Até amanhã!", "Até logo!", "Até já!", "Até à próxima!", "Adeus!"], ["lindo", "bonito", "giro"], ["mulher, a", "senhora, a"]];
+const pwGroup = w => PW_GROUPS.findIndex(g => g.includes(w.w) || g.includes(w.w + ", " + w.art));
+const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").split(/[^a-zа-яё]+/i).filter(x => x.length > 2));
 function pwOptions(w) {
-  const pool = WORDS.filter(x => x.id !== w.id && pwTr(x) !== pwTr(w));
+  const g = pwGroup(w), mine = pwToks(pwTr(w));
+  const pool = WORDS.filter(x => x.id !== w.id && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
   const same = shuffle(pool.filter(x => (x.pos || "") === (w.pos || "") && x.u === w.u));
   const rest = shuffle(pool);
   const opts = [...same, ...rest].filter((x, i, a) => a.findIndex(y => pwTr(y) === pwTr(x)) === i).slice(0, 3);
@@ -92,7 +100,7 @@ function palq() {
     const ans = PW.state !== "ask";
     return `${topbar("palavras", "Stop")}${bar}
       <div class="pwcard"><div class="pwword">${pwLabel(w)} ${play(pwLabel(w))}</div>
-        ${w.pos ? `<div class="small muted">${POS_NAME[lang][w.pos] || ""}</div>` : ""}</div>
+        ${w.pos && w.pos !== "other" ? `<div class="small muted">${POS_NAME[lang][w.pos] || ""}</div>` : ""}</div>
       <div class="opts">${PW.opts.map((o, k) => {
         const cls = ans && o.id === w.id ? "ok" : ans && k === PW.picked ? "no" : "";
         return `<button class="opt ${cls}" data-pwopt="${k}" ${ans ? "disabled" : ""}>${pwTr(o)}</button>`; }).join("")}</div>
@@ -110,7 +118,7 @@ function palq() {
   const hints = L === 2 || st !== "ask";
   return `${topbar("palavras", "Stop")}${bar}
     <div class="pwcard pwsent"><p class="pwline">${sentHtml(() => input)}</p>
-      ${L === 2 ? `<div class="pwhint">${w.pos ? `<span class="small muted">${POS_NAME[lang][w.pos] || ""}</span>` : ""}
+      ${L === 2 ? `<div class="pwhint">${w.pos && w.pos !== "other" ? `<span class="small muted">${POS_NAME[lang][w.pos] || ""}</span>` : ""}
         <b>${pwTr(w)}</b><span class="muted">${lang === "ru" ? w.sru : w.sen}</span></div>` : ""}
       ${L === 3 && st !== "ask" ? `<div class="pwhint"><b>${pwLabel(w)} = ${pwTr(w)}</b><span class="muted">${lang === "ru" ? w.sru : w.sen}</span></div>` : ""}</div>
     ${st === "retype" ? `<p class="small" style="color:var(--bad)">The word is <b>${ansW}</b>. Type it once to remember it.${PW.lastWrong ? ` <button class="linkbtn" data-pwmine>My word “${PW.lastWrong.replace(/</g, "&lt;")}” is right too</button>` : ""}</p>` : ""}
