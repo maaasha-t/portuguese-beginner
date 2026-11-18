@@ -6,7 +6,7 @@ const TR = {
 "Como ___ chamas?": "What's your name? (informal)",
 "Como ___ chama?": "What's your name? (formal)",
 "Tu ___ o David?": "Are you David?",
-"“É a Sofia?” — “Não, ___ a Inês.": "“Are you Sofia?” — “No, I'm Inês.”",
+"“É a Sofia?” — “Não, ___ a Inês.": "“Are you Sofia?” (polite: é with no ele/ela = you) — “No, I'm Inês.”",
 "Quem ___ ele?": "Who is he?",
 "___ Japão": "Japan", "___ China": "China", "___ Portugal": "Portugal", "___ Estados Unidos": "the United States", "___ Filipinas": "the Philippines",
 "___ Canadá": "Canada", "___ Angola": "Angola", "___ Índia": "India", "___ Rio de Janeiro": "Rio de Janeiro", "___ Finlândia": "Finland",

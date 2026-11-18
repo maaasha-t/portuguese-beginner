@@ -2219,7 +2219,8 @@ function poolFor(kind, lvl) {
   let all = ls.flatMap(l => l.chunks.flatMap(c => [...c.quiz.map((q, i) => mk(l, c, q, i, 1, { warm: true, from: l.title + " · " + c.title })), ...c.quiz2.map((q, i) => mk(l, c, q, i, 2, { warm: true, from: l.title + " · " + c.title }))]));
   if (lvl === 1 || lvl === 2) { const byL = all.filter(q => q.lvl === lvl); if (byL.length) all = byL; }
   const G = generated();
-  let ph = G.phrases.filter(q => inUnits(q.unit)).map(q => ({ ...q, warm: true }));
+  let ph = G.phrases.filter(q => inUnits(q.unit) && q.a.length >= 3).map(q => ({ ...q, warm: true }));
+  all = all.filter(q => !(q.t === "order" && q.a.length < 3));
   if (lvl === 2) {
     // without English, two sentences in one task can't be solved: keep one-sentence tasks only
     const one = q => q.t !== "order" || !q.a.slice(0, -1).some(w => /[.?!]$/.test(w));
@@ -3073,7 +3074,7 @@ function quiz() {
   if (!right && rule) why += `<div class="rule"><span class="eyebrow">Rule</span>${rule}</div>`;
   return `${topbar(Q.back.name, "Stop")}
     <div class="progress">${bars}</div>
-    ${q.warm ? `<span class="tag">From earlier · ${q.from}</span>` : ""}
+    ${q.warm && Q.back && Q.back.name !== "chunk" ? `<span class="tag">${q.from}</span>` : ""}
     <div class="quiz">
       ${q.task ? `<p class="task">${q.task}</p>` : ""}
       <p class="qtext">${gl(q.q, glossQ)}</p>
@@ -3322,9 +3323,9 @@ $app.addEventListener("click", e => {
     const l = lessonById(t.dataset.lesson), idx = l.chunks.findIndex(c => c.id === t.dataset.chunk), c = l.chunks[idx];
     const own = (lvl === 2 ? c.quiz2 : c.quiz).map((q, i) => mk(l, c, q, i, lvl));
     // retrieval: 2 warm-up questions from earlier parts of this lesson
-    const earlier = l.chunks.slice(0, idx).flatMap(pc => [...pc.quiz.map((q, i) => mk(l, pc, q, i, 1, { warm: true })), ...(lvl === 2 ? pc.quiz2.map((q, i) => mk(l, pc, q, i, 2, { warm: true })) : [])]);
-    const warm = shuffle(earlier).slice(0, 2);
-    return startQuiz(c.title + " · Level " + lvl, [...warm, ...(lvl === 2 ? shuffle(own) : own)], { name: "chunk", lesson: l.id, chunk: c.id }, () => { S.done[doneKey(l, c, lvl)] = true; save(); });
+    // no warm-ups from earlier parts any more: Review does that job. Word order with 1–2 words is too easy: skip it.
+    const real = own.filter(q => !(q.t === "order" && q.a.length < 3));
+    return startQuiz(c.title + " · Level " + lvl, lvl === 2 ? shuffle(real) : real, { name: "chunk", lesson: l.id, chunk: c.id }, () => { S.done[doneKey(l, c, lvl)] = true; save(); });
   }
   if (g === "mix") {
     const l = lessonById(t.dataset.lesson);
