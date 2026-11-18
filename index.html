@@ -215,6 +215,9 @@ a { color: var(--accent); }
 .ht span { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hgo { color: var(--muted); font-size: 22px; line-height: 1; }
 .hrev { border-color: var(--bad); }
+.listenrow { display: flex; gap: 8px; } .listenrow .btn { width: auto; flex: 1; padding: 10px 14px; } #listenstop { flex: 0 0 auto; }
+.reading { background: var(--accent-soft); border-radius: 8px; box-shadow: 0 0 0 4px var(--accent-soft); }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; font: inherit; font-size: 13px; }
 .sbar { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--muted); font-size: 15px; text-align: left; }
 .sbar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .slist { display: flex; flex-direction: column; gap: 6px; }
@@ -374,6 +377,7 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 <script src="rules.js"></script>
 <script src="palavras_data.js"></script>
 <script src="palavras.js"></script>
+<script src="listen.js"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2367,7 +2371,7 @@ function topbar(backTo, backLabel) {
   return `<div class="topbar">${backTo ? `<button class="back" data-go="${backTo}">‹ ${backLabel}</button>` : `<span></span>`}<span class="tright"><span class="voice" id="voice">${voiceNote}</span>${home}</span></div>`;
 }
 const view = { name: "home" };
-function go(name, extra) { Object.assign(view, { name }, extra || {}); render(); window.scrollTo(0, 0); }
+function go(name, extra) { if (typeof listenStop === "function" && LS) listenStop(); Object.assign(view, { name }, extra || {}); render(); window.scrollTo(0, 0); }
 
 const ICON = {
   lessons: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
@@ -2997,6 +3001,7 @@ function chunk() {
   const links = c.links.length ? `<div class="links"><p class="eyebrow">Listen to real people</p>${c.links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${t} ↗</a>`).join("")}</div>` : "";
   return `${topbar("lesson", l.title)}
     <div style="display:flex;flex-direction:column;gap:6px">${c.gram ? `<span class="gram-banner">GRAMÁTICA <span>Passaporte ${c.gram}</span></span>` : `<p class="eyebrow">Explain</p>`}<h2>${c.title}</h2></div>
+    ${"speechSynthesis" in window ? `<div class="listenrow"><button class="btn ghost" id="listenbtn" data-listen>▶ Listen to the lesson</button><button class="btn ghost" id="listenstop" data-listenstop hidden>■ Stop</button></div>` : ""}
     <div class="explain ${c.gram ? "gram" : ""}">${c.explain}</div>
     <div><p class="eyebrow">Tap to hear · say it out loud after the voice</p></div>
     <div class="words">${words}</div>
@@ -3272,6 +3277,8 @@ $app.addEventListener("click", e => {
     return startQuiz(`Formas · Level ${S.formLvl === 2 ? 2 : 1} · ${names[t.dataset.fm]}`, shuffle(pool).slice(0, 10), { name: "formas" }, null);
   }
 
+  if (t.hasAttribute("data-listen")) return listenToggle();
+  if (t.hasAttribute("data-listenstop")) return listenStop();
   if (Object.keys(t.dataset).some(k => k.startsWith("pw"))) return pwClick(t);
   if (t.dataset.wblvl) { S.wbLvl = +t.dataset.wblvl; save(); return render(); }
   if (t.dataset.wb) {

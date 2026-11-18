@@ -31,7 +31,7 @@ function pwMark(w, ok, lvl) {
 const pwLearned = w => { const s = pwSt(w.id); return s.k || (s.c || 0) - (s.w || 0) >= 2; };
 function pwPick(lvl, n) {
   const pool = pwPool(lvl);
-  const score = w => { const s = pwSt(w.id); return (lvl === 1 && s.k ? 1000 : 0) + (s.c || 0) * 3 - (s.w || 0) * 4 + (s.d === dayKey() ? 6 : 0) + Math.random() * 4; };
+  const score = w => { const s = pwSt(w.id); return (s.k ? (lvl === 1 ? 1000 : 40) : 0) + (s.c || 0) * 3 - (s.w || 0) * 4 + (s.d === dayKey() ? 6 : 0) + Math.random() * 4; };
   return pool.map(w => [score(w), w]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1]);
 }
 function pwStart(lvl) {
@@ -108,7 +108,7 @@ function palq() {
       ${L === 2 ? `<div class="pwhint">${w.pos ? `<span class="small muted">${POS_NAME[lang][w.pos] || ""}</span>` : ""}
         <b>${pwTr(w)}</b><span class="muted">${lang === "ru" ? w.sru : w.sen}</span></div>` : ""}
       ${L === 3 && st !== "ask" ? `<div class="pwhint"><b>${pwLabel(w)} = ${pwTr(w)}</b><span class="muted">${lang === "ru" ? w.sru : w.sen}</span></div>` : ""}</div>
-    ${st === "retype" ? `<p class="small" style="color:var(--bad)">The word is <b>${ansW}</b>. Type it once to remember it.</p>` : ""}
+    ${st === "retype" ? `<p class="small" style="color:var(--bad)">The word is <b>${ansW}</b>. Type it once to remember it.${PW.lastWrong ? ` <button class="linkbtn" data-pwmine>My word “${PW.lastWrong.replace(/</g, "&lt;")}” is right too</button>` : ""}</p>` : ""}
     ${st === "near" ? `<p class="small" style="color:var(--warn)">Almost! Watch the accents: <b>${ansW}</b></p>` : ""}
     ${st === "right" || st === "near" ? `<div class="row">${play(full)}<button class="btn" data-pwnext>Next</button></div>`
       : `<div class="accents">${ACC.map(ch => `<button type="button" class="acc" data-acc="${ch}">${ch}</button>`).join("")}</div>
@@ -135,7 +135,7 @@ function pwCheck() {
   } else {
     pwMark(w, false, PW.lvl);
     if (!PW.again.has(w.id)) { PW.again.add(w.id); PW.cards.push(w); }
-    PW.state = "retype"; PW.typed = "";
+    PW.state = "retype"; PW.lastWrong = v; PW.typed = "";
   }
   render();
 }
@@ -155,7 +155,13 @@ function pwClick(t) {
     return render();
   }
   if (t.hasAttribute("data-pwknow")) { S.words = S.words || {}; S.words[w.id] = Object.assign({}, S.words[w.id], { k: 1, d: dayKey() }); save(); PW.right++; PW.done++; PW.i++; PW.opts = null; PW.state = "ask"; return render(); }
-  if (t.hasAttribute("data-pwshow")) { pwMark(w, false, PW.lvl); if (!PW.again.has(w.id)) { PW.again.add(w.id); PW.cards.push(w); } PW.state = "retype"; PW.typed = ""; return render(); }
+  if (t.hasAttribute("data-pwshow")) { pwMark(w, false, PW.lvl); if (!PW.again.has(w.id)) { PW.again.add(w.id); PW.cards.push(w); } PW.state = "retype"; PW.lastWrong = ""; PW.typed = ""; return render(); }
   if (t.hasAttribute("data-pwcheck")) return pwCheck();
-  if (t.hasAttribute("data-pwnext")) { PW.done = Math.min(PW.total, PW.done + (PW.again.has(w.id) && PW.i >= PW.total ? 0 : 1)); PW.i++; PW.opts = null; PW.picked = null; PW.state = "ask"; PW.typed = ""; return render(); }
+  if (t.hasAttribute("data-pwmine")) {
+    // undo the wrong mark: count it as right and take the word out of the repeat queue
+    const s = Object.assign({}, (S.words || {})[w.id]); s.w = Math.max(0, (s.w || 1) - 1); s.c = (s.c || 0) + 1; S.words[w.id] = s; save();
+    const j = PW.cards.lastIndexOf(w); if (j > PW.i) PW.cards.splice(j, 1); PW.again.delete(w.id);
+    PW.right++; PW.state = "right"; PW.typed = PW.lastWrong; PW.lastWrong = ""; return render();
+  }
+  if (t.hasAttribute("data-pwnext")) { PW.done = Math.min(PW.total, PW.done + (PW.again.has(w.id) && PW.i >= PW.total ? 0 : 1)); PW.i++; PW.opts = null; PW.picked = null; PW.state = "ask"; PW.typed = ""; PW.lastWrong = ""; return render(); }
 }
