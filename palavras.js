@@ -54,9 +54,12 @@ const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").s
 function pwOptions(w) {
   const g = pwGroup(w), mine = pwToks(pwTr(w));
   const pool = WORDS.filter(x => x.id !== w.id && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
-  const same = shuffle(pool.filter(x => (x.pos || "") === (w.pos || "") && x.u === w.u));
-  const rest = shuffle(pool);
-  const opts = [...same, ...rest].filter((x, i, a) => a.findIndex(y => pwTr(y) === pwTr(x)) === i).slice(0, 3);
+  // harder: wrong options are the same part of speech, from the same or nearby units
+  const un = u => u === "P1" ? 4.5 : u === "P2" ? 8.5 : +u;
+  const pos = x => x.pos || "", near = x => Math.abs(un(x.u) - un(w.u));
+  const same = pool.filter(x => pos(x) === pos(w));
+  const tier = f => shuffle(same.filter(f));
+  const opts = [...tier(x => x.u === w.u), ...tier(x => x.u !== w.u && near(x) <= 2), ...tier(x => near(x) > 2), ...shuffle(pool)].filter((x, i, a) => a.findIndex(y => pwTr(y) === pwTr(x)) === i).slice(0, 3);
   return shuffle([w, ...opts]);
 }
 
