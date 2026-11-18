@@ -23,19 +23,36 @@ function pwPool(lvl) {
   return WORDS.filter(w => pwUnitOk(w.u) && pwTypeOk(w) && (lvl === 1 || w.s));
 }
 function pwLabel(w) { return (w.art && w.art !== "o/a" ? w.art + " " : "") + w.w; }
+// Progress per word and level: s1/s2/s3 = right answers in a row on that level, w1/w2/w3 = mistakes on that level.
+// A level is passed after 2 right in a row; a mistake starts that level again. Passing a harder level counts the easier ones.
+// Learned = Level 3 (exam) passed.
+const PW_NEED = 2;
+function pwRec(id) {
+  const s = Object.assign({}, pwSt(id));
+  if (s.s1 === undefined) { // older records: only total counters
+    s.s1 = Math.max(0, Math.min(PW_NEED, (s.c || 0) - (s.w || 0)));
+    s.s2 = Math.min(PW_NEED, s.l2 || 0); s.s3 = Math.min(PW_NEED, s.l3 || 0);
+  }
+  return s;
+}
+function pwStage(id) {
+  const s = pwRec(id);
+  return s.s3 >= PW_NEED ? 3 : s.s2 >= PW_NEED ? 2 : (s.k || s.s1 >= PW_NEED) ? 1 : 0;
+}
 function pwMark(w, ok, lvl) {
   S.words = S.words || {};
-  const s = Object.assign({}, S.words[w.id] || {});
-  if (ok) s.c = (s.c || 0) + 1; else s.w = (s.w || 0) + 1;
-  if (lvl >= 2 && ok) s["l" + lvl] = (s["l" + lvl] || 0) + 1;
+  const s = pwRec(w.id), st = "s" + lvl;
+  if (ok) { s.c = (s.c || 0) + 1; s[st] = (s[st] || 0) + 1; if (lvl >= 2) s["l" + lvl] = (s["l" + lvl] || 0) + 1; }
+  else { s.w = (s.w || 0) + 1; s["w" + lvl] = (s["w" + lvl] || 0) + 1; s["b" + lvl] = s[st] || 0; s[st] = 0; }
   s.d = dayKey();
   S.words[w.id] = s; save();
 }
-// learned: Level 1 known or answered right at least twice more than wrong
-const pwLearned = w => { const s = pwSt(w.id); return s.k || (s.c || 0) - (s.w || 0) >= 2; };
+const pwLearned = w => pwStage(w.id) >= 3;
 function pwPick(lvl, n) {
   const pool = pwPool(lvl);
-  const score = w => { const s = pwSt(w.id); return (s.k ? (lvl === 1 ? 1000 : 40) : 0) + (s.c || 0) * 3 - (s.w || 0) * 4 + (s.d === dayKey() ? 6 : 0) + Math.random() * 4; };
+  // first: words ready for this level (easier level passed), with mistakes; last: words already passed here
+  const score = w => { const s = pwRec(w.id), g = pwStage(w.id);
+    return (g >= lvl ? 1000 : 0) + (g === lvl - 1 ? -20 : 0) + (s["s" + lvl] || 0) * 3 - (s["w" + lvl] || 0) * 4 + (s.d === dayKey() ? 6 : 0) + Math.random() * 4; };
   return pool.map(w => [score(w), w]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1]);
 }
 function pwStart(lvl) {
@@ -68,7 +85,7 @@ function palavras() {
   const units = [...new Set(all.map(w => w.u))];
   return `${topbar("home", "Home")}
     <div><p class="eyebrow">Palavras · words from the book</p><h1>Words</h1>
-      <p class="muted">${all.length} words from ${unitLabel().toLowerCase()}${o.p ? " + Português em Ação (P)" : ""}. Learned: <b>${learned}</b>.</p></div>
+      <p class="muted">${all.length} words from ${unitLabel().toLowerCase()}${o.p ? " + Português em Ação (P)" : ""}. Learned: <b>${learned}</b>. <button class="linkbtn" data-go="palstats">My words →</button></p></div>
     <div class="segs" role="group" aria-label="Level">
       <button class="${L === 1 ? "on" : ""}" data-pwlvl="1">1 · Remember</button>
       <button class="${L === 2 ? "on" : ""}" data-pwlvl="2">2 · Lingvist</button>
@@ -136,7 +153,7 @@ function pwResult() {
   return `${topbar("palavras", "Words")}
     <div class="exsec"><p class="eyebrow">Level ${PW.lvl} · done</p><div class="score">${r}<span style="font-size:24px"> / ${n}</span></div>
       <p>${r === n ? "Perfect!" : r >= n * 0.7 ? "Good. The missed words will come back first next time." : "The missed words will come back first next time."}</p>
-      <div class="row"><button class="btn" data-pwgo>Next set</button><button class="btn ghost" data-go="palavras">Words</button></div></div>`;
+      <div class="row"><button class="btn" data-pwgo>Next set</button><button class="btn ghost" data-go="palstats">My words</button></div></div>`;
 }
 function pwCheck() {
   const w = PW.cards[PW.i], el = document.getElementById("pwa"); if (!el) return;
@@ -159,6 +176,7 @@ function pwClick(t) {
   if (t.dataset.pwlvl) { S.wordLvl = +t.dataset.pwlvl; save(); return render(); }
   if (t.dataset.pwlang) { S.wordOpts = Object.assign(pwOpts(), { lang: t.dataset.pwlang }); save(); return render(); }
   if (t.dataset.pwtype) { S.wordOpts = Object.assign(pwOpts(), { type: t.dataset.pwtype }); save(); return render(); }
+  if (t.dataset.pwstat) { S.pwStatF = t.dataset.pwstat; save(); return render(); }
   if (t.dataset.pwp) { S.wordOpts = Object.assign(pwOpts(), { p: t.dataset.pwp === "1" }); save(); return render(); }
   if (t.hasAttribute("data-pwgo")) return pwStart(S.wordLvl || 1);
   if (!PW) return;
@@ -171,14 +189,37 @@ function pwClick(t) {
     if (!ok && !PW.again.has(w.id)) { PW.again.add(w.id); PW.cards.push(w); }
     return render();
   }
-  if (t.hasAttribute("data-pwknow")) { S.words = S.words || {}; S.words[w.id] = Object.assign({}, S.words[w.id], { k: 1, d: dayKey() }); save(); PW.right++; PW.done++; PW.i++; PW.opts = null; PW.state = "ask"; return render(); }
+  if (t.hasAttribute("data-pwknow")) { S.words = S.words || {}; S.words[w.id] = Object.assign(pwRec(w.id), { k: 1, d: dayKey() }); save(); PW.right++; PW.done++; PW.i++; PW.opts = null; PW.state = "ask"; return render(); }
   if (t.hasAttribute("data-pwshow")) { pwMark(w, false, PW.lvl); if (!PW.again.has(w.id)) { PW.again.add(w.id); PW.cards.push(w); } PW.state = "retype"; PW.lastWrong = ""; PW.typed = ""; return render(); }
   if (t.hasAttribute("data-pwcheck")) return pwCheck();
   if (t.hasAttribute("data-pwmine")) {
     // undo the wrong mark: count it as right and take the word out of the repeat queue
-    const s = Object.assign({}, (S.words || {})[w.id]); s.w = Math.max(0, (s.w || 1) - 1); s.c = (s.c || 0) + 1; S.words[w.id] = s; save();
+    const s = pwRec(w.id), L = PW.lvl; s.w = Math.max(0, (s.w || 1) - 1); s["w" + L] = Math.max(0, (s["w" + L] || 1) - 1); s.c = (s.c || 0) + 1;
+    s["s" + L] = (s["b" + L] || 0) + 1; if (L >= 2) s["l" + L] = (s["l" + L] || 0) + 1; S.words[w.id] = s; save();
     const j = PW.cards.lastIndexOf(w); if (j > PW.i) PW.cards.splice(j, 1); PW.again.delete(w.id);
     PW.right++; PW.state = "right"; PW.typed = PW.lastWrong; PW.lastWrong = ""; return render();
   }
   if (t.hasAttribute("data-pwnext")) { PW.done = Math.min(PW.total, PW.done + (PW.again.has(w.id) && PW.i >= PW.total ? 0 : 1)); PW.i++; PW.opts = null; PW.picked = null; PW.state = "ask"; PW.typed = ""; PW.lastWrong = ""; return render(); }
+}
+
+// My words: progress per word
+const PW_FILTERS = [["all", "All"], ["hard", "Hard"], ["3", "Learned"], ["2", "Level 2 passed"], ["1", "Level 1 passed"], ["0", "Not yet"]];
+function palstats() {
+  const all = pwPool(1), f = S.pwStatF || "all", n = [0, 0, 0, 0];
+  const info = all.map(w => { const s = pwRec(w.id), g = pwStage(w.id); n[g]++; return { w, s, g, bad: (s.w || 0), seen: !!(s.c || s.w || s.k) }; });
+  const hard = x => x.g < 3 && x.bad >= 2;
+  const cnt = k => k === "all" ? all.length : k === "hard" ? info.filter(hard).length : n[+k];
+  const list = info.filter(x => f === "all" || (f === "hard" ? hard(x) : x.g === +f))
+    .sort((a, b) => f === "hard" ? b.bad - a.bad : (b.g - a.g) || (b.seen - a.seen) || (b.bad - a.bad));
+  const dot = (s, g, L) => { const done = g >= L, half = !done && (s["s" + L] || 0) > 0;
+    return `<i class="pwdot ${done ? "on" : half ? "half" : ""}" title="Level ${L}"></i>`; };
+  const pct = k => (n[k] / Math.max(1, all.length) * 100).toFixed(1);
+  return `${topbar("palavras", "Words")}
+    <div><p class="eyebrow">Palavras · progress</p><h1>My words</h1>
+      <p class="muted">${n[3]} of ${all.length} learned.</p></div>
+    <div class="pwmeter" aria-hidden="true"><i class="g3" style="width:${pct(3)}%"></i><i class="g2" style="width:${pct(2)}%"></i><i class="g1" style="width:${pct(1)}%"></i></div>
+    <p class="small muted">Each dot is a level: Remember · Lingvist · Exam. A level is passed after <b>2 right answers in a row</b> (half dot = 1 so far). A mistake starts that level again. Passing a harder level counts the easier ones too. A word is <b>learned</b> when Level 3 is passed. “Hard” = 2+ mistakes and not learned yet.</p>
+    <div class="chips">${PW_FILTERS.map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-pwstat="${k}">${t} · ${cnt(k)}</button>`).join("")}</div>
+    <div class="pwlist">${list.map(({ w, s, g, bad }) => `<div class="pwrow${g >= 3 ? " done" : ""}"><span class="pwdots">${dot(s, g, 1)}${dot(s, g, 2)}${dot(s, g, 3)}</span>
+      <span class="pt">${pwLabel(w)}</span><span class="muted">${pwTr(w)}</span>${bad ? `<span class="pwbad">✗${bad}</span>` : ""}</div>`).join("") || `<p class="muted">No words here yet.</p>`}</div>`;
 }

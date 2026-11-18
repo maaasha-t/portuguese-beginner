@@ -241,6 +241,18 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 .ic-review { background: var(--bad-soft); color: var(--bad); }
 .ic-home { background: var(--accent-soft); color: var(--accent); }
 .ic-words { background: #efe4fb; color: #6b3fb3; }
+.pwmeter { display: flex; height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.pwmeter i { display: block; height: 100%; }
+.pwmeter .g3 { background: var(--good); } .pwmeter .g2 { background: var(--accent); } .pwmeter .g1 { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.pwlist { display: flex; flex-direction: column; }
+.pwrow { display: flex; align-items: baseline; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.pwrow .pt { font-weight: 600; } .pwrow .muted { flex: 1; font-size: 14px; }
+.pwdots { display: inline-flex; gap: 3px; flex: none; }
+.pwdot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--line); display: inline-block; }
+.pwdot.on { background: var(--accent); border-color: var(--accent); }
+.pwrow.done .pwdot.on { background: var(--good); border-color: var(--good); }
+.pwdot.half { border-color: var(--accent); background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
+.pwbad { color: var(--bad); font-size: 12px; font-variant-numeric: tabular-nums; flex: none; }
 .pwbar { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .pwbar div { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
 .pwbar i { display: block; height: 100%; background: var(--accent); }
@@ -2260,7 +2272,10 @@ function mergeState(a, b) {
   // words: per word keep the higher counters from both devices
   const wa = a.words || {}, wb = b.words || {}; out.words = {};
   new Set([...Object.keys(wa), ...Object.keys(wb)]).forEach(k => { const x = wa[k] || {}, y = wb[k] || {}, m = {};
-    ["c", "w", "l2", "l3"].forEach(f => { const v = Math.max(x[f] || 0, y[f] || 0); if (v) m[f] = v; });
+    ["c", "w", "l2", "l3", "w1", "w2", "w3"].forEach(f => { const v = Math.max(x[f] || 0, y[f] || 0); if (v) m[f] = v; });
+    // streaks: from the device that practised the word last
+    const nw = (x.d || "") > (y.d || "") ? x : (y.d || "") > (x.d || "") ? y : null;
+    ["s1", "s2", "s3", "b1", "b2", "b3"].forEach(f => { const v = nw ? nw[f] : Math.max(x[f] || 0, y[f] || 0); if (v !== undefined) m[f] = v; });
     if (x.k || y.k) m.k = 1; const d = [x.d, y.d].filter(Boolean).sort().pop(); if (d) m.d = d; out.words[k] = m; });
   out.days = [...new Set([...(a.days || []), ...(b.days || [])])].sort();
   const tests = new Map(); [...(a.tests || []), ...(b.tests || [])].forEach(t => { const o = tests.get(t.id); if (!o || t.score > o.score) tests.set(t.id, t); });
@@ -3139,7 +3154,7 @@ function result() {
 // desktop only (wide screens): menu on the left
 function sideNav() {
   const cur = view.name === "quiz" || view.name === "result" ? (Q && Q.back ? Q.back.name : "home") : view.name;
-  const sec = { lesson: "lessons", chunk: "lessons", card: "cards", exame: "test" }[cur] || cur;
+  const sec = { lesson: "lessons", chunk: "lessons", card: "cards", exame: "test", palq: "palavras", palstats: "palavras" }[cur] || cur;
   const m = mistakeCount();
   const item = (k, label, icn) => `<button class="sitem ${sec === k ? "on" : ""}" data-go="${k}">${ic(icn || k)}<span>${label}</span></button>`;
   return `<nav class="side" aria-label="Menu">
@@ -3155,7 +3170,7 @@ function sideNav() {
 function render() {
   const v = view.name;
   setTimeout(() => { const el = document.getElementById("wa"); if (el && !el.disabled) el.focus(); }, 0);
-  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame, search, palavras, palq };
+  const V = { home, lessons, lesson, chunk, quiz, result, cards, card, units, verbs, workbook, test, falar, backup, formas, exame, search, palavras, palq, palstats };
   if (v === "palq") setTimeout(() => { const el = document.getElementById("pwa"); if (el && !el.disabled) el.focus(); }, 0);
   if (v === "search") setTimeout(() => { const el = document.getElementById("gs"); if (el && !el.value) el.focus(); }, 0);
   $app.innerHTML = `${sideNav()}<div class="main">${(V[v] || home)()}</div>`;
