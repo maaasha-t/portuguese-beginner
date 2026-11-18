@@ -7,7 +7,9 @@ const POS_NAME = {
   ru: { noun: "существительное", verb: "глагол", adjective: "прилагательное", adverb: "наречие", phrase: "фраза", number: "числительное", other: "слово" },
 };
 let PW = null; // the running session
-const pwOpts = () => Object.assign({ lang: "en", p: true, type: "all" }, S.wordOpts || {});
+const pwOpts = () => Object.assign({ lang: "en", p: true, type: "all", geo: true }, S.wordOpts || {});
+// countries, cities, nationalities and languages (units 2–4): can be skipped in Settings
+const pwIsGeo = w => /^[A-Z]/.test(w.en) && ["2", "3", "4"].includes(String(w.u)) && w.pos !== "phrase";
 // word types for the filter
 const pwIsVerb = w => w.pos === "verb" || /^to /.test(w.en);
 const PW_TYPES = [["all", "All words"], ["verb", "Only verbs"], ["noun", "Only nouns"], ["adjective", "Only adjectives"]];
@@ -15,12 +17,13 @@ const pwTypeOk = w => { const t = pwOpts().type; return t === "all" || (t === "v
 const pwLang = () => pwOpts().lang === "ru" ? "ru" : "en";
 const pwTr = w => w[pwLang()] || w.en;
 const pwSt = id => (S.words || {})[id] || {};
-function pwUnitOk(u) {
+function pwUnitOk(u, w) {
+  if (w && !pwOpts().geo && pwIsGeo(w)) return false;
   if (/^P/.test(u)) return pwOpts().p;
   return inUnits(+u);
 }
 function pwPool(lvl) {
-  return WORDS.filter(w => pwUnitOk(w.u) && pwTypeOk(w) && (lvl === 1 || w.s));
+  return WORDS.filter(w => pwUnitOk(w.u, w) && pwTypeOk(w) && (lvl === 1 || w.s));
 }
 function pwLabel(w) { return (w.art && w.art !== "o/a" ? w.art + " " : "") + w.w; }
 // Progress per word and level: s1/s2/s3 = right answers in a row on that level, w1/w2/w3 = mistakes on that level.
@@ -84,7 +87,7 @@ const pwGroup = w => PW_GROUPS.findIndex(g => g.includes(w.w) || g.includes(w.w 
 const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").split(/[^a-zа-яё]+/i).filter(x => x.length > 2));
 function pwOptions(w) {
   const g = pwGroup(w), mine = pwToks(pwTr(w));
-  const pool = WORDS.filter(x => x.id !== w.id && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
+  const pool = WORDS.filter(x => x.id !== w.id && (pwOpts().geo || !pwIsGeo(x)) && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
   // harder: wrong options are the same part of speech, from the same or nearby units
   const un = u => u === "P1" ? 4.5 : u === "P2" ? 8.5 : +u;
   const near = x => Math.abs(un(x.u) - un(w.u));
@@ -108,7 +111,7 @@ function palavras() {
     <p class="small muted">${L === 1 ? "See a word, hear it, pick what it means. Tap “I know it” to skip words you already know. 10 words per set."
       : L === 2 ? "A sentence with a gap, plus the word's meaning and the whole sentence translated. Type the word. A wrong word comes back later. 20 per set."
       : "A sentence with a gap and no hints at all, like on the exam. Type the word. 20 per set."}</p>
-    <div class="chips">${PW_TYPES.map(([k, t]) => `<button class="chip ${o.type === k ? "on" : ""}" data-pwtype="${k}">${t} · ${WORDS.filter(w => pwUnitOk(w.u) && (k === "all" || (k === "verb" ? pwIsVerb(w) : w.pos === k && !pwIsVerb(w)))).length}</button>`).join("")}</div>
+    <div class="chips">${PW_TYPES.map(([k, t]) => `<button class="chip ${o.type === k ? "on" : ""}" data-pwtype="${k}">${t} · ${WORDS.filter(w => pwUnitOk(w.u, w) && (k === "all" || (k === "verb" ? pwIsVerb(w) : w.pos === k && !pwIsVerb(w)))).length}</button>`).join("")}</div>
     <button class="btn" data-pwgo>Start · ${Math.min(L === 1 ? 10 : 20, pwPool(L).length)} ${o.type === "verb" ? "verbs" : "words"}</button>
     <div class="exsec"><h2>Settings</h2>
       <div class="row" style="gap:6px;flex-wrap:wrap">
@@ -119,6 +122,10 @@ function palavras() {
         <span class="small muted" style="align-self:center">“Português em Ação” 1–2 (café, plane, border):</span>
         <button class="chip ${o.p ? "on" : ""}" data-pwp="1">Include</button>
         <button class="chip ${!o.p ? "on" : ""}" data-pwp="0">Skip</button></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">
+        <span class="small muted" style="align-self:center">Countries, cities, nationalities, languages (${WORDS.filter(pwIsGeo).length} words):</span>
+        <button class="chip ${o.geo ? "on" : ""}" data-pwgeo="1">Include</button>
+        <button class="chip ${!o.geo ? "on" : ""}" data-pwgeo="0">Skip</button></div>
       <button class="unitchip" data-go="units">${unitLabel()} · change</button></div>`;
 }
 
@@ -192,6 +199,7 @@ function pwClick(t) {
   if (t.dataset.pwlang) { S.wordOpts = Object.assign(pwOpts(), { lang: t.dataset.pwlang }); save(); return render(); }
   if (t.dataset.pwtype) { S.wordOpts = Object.assign(pwOpts(), { type: t.dataset.pwtype }); save(); return render(); }
   if (t.dataset.pwstat) { S.pwStatF = t.dataset.pwstat; save(); return render(); }
+  if (t.dataset.pwgeo) { S.wordOpts = Object.assign(pwOpts(), { geo: t.dataset.pwgeo === "1" }); save(); return render(); }
   if (t.dataset.pwp) { S.wordOpts = Object.assign(pwOpts(), { p: t.dataset.pwp === "1" }); save(); return render(); }
   if (t.hasAttribute("data-pwgo")) return pwStart(S.wordLvl || 1);
   if (!PW) return;
