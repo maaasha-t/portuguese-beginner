@@ -7,7 +7,11 @@ const POS_NAME = {
   ru: { noun: "существительное", verb: "глагол", adjective: "прилагательное", adverb: "наречие", phrase: "фраза", number: "числительное", other: "слово" },
 };
 let PW = null; // the running session
-const pwOpts = () => Object.assign({ lang: "en", p: true }, S.wordOpts || {});
+const pwOpts = () => Object.assign({ lang: "en", p: true, type: "all" }, S.wordOpts || {});
+// word types for the filter
+const pwIsVerb = w => w.pos === "verb" || /^to /.test(w.en);
+const PW_TYPES = [["all", "All words"], ["verb", "Only verbs"], ["noun", "Only nouns"], ["adjective", "Only adjectives"]];
+const pwTypeOk = w => { const t = pwOpts().type; return t === "all" || (t === "verb" ? pwIsVerb(w) : w.pos === t && !pwIsVerb(w)); };
 const pwLang = () => pwOpts().lang === "ru" ? "ru" : "en";
 const pwTr = w => w[pwLang()] || w.en;
 const pwSt = id => (S.words || {})[id] || {};
@@ -16,7 +20,7 @@ function pwUnitOk(u) {
   return inUnits(+u);
 }
 function pwPool(lvl) {
-  return WORDS.filter(w => pwUnitOk(w.u) && (lvl === 1 || w.s));
+  return WORDS.filter(w => pwUnitOk(w.u) && pwTypeOk(w) && (lvl === 1 || w.s));
 }
 function pwLabel(w) { return (w.art && w.art !== "o/a" ? w.art + " " : "") + w.w; }
 function pwMark(w, ok, lvl) {
@@ -61,7 +65,8 @@ function palavras() {
     <p class="small muted">${L === 1 ? "See a word, hear it, pick what it means. Tap “I know it” to skip words you already know. 10 words per set."
       : L === 2 ? "A sentence with a gap, plus the word's meaning and the whole sentence translated. Type the word. A wrong word comes back later. 20 per set."
       : "A sentence with a gap and no hints at all, like on the exam. Type the word. 20 per set."}</p>
-    <button class="btn" data-pwgo>Start · ${L === 1 ? 10 : 20} words</button>
+    <div class="chips">${PW_TYPES.map(([k, t]) => `<button class="chip ${o.type === k ? "on" : ""}" data-pwtype="${k}">${t} · ${WORDS.filter(w => pwUnitOk(w.u) && (k === "all" || (k === "verb" ? pwIsVerb(w) : w.pos === k && !pwIsVerb(w)))).length}</button>`).join("")}</div>
+    <button class="btn" data-pwgo>Start · ${Math.min(L === 1 ? 10 : 20, pwPool(L).length)} ${o.type === "verb" ? "verbs" : "words"}</button>
     <div class="exsec"><h2>Settings</h2>
       <div class="row" style="gap:6px;flex-wrap:wrap">
         <span class="small muted" style="align-self:center">Translation:</span>
@@ -142,6 +147,7 @@ function pwCheck() {
 function pwClick(t) {
   if (t.dataset.pwlvl) { S.wordLvl = +t.dataset.pwlvl; save(); return render(); }
   if (t.dataset.pwlang) { S.wordOpts = Object.assign(pwOpts(), { lang: t.dataset.pwlang }); save(); return render(); }
+  if (t.dataset.pwtype) { S.wordOpts = Object.assign(pwOpts(), { type: t.dataset.pwtype }); save(); return render(); }
   if (t.dataset.pwp) { S.wordOpts = Object.assign(pwOpts(), { p: t.dataset.pwp === "1" }); save(); return render(); }
   if (t.hasAttribute("data-pwgo")) return pwStart(S.wordLvl || 1);
   if (!PW) return;
