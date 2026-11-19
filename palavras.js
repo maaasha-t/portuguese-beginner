@@ -66,7 +66,7 @@ function pwStart(lvl) {
 }
 // words that look alike in meaning: never offered as wrong options for each other (too confusing)
 const PW_GROUPS = [["este/esta", "esse/essa", "aquele", "isto", "isso", "aquilo", "aqui", "aí", "ali"],
-  ["Não percebo!", "Não compreendo!"], ["Muito gosto!", "Muito prazer!"], ["Até logo!", "Até já!"], ["lindo", "bonito", "giro"], ["mulher, a", "senhora, a"]];
+  ["Não percebo!", "Não compreendo!"], ["Muito gosto!", "Muito prazer!"], ["Até logo!", "Até já!"], ["Tudo bem?", "Como está?", "Estás bom/boa?"], ["lindo", "bonito", "giro"], ["mulher, a", "senhora, a"]];
 // small words of the same kind are the wrong options for each other (dele → meu, nosso, tu…), so the answer is not obvious
 const PW_KINDS = {
   person: "eu|tu|você|ele/ela|nós|vocês|meu/minha|teu/tua|seu/sua|dele/dela|deles/delas|nosso|vosso",
@@ -84,17 +84,31 @@ const PW_KIND = {};
 Object.entries(PW_KINDS).forEach(([k, v]) => v.split("|").forEach(x => { if (!PW_KIND[x]) PW_KIND[x] = k; }));
 const pwKind = w => PW_KIND[w.w] || w.pos || "";
 const pwGroup = w => PW_GROUPS.findIndex(g => g.includes(w.w) || g.includes(w.w + ", " + w.art));
-const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").split(/[^a-zа-яё]+/i).filter(x => x.length > 2));
+// common little words do not make two meanings look alike (Как это пишется? vs Как сказать?)
+const PW_STOP = new Set("как это что кто где мне быть хотеть the you how what are can say not have".split(" "));
+const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").split(/[^a-zа-яё]+/i).filter(x => x.length > 2 && !PW_STOP.has(x)));
 function pwOptions(w) {
   const g = pwGroup(w), mine = pwToks(pwTr(w));
   const pool = WORDS.filter(x => x.id !== w.id && (pwOpts().geo || !pwIsGeo(x)) && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
   // harder: wrong options are the same part of speech, from the same or nearby units
   const un = u => u === "P1" ? 4.5 : u === "P2" ? 8.5 : +u;
   const near = x => Math.abs(un(x.u) - un(w.u));
+  // a question is offered with questions, an exclamation with exclamations (the ? or ! must not give the answer away)
+  const mark = x => (pwTr(x).trim().match(/[?!]$/) || [""])[0], mk = mark(w);
   const same = pool.filter(x => pwKind(x) === pwKind(w));
-  const tier = f => shuffle(same.filter(f));
-  const opts = [...tier(x => x.u === w.u), ...tier(x => x.u !== w.u && near(x) <= 2), ...tier(x => near(x) > 2),
-    ...shuffle(pool.filter(x => (x.pos || "") === (w.pos || ""))), ...shuffle(pool)].filter((x, i, a) => a.findIndex(y => pwTr(y) === pwTr(x)) === i).slice(0, 3);
+  const okMark = x => !mk || mark(x) === mk;
+  const tier = f => shuffle(same.filter(x => okMark(x) && f(x)));
+  const cand = [...tier(x => x.u === w.u), ...tier(x => x.u !== w.u && near(x) <= 2), ...tier(x => near(x) > 2),
+    ...shuffle(pool.filter(x => mk && mark(x) === mk && (x.pos || "") === (w.pos || ""))), ...shuffle(pool.filter(x => mk && mark(x) === mk)),
+    ...shuffle(same), ...shuffle(pool.filter(x => (x.pos || "") === (w.pos || ""))), ...shuffle(pool)];
+  // the wrong options must not look alike either (two near-same options = both obviously wrong)
+  const opts = [];
+  for (const x of cand) {
+    if (opts.length === 3) break;
+    const tx = pwToks(pwTr(x)), gx = pwGroup(x);
+    if (opts.some(y => pwTr(y) === pwTr(x) || (gx >= 0 && pwGroup(y) === gx) || [...pwToks(pwTr(y))].some(t => tx.has(t)))) continue;
+    opts.push(x);
+  }
   return shuffle([w, ...opts]);
 }
 
@@ -145,7 +159,7 @@ function palq() {
         ${w.pos && w.pos !== "other" ? `<div class="small muted">${POS_NAME[lang][w.pos] || ""}</div>` : ""}</div>
       <div class="opts">${PW.opts.map((o, k) => {
         const cls = ans && o.id === w.id ? "ok" : ans && k === PW.picked ? "no" : "";
-        return `<button class="opt ${cls}" data-pwopt="${k}" ${ans ? "disabled" : ""}>${pwTr(o)}</button>`; }).join("")}</div>
+        return `<button class="opt ${cls}" data-pwopt="${k}" ${ans ? "disabled" : ""}>${pwTr(o).replace(/[.!?]$/, "")}</button>`; }).join("")}</div>
       ${ans ? `<div class="why ${PW.state === "right" ? "ok" : "no"}"><strong>${PW.state === "right" ? "Certo!" : "Not quite"}</strong>
           <span><b>${pwLabel(w)}</b> = ${pwTr(w)}</span>
           ${w.s ? `<span class="pt">${sentHtml(x => `<b>${x}</b>`)}</span><span class="muted">= ${lang === "ru" ? w.sru : w.sen}</span>${play(full)}` : ""}</div>
