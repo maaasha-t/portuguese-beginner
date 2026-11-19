@@ -3374,6 +3374,19 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+// iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
+const BUILD = "2ba94ee7ec";
+function checkUpdate() {
+  if (document.hidden || !navigator.onLine) return;
+  if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
+  fetch("version.txt", { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => { v = v.trim(); if (!v || v === BUILD) return;
+    let done = ""; try { done = sessionStorage.getItem("caderno.reloaded") || ""; } catch {}
+    if (done === v) return; // reload once per new version (no loop if the server is still half-updated)
+    try { sessionStorage.setItem("caderno.reloaded", v); } catch {}
+    location.reload(); }).catch(() => {});
+}
+document.addEventListener("visibilitychange", checkUpdate);
+setTimeout(checkUpdate, 3000);
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 </script>
 </body>
