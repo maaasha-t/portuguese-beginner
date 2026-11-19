@@ -209,6 +209,9 @@ a { color: var(--accent); }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .hlist { grid-template-columns: 1fr; gap: 6px; }
 .hrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px 8px 8px; }
+.hgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.htile { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+.htile .ht span { white-space: normal; }
 .hrow .ic { width: 38px; height: 38px; border-radius: 10px; }
 .ht { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.25; }
 .ht b { font-family: var(--font-display); font-size: 17px; }
@@ -381,16 +384,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=51569b6091"></script>
-<script src="translations.js?v=51569b6091"></script>
-<script src="extras2.js?v=51569b6091"></script>
-<script src="cards.js?v=51569b6091"></script>
-<script src="formas.js?v=51569b6091"></script>
-<script src="exame.js?v=51569b6091"></script>
-<script src="rules.js?v=51569b6091"></script>
-<script src="palavras_data.js?v=51569b6091"></script>
-<script src="palavras.js?v=51569b6091"></script>
-<script src="listen.js?v=51569b6091"></script>
+<script src="extras.js?v=0c10d5c5d5"></script>
+<script src="translations.js?v=0c10d5c5d5"></script>
+<script src="extras2.js?v=0c10d5c5d5"></script>
+<script src="cards.js?v=0c10d5c5d5"></script>
+<script src="formas.js?v=0c10d5c5d5"></script>
+<script src="exame.js?v=0c10d5c5d5"></script>
+<script src="rules.js?v=0c10d5c5d5"></script>
+<script src="palavras_data.js?v=0c10d5c5d5"></script>
+<script src="palavras.js?v=0c10d5c5d5"></script>
+<script src="listen.js?v=0c10d5c5d5"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2630,14 +2633,14 @@ function home() {
       <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync ↔"}</button>
     </div>
     ${m ? `<button class="hrow hrev" data-go="review">${ic("review")}<span class="ht"><b>Review · ${m}</b><span>Your mistakes. Right twice → cleared</span></span><span class="hgo">›</span></button>` : ""}
-    <div class="tiles hlist">
-      <button class="hrow" data-go="palavras">${ic("words")}<span class="ht"><b>Palavras</b><span>All words from the book, 3 levels</span></span><span class="hgo">›</span></button>
-      <button class="hrow" data-go="lessons">${ic("lessons")}<span class="ht"><b>Lições</b><span>Lessons by unit: explain → practice</span></span><span class="hgo">›</span></button>
-      <button class="hrow" data-go="cards">${ic("cards")}<span class="ht"><b>Cábulas</b><span>Cheat sheets, one rule each</span></span><span class="hgo">›</span></button>
-      <button class="hrow" data-go="verbs">${ic("verbs")}<span class="ht"><b>Verbos</b><span>Verb forms, 2 levels</span></span><span class="hgo">›</span></button>
-      <button class="hrow" data-go="formas">${ic("formas")}<span class="ht"><b>Formas</b><span>Gender and number, 2 levels</span></span><span class="hgo">›</span></button>
-      <button class="hrow" data-go="workbook">${ic("workbook")}<span class="ht"><b>Workbook</b><span>Mixed tasks, new every time</span></span><span class="hgo">›</span></button>
-      <button class="hrow" data-go="test">${ic("test")}<span class="ht"><b>Teste</b><span>Exam practice: typing or options</span></span><span class="hgo">›</span></button>
+    <div class="hgrid">
+      <button class="hrow htile" data-go="cards">${ic("cards")}<span class="ht"><b>Cábulas</b><span>Cheat sheets, one rule each</span></span></button>
+      <button class="hrow htile" data-go="palavras">${ic("words")}<span class="ht"><b>Palavras</b><span>Words from the book, 3 levels</span></span></button>
+      <button class="hrow htile" data-go="test">${ic("test")}<span class="ht"><b>Teste</b><span>Exam practice</span></span></button>
+      <button class="hrow htile" data-go="verbs">${ic("verbs")}<span class="ht"><b>Verbos</b><span>Verb forms, 3 levels</span></span></button>
+      <button class="hrow htile" data-go="lessons">${ic("lessons")}<span class="ht"><b>Lições</b><span>Lessons: explain → practice</span></span></button>
+      <button class="hrow htile" data-go="workbook">${ic("workbook")}<span class="ht"><b>Workbook</b><span>Mixed tasks, new every time</span></span></button>
+      <button class="hrow htile" data-go="formas">${ic("formas")}<span class="ht"><b>Formas</b><span>Gender and number</span></span></button>
       <!-- Falar (voice lesson prompt) is built but hidden: backlog, see README -->
     </div>
 `;
@@ -3214,7 +3217,7 @@ function sideNav() {
     ${item("home", "Home")}
     <button class="sitem ${sec === "search" ? "on" : ""}" data-go="search"><span class="ic ic-home"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span>Search</span></button>
     ${m ? `<button class="sitem" data-go="review">${ic("review")}<span>Review · ${m}</span></button>` : ""}
-    ${item("palavras", "Palavras", "words")}${item("lessons", "Lições")}${item("cards", "Cábulas")}${item("verbs", "Verbos")}${item("formas", "Formas")}${item("workbook", "Workbook")}${item("test", "Teste")}
+    ${item("cards", "Cábulas")}${item("palavras", "Palavras", "words")}${item("test", "Teste")}${item("verbs", "Verbos")}${item("lessons", "Lições")}${item("workbook", "Workbook")}${item("formas", "Formas")}
     <div class="sfoot"><button class="unitchip" data-go="units">${unitLabel()} · change</button>
     <button class="unitchip" data-go="backup">${syncCfg().id ? "✓ Sync on" : "Sync phone ↔ computer"}</button></div>
   </nav>`;
@@ -3432,7 +3435,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "51569b6091";
+const BUILD = "0c10d5c5d5";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
