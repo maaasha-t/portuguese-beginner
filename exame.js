@@ -319,6 +319,7 @@ function xNumWord(n) {
   const T = ["", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"];
   const H = ["", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"];
   if (n === 1000) return "mil"; if (n === 100) return "cem";
+  if (n > 1000) { const r = n - 1000; return "mil" + (r < 100 || r % 100 === 0 ? " e " : " ") + xNumWord(r); }
   const two = m => m < 20 ? U[m] : T[Math.floor(m / 10)] + (m % 10 ? " e " + U[m % 10] : "");
   if (n < 100) return two(n);
   const h = Math.floor(n / 100), r = n % 100;
@@ -326,9 +327,9 @@ function xNumWord(n) {
 }
 function xNumbers(U) {
   const out = [], seen = new Set();
-  const rng = []; if (okU(U, 1)) rng.push([11, 20, "u1.numeros", 1]); if (okU(U, 2)) rng.push([21, 99, "u2.num21", 2]); if (okU(U, 3)) rng.push([101, 999, "u3.num1000", 3]);
+  const rng = []; if (okU(U, 1)) rng.push([11, 20, "u1.numeros", 1]); if (okU(U, 2)) rng.push([21, 99, "u2.num21", 2]); if (okU(U, 3)) { rng.push([101, 999, "u3.num1000", 3]); rng.push([101, 999, "u3.num1000", 3]); rng.push([1001, 1999, "u3.num1000", 3]); }
   if (!rng.length) return out;
-  for (let k = 0; k < 10; k++) {
+  for (let k = 0; k < 14; k++) {
     const r = XR(rng); let n = r[0] + Math.floor(Math.random() * (r[1] - r[0] + 1)); if (r[3] === 3 && Math.random() < 0.3) n = Math.round(n / 100) * 100 || 100;
     if (seen.has(n)) continue; seen.add(n);
     const w = xNumWord(n); out.push({ p: String(n), a: [w, w.replace("catorze", "quatorze")], topic: r[2], unit: r[3] });
@@ -360,7 +361,8 @@ function xArtPl(U) {
 const XFAM = [
   [["neto", "neta"], ["avô", "avó"]], [["filho", "filha"], ["pai", "mãe"]], [["pai", "mãe"], ["filho", "filha"]],
   [["irmão", "irmã"], ["irmão", "irmã"]], [["primo", "prima"], ["primo", "prima"]], [["avô", "avó"], ["neto", "neta"]],
-  [["namorado", "namorada"], ["namorado", "namorada"]],
+  [["namorado", "namorada"], ["namorado", "namorada"]], [["tio", "tia"], ["sobrinho", "sobrinha"]], [["sobrinho", "sobrinha"], ["tio", "tia"]],
+  [["marido", "mulher"], ["marido", "mulher"]],
 ];
 const XFAMDEF = [
   ["A mãe da minha mãe é a minha ___.", "avó"], ["O pai do meu pai é o meu ___.", "avô"], ["O irmão do meu pai é o meu ___.", "tio"],
@@ -373,7 +375,7 @@ function xFamily(U) {
   const out = XS(XFAMDEF).slice(0, 3).map(([p, a]) => ({ p, a: [a], topic: "u9.familia", unit: 9 }));
   for (let k = 0; k < 6; k++) {
     const r = XR(XFAM), og = XR(["m", "f"]), me = XR(["m", "f"]), name = og === "f" ? XR(XF) : XR(XM);
-    if (r[0][0] === "namorado" && og === me) continue;
+    if ((r[0][0] === "namorado" || r[0][0] === "marido") && og === me) continue;
     const rel = r[0][og === "f" ? 1 : 0], ans = r[1][me === "f" ? 1 : 0];
     out.push({ p: `${og === "f" ? "A minha" : "O meu"} ${rel} chama-se ${name}. Sou ${me === "f" ? "a" : "o"} ___ ${og === "f" ? "da" : "do"} ${name}.`, a: [ans], topic: "u9.familia", unit: 9 });
   }
@@ -387,6 +389,83 @@ function xBank(U) {
   const pick = [], seen = new Set();
   XS(ok).forEach(w => { const k = w.a[0].toLowerCase(); if (pick.length < 6 && !seen.has(k)) { seen.add(k); pick.push(w); } });
   return pick.map(w => ({ p: w.s.replace(/\[\[(.+?)\]\]/, "___"), a: w.a, topic: (w.u === "1" ? "u1.apresentar" : "u" + w.u + "." + ({ 2: "paises", 3: "linguas", 4: "objetos", 5: "ter", 6: "profissoes", 7: "adjetivos", 8: "rotina", 9: "familia", 10: "aparencia" })[w.u]), unit: +w.u, bank: w.a[0] }));
+}
+
+
+/* ---------- Real exam (Exame #1, PLA A1, Nov 2026): 10 parts in this order ---------- */
+// 1. pronomes reflexos me / te / se
+function xReflex(U) {
+  if (!okU(U, 1)) return [];
+  const f = () => XR(XF), m = () => XR(XM);
+  const T = [
+    () => [`Como ___ chama a senhora?`, "se"], () => [`Como ___ chama o senhor?`, "se"], () => [`Chamo-___ ${XR([f(), m()])}.`, "me"],
+    () => [`Como ___ chamas?`, "te"], () => [`Chamas-___ ${m()}?`, "te"], () => [`Ele chama-___ ${m()}.`, "se"], () => [`Ela chama-___ ${f()}.`, "se"],
+    () => [`Elas chamam-___ ${f()} e ${f()}.`, "se"], () => [`O senhor chama-___ ${m()}?`, "se"], () => [`Como ___ chamam eles?`, "se"],
+    () => [`Eu chamo-___ ${f()}.`, "me"], () => [`Tu chamas-___ ${f()}?`, "te"], () => [`A senhora chama-___ ${f()}?`, "se"], () => [`Como ___ chama ela?`, "se"],
+  ];
+  return XS(T).map(t => { const [p, a] = t(); return { p, a: [a], topic: "u1.apresentar", unit: 1 }; });
+}
+// 2. de / em (+ artigo) com países
+const XCOUNTRY = [["Portugal", ""], ["Angola", ""], ["Moçambique", ""], ["Cabo Verde", ""], ["Timor-Leste", ""], ["Marrocos", ""], ["Brasil", "o"], ["Egito", "o"],
+  ["Paquistão", "o"], ["Japão", "o"], ["Canadá", "o"], ["Estados Unidos", "os"], ["Filipinas", "as"], ["China", "a"], ["Nigéria", "a"], ["Polónia", "a"], ["Índia", "a"],
+  ["Ucrânia", "a"], ["Alemanha", "a"], ["França", "a"], ["Espanha", "a"], ["Itália", "a"], ["Inglaterra", "a"], ["Rússia", "a"], ["Suécia", "a"], ["Grécia", "a"]];
+const XCAPITAL = { "Portugal": "Lisboa", "Angola": "Luanda", "Moçambique": "Maputo", "Cabo Verde": "Praia", "Timor-Leste": "Díli", "Marrocos": "Casablanca", "Brasil": "São Paulo",
+  "Egito": "Cairo", "Paquistão": "Karachi", "Japão": "Tóquio", "Canadá": "Toronto", "Estados Unidos": "Chicago", "Filipinas": "Manila", "China": "Xangai", "Nigéria": "Lagos",
+  "Polónia": "Varsóvia", "Índia": "Mumbai", "Ucrânia": "Kiev", "Alemanha": "Berlim", "França": "Paris", "Espanha": "Madrid", "Itália": "Roma", "Inglaterra": "Londres",
+  "Rússia": "Moscovo", "Suécia": "Estocolmo", "Grécia": "Atenas" };
+function xPaises(U) {
+  if (!okU(U, 2)) return [];
+  const de = a => ({ "": "de", o: "do", a: "da", os: "dos", as: "das" })[a], em = a => ({ "": "em", o: "no", a: "na", os: "nos", as: "nas" })[a];
+  return XS(XCOUNTRY).map(([c, art]) => {
+    const r = Math.random(), city = XCAPITAL[c];
+    if (r < 0.4) { const p = XNAME(); return { p: `${XCAP(XART[XFI(p.g)])} ${p.n} é ___ ${c}.`, a: [de(art)], topic: "u2.deonde", unit: 2 }; }
+    if (r < 0.55) { const two = XR([["O " + XR(XM) + " e o " + XR(XM), "são"], ["Eles", "são"], ["Nós", "somos"]]); return { p: `${two[0]} ${two[1]} ___ ${c}.`, a: [de(art)], topic: "u2.deonde", unit: 2 }; }
+    if (r < 0.85) return { p: `${city} fica ___ ${c}.`, a: [em(art)], topic: "u2.ondefica", unit: 2 };
+    return { p: `${city} é uma cidade ___ ${c}.`, a: [de(art), em(art)], topic: "u2.ondefica", unit: 2 };
+  });
+}
+// 5. palavras que faltam: trabalho e rotina
+const XWORK = [
+  ["Uma enfermeira trabalha num ___.", ["hospital"], 6], ["Um médico trabalha num ___.", ["hospital"], 6], ["Uma ___ trabalha numa escola e ensina os alunos.", ["professora"], 6],
+  ["Um ___ trabalha numa escola e ensina os alunos.", ["professor"], 6], ["Um ___ trabalha num restaurante e faz a comida.", ["cozinheiro"], 6],
+  ["Qual é a tua ___? Sou engenheiro.", ["profissão"], 6], ["Quantas horas trabalhas ___ dia?", ["por"], 8], ["Quantos dias trabalhas ___ semana?", ["por"], 8],
+  ["Às vezes, trabalho ___ fim de semana.", ["ao"], 8], ["___ vezes, trabalho ao sábado.", ["Às"], 8], ["Ela gosta ___ ser cozinheira.", ["de"], 8],
+  ["Trabalhamos ___ o Pedro e a Ana.", ["com"], 8], ["A Marta ___ numa loja de roupa.", ["trabalha"], 8], ["O Rui trabalha ___ hospital.", ["num", "no"], 8],
+  ["Trabalho das nove ___ cinco.", ["às"], 8], ["Não trabalho porque estou ___ férias.", ["de"], 8], ["Ela trabalha ___ casa.", ["em"], 8],
+  ["Ao domingo não trabalho, ___ que bom!", ["ainda"], 99],
+].filter(x => x[2] < 99);
+function xWork(U) {
+  return XS(XWORK.filter(x => okU(U, x[2]) || [...U].some(u => u >= x[2]))).map(([p, a, u]) => ({ p, a, topic: u === 6 ? "u6.profissoes" : "u8.rotina", unit: u }));
+}
+// 6. possessivos da caixa
+const XPBOX = [
+  () => { const c = XR(["Moçambique", "Angola", "Cabo Verde"]); return [`Ela é de ${c}. O primeiro nome ___ é ${XR(XF)}.`, "dela"]; },
+  () => [`Ele é da Índia. O último nome ___ é Sharma.`, "dele"],
+  () => [`Eles são do Brasil. A casa ___ é muito grande.`, "deles"],
+  () => [`— Qual é a ___ morada? — A minha morada é Rua das Flores, 12.`, "tua"],
+  () => [`— Qual é a tua morada? — A ___ morada é Rua do Sol, 5.`, "minha"],
+  () => [`— Qual é o teu telemóvel? — O ___ telemóvel é 912 345 678.`, "meu"],
+  () => [`Somos empregados. O nome do ___ chefe é Almeida.`, "nosso"],
+  () => [`Somos de Braga. A ___ cidade é bonita.`, "nossa"],
+  () => [`Vocês são de Odessa? Qual é o nome da ___ rua?`, "vossa"],
+  () => [`Vocês têm carro? De que cor é o ___ carro?`, "vosso"],
+];
+function xPossBox(U) {
+  if (!okU(U, 5) && !okU(U, 9)) return [];
+  return XS(XPBOX).map(t => { const [p, a] = t(); return { p, a: [a], topic: a.startsWith("de") ? "u9.poss2" : "u5.possessivos", unit: 5, bank: a }; });
+}
+// 7. De quem é? É ___ (pessoa)
+function xWhoseShort(U) {
+  if (!okU(U, 5) && !okU(U, 9)) return [];
+  const O = [["isto", "m", 0], ["isso", "m", 0], ["a mala", "f", 0], ["a bicicleta azul", "f", 0], ["aquele carro", "m", 0], ["o livro", "m", 0], ["a caneta", "f", 0],
+    ["os óculos", "m", 1], ["as chaves", "f", 1], ["os livros", "m", 1]];
+  const P = [["tu", "teu"], ["nós", "nosso"], ["eu", "meu"], ["ela", "dela"], ["ele", "dele"], ["eles", "deles"], ["elas", "delas"], ["o senhor", "seu"], ["a senhora", "seu"]];
+  return XS(O).map(o => {
+    const p = XR(P), f = XFI(o[1], o[2]), v = o[2] ? "São" : "É";
+    const a = p[1].startsWith("de") ? [p[1]] : [XPOSS[p[1]][f]];
+    if (p[1] === "seu") a.push(p[0] === "o senhor" ? "do senhor" : "da senhora", p[0] === "o senhor" ? "dele" : "dela");
+    return { p: `De quem ${o[2] ? "são" : "é"} ${o[0]}? ${v} ___ (${p[0]})`, a, topic: p[1].startsWith("de") ? "u9.poss2" : "u5.possessivos", unit: 5 };
+  });
 }
 
 /* ---------- the sheet ---------- */
@@ -408,19 +487,28 @@ const XSECTIONS = [
   ["family", "Escreva as palavras que faltam.", "Write the missing words (family).", xFamily],
   ["bank", "Complete as frases com as palavras da caixa.", "Complete the sentences with the words from the box.", xBank],
 ];
+// The sheet follows the real exam (Exame #1, PLA A1, Nov 2026): 10 parts, each worth 10 points.
+const XREAL = [
+  ["reflex", 9, "Complete as frases com os pronomes reflexos “me”, “te” e “se”.", "Complete with me, te or se.", xReflex],
+  ["paises", 9, "Preencha os espaços em branco com as preposições DE (+artigo se necessário) e EM (+artigo definido se necessário).", "Fill in DE or EM (+ the article if needed).", xPaises],
+  ["serestar", 12, "Complete com os verbos “ser” e “estar” na forma conjugada correta.", "Complete with ser or estar in the right form.", xSerEstar],
+  ["family", 7, "Escreva as palavras que faltam.", "Write the missing words (family).", xFamily],
+  ["work", 9, "Escreva as palavras que faltam.", "Write the missing words (work, routine).", xWork],
+  ["possbox", 5, "Complete as frases com as palavras da caixa.", "Complete with the words from the box.", xPossBox],
+  ["whose", 6, "Escreva as respostas corretas a estas perguntas usando os Pronomes Possessivos, seguindo o que diz entre parêntesis “()”.", "Answer with a possessive, for the person in brackets.", xWhoseShort],
+  ["order", 8, "Coloque as palavras por ordem para formar uma frase correta.", "Put the words in order to make a correct sentence.", xOrder],
+  ["numbers", 8, "Escreva o nome completo destes números:", "Write these numbers in words.", xNumbers],
+  ["order2", 8, "Escreva frases com sentido com as palavras dadas.", "Write sentences that make sense with the given words.", xOrder],
+];
 function makeExam(units) {
   const U = new Set(units.length ? units : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-  const ready = XSECTIONS.map(([key, instr, en, f]) => {
-    const seen = new Set(), items = XS(f(U)).filter(it => !seen.has(it.p) && seen.add(it.p));
-    return { key, instr, en, items };
-  }).filter(s => s.items.length >= 3);
-  const MUST = ["order", "build", "serestar", "bank", "family"];
-  const first = ready.filter(s => MUST.includes(s.key));
-  const rest = XS(ready.filter(s => !MUST.includes(s.key))).slice(0, Math.max(0, 9 - first.length));
-  const keys = new Set([...first, ...rest].map(s => s.key));
-  return ready.filter(s => keys.has(s.key)).map((s, i) => ({
-    letter: "ABCDEFGHIJ"[i], instr: s.instr, en: s.en, key: s.key,
-    items: s.items.slice(0, s.key === "order" || s.key === "build" || s.key === "errors" || s.key === "questions" ? 5 : 6).map(it => ({ ...it, ans: "", r: null })),
-    box: s.key === "bank" ? XS(s.items.slice(0, 6).map(it => XPROPER.has(it.bank) ? it.bank : it.bank.toLowerCase())) : null,
-  }));
+  const used = new Set(), out = [];
+  XREAL.forEach(([key, n, instr, en, f]) => {
+    const seen = new Set(), items = XS(f(U)).filter(it => !used.has(it.p) && !seen.has(it.p) && seen.add(it.p)).slice(0, n);
+    if (items.length < 3) return;
+    items.forEach(it => used.add(it.p));
+    out.push({ letter: String(out.length + 1), instr, en, key, items: items.map(it => ({ ...it, ans: "", r: null })),
+      box: key === "possbox" ? XS(items.map(it => it.bank)) : null });
+  });
+  return out;
 }

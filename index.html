@@ -2962,8 +2962,9 @@ function exSay(key, it) {
   return r;
 }
 function exScore(E) {
-  const all = E.sections.flatMap(s => s.items), pts = all.reduce((n, it) => n + (it.r === "ok" ? 1 : it.r === "near" ? 0.5 : 0), 0);
-  return Math.round(pts / all.length * 100);
+  // like the real exam: every part is worth the same (10 parts × 10 points)
+  const part = s => s.items.reduce((n, it) => n + (it.r === "ok" ? 1 : it.r === "near" ? 0.5 : 0), 0) / s.items.length;
+  return Math.round(E.sections.reduce((n, s) => n + part(s), 0) / E.sections.length * 100);
 }
 function exame() {
   const E = S.exam; if (!E) return test();
@@ -3375,7 +3376,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "8e9547d503";
+const BUILD = "9c0cbe823f";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
