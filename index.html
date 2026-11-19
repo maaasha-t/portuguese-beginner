@@ -381,16 +381,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js"></script>
-<script src="translations.js"></script>
-<script src="extras2.js"></script>
-<script src="cards.js"></script>
-<script src="formas.js"></script>
-<script src="exame.js"></script>
-<script src="rules.js"></script>
-<script src="palavras_data.js"></script>
-<script src="palavras.js"></script>
-<script src="listen.js"></script>
+<script src="extras.js?v=957e7a75a2"></script>
+<script src="translations.js?v=957e7a75a2"></script>
+<script src="extras2.js?v=957e7a75a2"></script>
+<script src="cards.js?v=957e7a75a2"></script>
+<script src="formas.js?v=957e7a75a2"></script>
+<script src="exame.js?v=957e7a75a2"></script>
+<script src="rules.js?v=957e7a75a2"></script>
+<script src="palavras_data.js?v=957e7a75a2"></script>
+<script src="palavras.js?v=957e7a75a2"></script>
+<script src="listen.js?v=957e7a75a2"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -3362,7 +3362,7 @@ $app.addEventListener("click", e => {
   }
   if (t.dataset.exhard) { S.exHard = t.dataset.exhard === "1"; save(); return render(); }
   if (t.dataset.exnum) { S.exNoNum = t.dataset.exnum === "0"; save(); return render(); }
-  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: (S.exHard ? makeExamHard : makeExam)(S.units, { noNum: S.exNoNum }), hard: !!S.exHard, graded: false }; save(); return go("exame"); }
+  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: (S.exHard && typeof makeExamHard === "function" ? makeExamHard : makeExam)(S.units, { noNum: S.exNoNum }), hard: !!S.exHard, graded: false }; save(); return go("exame"); }
   if (t.dataset.exen !== undefined) { const E = S.exam; E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
   if (t.hasAttribute("data-exsubmit")) {
     const all = S.exam.sections.flatMap(s => s.items), empty = all.filter(it => !it.ans.trim()).length;
@@ -3430,7 +3430,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "e7b46dc4cc";
+const BUILD = "957e7a75a2";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
