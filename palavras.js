@@ -65,7 +65,7 @@ function pwStart(lvl) {
   go("palq");
 }
 // words that look alike in meaning: never offered as wrong options for each other (too confusing)
-const PW_GROUPS = [["este/esta", "esse/essa", "aquele", "isto", "isso", "aquilo", "aqui", "aí", "ali"],
+const PW_GROUPS = [["este/esta", "isto", "aqui"], ["esse/essa", "isso", "aí"], ["aquele", "aquilo", "ali"],
   ["Não percebo!", "Não compreendo!"], ["Muito gosto!", "Muito prazer!"], ["Até logo!", "Até já!"], ["Tudo bem?", "Como está?", "Estás bom/boa?"], ["lindo", "bonito", "giro"], ["mulher, a", "senhora, a"]];
 // small words of the same kind are the wrong options for each other (dele → meu, nosso, tu…), so the answer is not obvious
 const PW_KINDS = {
@@ -83,13 +83,15 @@ const PW_KINDS = {
 const PW_KIND = {};
 Object.entries(PW_KINDS).forEach(([k, v]) => v.split("|").forEach(x => { if (!PW_KIND[x]) PW_KIND[x] = k; }));
 const pwKind = w => PW_KIND[w.w] || w.pos || "";
+// este / esse / aquele differ only in the (near me / near you / far) note: they are told apart by distance groups, not by words
+const pwBoth = (a, b) => pwKind(a) === "point" && pwKind(b) === "point";
 const pwGroup = w => PW_GROUPS.findIndex(g => g.includes(w.w) || g.includes(w.w + ", " + w.art));
 // common little words do not make two meanings look alike (Как это пишется? vs Как сказать?)
 const PW_STOP = new Set("как это что кто где мне быть хотеть the you how what are can say not have".split(" "));
 const pwToks = t => new Set(String(t).toLowerCase().replace(/\([^)]*\)/g, " ").split(/[^a-zа-яё]+/i).filter(x => x.length > 2 && !PW_STOP.has(x)));
 function pwOptions(w) {
   const g = pwGroup(w), mine = pwToks(pwTr(w));
-  const pool = WORDS.filter(x => x.id !== w.id && (pwOpts().geo || !pwIsGeo(x)) && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && ![...pwToks(pwTr(x))].some(t => mine.has(t)));
+  const pool = WORDS.filter(x => x.id !== w.id && (pwOpts().geo || !pwIsGeo(x)) && pwTr(x) !== pwTr(w) && (g < 0 || pwGroup(x) !== g) && (pwBoth(w, x) || ![...pwToks(pwTr(x))].some(t => mine.has(t))));
   // harder: wrong options are the same part of speech, from the same or nearby units
   const un = u => u === "P1" ? 4.5 : u === "P2" ? 8.5 : +u;
   const near = x => Math.abs(un(x.u) - un(w.u));
@@ -106,7 +108,7 @@ function pwOptions(w) {
   for (const x of cand) {
     if (opts.length === 3) break;
     const tx = pwToks(pwTr(x)), gx = pwGroup(x);
-    if (opts.some(y => pwTr(y) === pwTr(x) || (gx >= 0 && pwGroup(y) === gx) || [...pwToks(pwTr(y))].some(t => tx.has(t)))) continue;
+    if (opts.some(y => pwTr(y) === pwTr(x) || (gx >= 0 && pwGroup(y) === gx) || (!pwBoth(x, y) && [...pwToks(pwTr(y))].some(t => tx.has(t))))) continue;
     opts.push(x);
   }
   return shuffle([w, ...opts]);
