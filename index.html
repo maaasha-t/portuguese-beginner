@@ -3375,7 +3375,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "2ba94ee7ec";
+const BUILD = "a172b828b3";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
