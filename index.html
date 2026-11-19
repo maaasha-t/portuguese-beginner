@@ -2984,7 +2984,7 @@ function test() {
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Numbers in words:</span>
       <button class="chip ${S.exNoNum ? "" : "on"}" data-exnum="1">Include</button><button class="chip ${S.exNoNum ? "on" : ""}" data-exnum="0">Skip</button></div>
     ${open ? `<button class="btn ghost" data-go="exame">Continue the unfinished sheet</button>` : ""}
-    <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up: 32 questions with choices. 100 points, 50 to pass.</span></span></button>
+    <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up with choices: 32 questions, only the exam topics (me/te/se, de/em, ser/estar, family, work, possessives).</span></span></button>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
 
@@ -3377,7 +3377,10 @@ $app.addEventListener("click", e => {
     save(); const y = window.scrollY; render(); window.scrollTo(0, y); return;
   }
   if (t.hasAttribute("data-ticket")) {
-    const qs = poolFor("choose"), hard = qs.filter(q => q.lvl === 2), easy = qs.filter(q => q.lvl === 1);
+    // only what the real exam asks: no pronunciation, colours, spelling, nationalities…
+    const EXT = ["u1.apresentar", "u2.deonde", "u2.ondefica", "u3.estar", "u4.isto", "u5.ter", "u5.ondeesta", "u5.possessivos", "u6.profissoes", "u6.dados",
+      "u7.contracoes", "u8.locais", "u8.rotina", "u9.familia", "u9.poss2", "u9.este", "u10.fome"].concat(S.exNoNum ? [] : ["u1.numeros", "u2.num21", "u3.num1000"]);
+    const qs = poolFor("choose").filter(q => EXT.includes(q.id.split(".").slice(0, 2).join("."))), hard = qs.filter(q => q.lvl === 2), easy = qs.filter(q => q.lvl === 1);
     const ticket = shuffle([...shuffle(hard).slice(0, 22), ...shuffle(easy).slice(0, 10)]).slice(0, 32);
     if (!ticket.length) return;
     startQuiz("Teste · " + unitLabel(), ticket, { name: "test" }, null);
@@ -3427,7 +3430,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "c34e19ff8b";
+const BUILD = "e7b46dc4cc";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
