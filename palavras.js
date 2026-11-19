@@ -23,8 +23,8 @@ function pwUnitOk(u, w) {
   return inUnits(+u);
 }
 function pwPool(lvl) {
-  // Level 2 takes only words passed on Level 1 (or “I know this word”), Level 3 only words passed on Level 2
-  return WORDS.filter(w => pwUnitOk(w.u, w) && pwTypeOk(w) && (lvl === 1 || (w.s && pwStage(w.id) >= lvl - 1)));
+  // Level 2 takes only words you have already met on Level 1 (right or wrong), Level 3 only words met on Level 2
+  return WORDS.filter(w => pwUnitOk(w.u, w) && pwTypeOk(w) && (lvl === 1 || (w.s && pwMet(w.id, lvl - 1))));
 }
 function pwLabel(w) { return (w.art && w.art !== "o/a" ? w.art + " " : "") + w.w; }
 // Progress per word and level: s1/s2/s3 = right answers in a row on that level, w1/w2/w3 = mistakes on that level.
@@ -52,6 +52,12 @@ function pwMark(w, ok, lvl) {
   S.words[w.id] = s; save();
 }
 const pwLearned = w => pwStage(w.id) >= 3;
+// any answer on that level, right or wrong (passing a level counts too)
+function pwMet(id, lvl) {
+  const s = pwSt(id);
+  if (pwStage(id) >= lvl) return true;
+  return lvl === 1 ? !!(s.k || s.c || s.w || s.s1 || s.w1) : !!(s["s" + lvl] || s["w" + lvl] || s["l" + lvl]);
+}
 function pwPick(lvl, n) {
   const pool = pwPool(lvl);
   // first: words ready for this level (easier level passed), with mistakes; last: words already passed here
@@ -129,9 +135,9 @@ function palavras() {
       : L === 2 ? "A sentence with a gap, plus the word's meaning and the whole sentence translated. Type the word. A wrong word comes back later. 20 per set."
       : "A sentence with a gap and no hints at all, like on the exam. Type the word. 20 per set."}</p>
     <div class="chips">${PW_TYPES.map(([k, t]) => `<button class="chip ${o.type === k ? "on" : ""}" data-pwtype="${k}">${t} · ${WORDS.filter(w => pwUnitOk(w.u, w) && (k === "all" || (k === "verb" ? pwIsVerb(w) : w.pos === k && !pwIsVerb(w)))).length}</button>`).join("")}</div>
-    ${L > 1 ? `<p class="small muted">Only words you passed on Level ${L - 1}: <b>${pwPool(L).length}</b> ready.</p>` : ""}
+    ${L > 1 ? `<p class="small muted">Only words you have already met on Level ${L - 1}: <b>${pwPool(L).length}</b>.</p>` : ""}
     ${pwPool(L).length ? `<button class="btn" data-pwgo>Start · ${Math.min(L === 1 ? 10 : 20, pwPool(L).length)} ${o.type === "verb" ? "verbs" : "words"}</button>`
-      : `<p class="small">No words are ready for this level yet. Pass some words on Level ${L - 1} first (2 right in a row, or “I know this word” on Level 1).</p>`}
+      : `<p class="small">No words here yet. Words show up on this level after you meet them on Level ${L - 1}.</p>`}
     <div class="exsec"><h2>Settings</h2>
       <div class="row" style="gap:6px;flex-wrap:wrap">
         <span class="small muted" style="align-self:center">Translation:</span>
