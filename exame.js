@@ -500,10 +500,11 @@ const XREAL = [
   ["numbers", 8, "Escreva o nome completo destes números:", "Write these numbers in words.", xNumbers],
   ["order2", 8, "Escreva frases com sentido com as palavras dadas.", "Write sentences that make sense with the given words.", xOrder],
 ];
-function makeExam(units) {
+function makeExam(units, opt) {
   const U = new Set(units.length ? units : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const used = new Set(), out = [];
   XREAL.forEach(([key, n, instr, en, f]) => {
+    if (key === "numbers" && opt && opt.noNum) return;
     const seen = new Set(), items = XS(f(U)).filter(it => !used.has(it.p) && !seen.has(it.p) && seen.add(it.p)).slice(0, n);
     if (items.length < 3) return;
     items.forEach(it => used.add(it.p));

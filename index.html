@@ -2933,7 +2933,9 @@ function test() {
   const E = S.exam, open = E && !E.graded;
   return `${topbar("home", "Home")}
     <div><p class="eyebrow">Teste</p><h1>Exam practice</h1></div>
-    <button class="tile-big wide" data-exnew>${ic("test")}<span><h3>Exame · typing only</h3><span class="small muted">Like the real exam: 8 tasks A–H, instructions in Portuguese, no options, no example. You write everything. Every sheet is new. From ${unitLabel().toLowerCase()}.</span></span></button>
+    <button class="tile-big wide" data-exnew>${ic("test")}<span><h3>Exame · typing only</h3><span class="small muted">Like the real exam (PLA A1): 10 parts, instructions in Portuguese, no options, no example. You write everything. Every sheet is new. From ${unitLabel().toLowerCase()}.</span></span></button>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Numbers in words (part 9):</span>
+      <button class="chip ${S.exNoNum ? "" : "on"}" data-exnum="1">Include</button><button class="chip ${S.exNoNum ? "on" : ""}" data-exnum="0">Skip</button></div>
     ${open ? `<button class="btn ghost" data-go="exame">Continue the unfinished sheet</button>` : ""}
     <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up: 32 questions with choices. 100 points, 50 to pass.</span></span></button>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
@@ -3311,7 +3313,8 @@ $app.addEventListener("click", e => {
     startQuiz(`Workbook · Level ${L} · ${names[t.dataset.wb]}`, shuffle(pool).slice(0, 10), { name: "workbook" }, null);
     Q.src = L === 2 ? "wb" : "wb1"; return;
   }
-  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: makeExam(S.units), graded: false }; save(); return go("exame"); }
+  if (t.dataset.exnum) { S.exNoNum = t.dataset.exnum === "0"; save(); return render(); }
+  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: makeExam(S.units, { noNum: S.exNoNum }), graded: false }; save(); return go("exame"); }
   if (t.dataset.exen !== undefined) { const E = S.exam; E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
   if (t.hasAttribute("data-exsubmit")) {
     const all = S.exam.sections.flatMap(s => s.items), empty = all.filter(it => !it.ans.trim()).length;
@@ -3376,7 +3379,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "9c0cbe823f";
+const BUILD = "c3af1232ed";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
