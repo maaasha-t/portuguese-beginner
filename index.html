@@ -2373,7 +2373,7 @@ function allQuestions() {
     c.quiz.forEach((q, i) => out.push(mk(l, c, q, i, 1)));
     c.quiz2.forEach((q, i) => out.push(mk(l, c, q, i, 2)));
   }));
-  const G = generated(); out.push(...G.phrases, ...G.verbs, ...G.rewrite, ...verbSentences(() => true));
+  const G = generated(); out.push(...G.phrases, ...G.verbs, ...G.rewrite, ...verbSentences(() => true), ...verbSentences3(() => true));
   AQ = out; AQmap = new Map(out.map(q => [q.id, q]));
   return out;
 }
@@ -2857,6 +2857,49 @@ function verbSentences(ok) {
   });
   return out;
 }
+// Level 3: no verb given at all. The rest of the sentence shows which verb it is. [rest, English, other verbs that also fit]
+const VCTX = {
+  ser: [["de Portugal", "from Portugal"], ["da Ucrânia", "from Ukraine"], ["muito simpáticos", "very nice", [], 1], ["professores", "teachers", [], 1]],
+  estar: [["com fome", "hungry"], ["com frio", "cold"], ["de férias", "on holiday"], ["cansados", "tired", [], 1]],
+  ter: [["dois irmãos", "two brothers"], ["olhos azuis", "blue eyes"], ["vinte anos", "twenty years old"], ["muito trabalho", "a lot of work"]],
+  ler: [["o jornal todos os dias", "the newspaper every day"], ["livros em português", "books in Portuguese"]],
+  ver: [["televisão à noite", "TV at night"], ["filmes em casa", "films at home"]],
+  falar: [["inglês e português", "English and Portuguese"], ["francês muito bem", "French very well"]],
+  morar: [["numa casa grande", "in a big house", ["estar"]], ["perto do centro", "near the centre", ["estar", "ficar"]]],
+  gostar: [["de café", "coffee"], ["muito de dançar", "dancing a lot"]],
+  trabalhar: [["num hospital", "in a hospital", ["estar"]], ["oito horas por dia", "eight hours a day", ["estudar"]]],
+  estudar: [["português na universidade", "Portuguese at university"]],
+  viajar: [["de avião", "by plane"]],
+  dançar: [["tango", "tango"]],
+  cozinhar: [["o jantar", "dinner"]],
+  usar: [["óculos", "glasses"]],
+};
+const CHAMAR3 = [["Eu", 0, "Ana."], ["Tu", 1, "Rita?"], ["A minha irmã", 2, "Sofia."], ["O meu pai", 2, "Rui."], ["O senhor", 2, "Pedro?"]];
+function verbSentences3(ok) {
+  const out = [], fm = (name, pi) => { const v = VERBS.find(x => x[0] === name); return v && v[2 + pi]; };
+  VERBS.filter(ok).forEach(v => {
+    if (v[0] === "chamar-se") {
+      CHAMAR3.forEach(([subj, pi, name], j) => out.push({ t: "w", id: `verb.${v[0]}.C.${pi}.${j}`, lvl: 3, unit: v[7], from: "Verbos", task: "One verb is missing. Write it in the right form.", noGloss: true,
+        q: `${subj} ___ ${name}`, a: [v[2 + pi], fm("ser", pi)].filter(Boolean), hint: `verb: chamar-se · ${subj}`,
+        why: `${subj} <b>${v[2 + pi]}</b> ${name}<br>${verbTable(v, pi)}`, sayAfter: `${subj} ${v[2 + pi]} ${name}` }));
+      return;
+    }
+    (VCTX[v[0]] || []).forEach(([rest0, en, also, plural], k) => {
+      WHO_SUBJ.filter(([, pi]) => !plural || pi >= 3).forEach(([subj, pi, note], j) => {
+        const rest = plural && subj === "Elas" ? rest0.replace("professores", "professoras").replace(/os$/, "as") : rest0;
+        if ((j + k) % 3) return; // a few subjects per phrase, not all
+        const form = v[2 + pi]; if (!form) return;
+        const neg = (j + k) % 4 === 3 ? "não " : "";
+        const a = [form, ...(also || []).map(n => fm(n, pi))].filter(Boolean);
+        out.push({ t: "w", id: `verb.${v[0]}.C.${pi}.${k}.${j}`, lvl: 3, unit: v[7], from: "Verbos", task: "One verb is missing. Write it in the right form.", noGloss: true,
+          q: `${subj} ${neg}___ ${rest}.`, a, hint: `verb: ${v[0]} · ${subj} = ${note}`,
+          why: `<span class="muted">${subj} ${neg}<b>${form}</b> ${rest}. = ${whoEn(subj, pi, v[0], en, !!neg)}</span><br>${verbTable(v, pi)}`,
+          sayAfter: `${subj} ${neg}${form} ${rest}.` });
+      });
+    });
+  });
+  return out;
+}
 // pick your own verbs: learn one or two at a time
 function verbPicker(vs) {
   const pick = (S.verbPick || []).filter(n => vs.some(v => v[0] === n && (v[8] || n === "chamar-se"))), on = n => pick.includes(n);
@@ -2876,8 +2919,9 @@ function verbs() {
     <div><p class="eyebrow">Verbos</p><h1>Verb trainer</h1><p class="muted">${vs.length} verbs from ${unitLabel().toLowerCase()}. You always type the form yourself.</p></div>
     <div class="segs" role="group" aria-label="Level">
       <button class="${(S.verbLvl || 1) === 1 ? "on" : ""}" data-vlvl="1">Level 1 · forms</button>
-      <button class="${S.verbLvl === 2 ? "on" : ""}" data-vlvl="2">Level 2 · sentences</button></div>
-    <p class="small muted">${S.verbLvl === 2 ? "You see a sentence. Work out who it is, then type the form: <i>O Rui e a Ana ___ dois irmãos. (ter)</i> → <b>têm</b>. Hint shows who it is." : "You see a verb and a person. Type the form: <i>ter · nós</i> → <b>temos</b>."}</p>
+      <button class="${S.verbLvl === 2 ? "on" : ""}" data-vlvl="2">Level 2 · sentences</button>
+      <button class="${S.verbLvl === 3 ? "on" : ""}" data-vlvl="3">Level 3 · no verb</button></div>
+    <p class="small muted">${S.verbLvl === 3 ? "Like the exam: the verb isn't given. The rest of the sentence tells you which verb it is: <i>Os meus pais ___ olhos azuis.</i> → <b>têm</b>. Hint shows the verb." : S.verbLvl === 2 ? "You see a sentence. Work out who it is, then type the form: <i>O Rui e a Ana ___ dois irmãos. (ter)</i> → <b>têm</b>. Hint shows who it is." : "You see a verb and a person. Type the form: <i>ter · nós</i> → <b>temos</b>."}</p>
     <div class="mode-list">
       <button class="btn" data-verbs="all">All verbs · 10 tasks</button>
       <button class="btn ghost" data-verbs="irr">Irregular only (ser, estar, ter, ler, ver…)</button>
@@ -2934,7 +2978,10 @@ function test() {
   return `${topbar("home", "Home")}
     <div><p class="eyebrow">Teste</p><h1>Exam practice</h1></div>
     <button class="tile-big wide" data-exnew>${ic("test")}<span><h3>Exame · typing only</h3><span class="small muted">Like the real exam (PLA A1): 10 parts, instructions in Portuguese, no options, no example. You write everything. Every sheet is new. From ${unitLabel().toLowerCase()}.</span></span></button>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Numbers in words (part 9):</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Sheet:</span>
+      <button class="chip ${S.exHard ? "" : "on"}" data-exhard="0">Like the real exam</button><button class="chip ${S.exHard ? "on" : ""}" data-exhard="1">Harder</button></div>
+    ${S.exHard ? `<p class="small muted" style="margin:0">Harder: more whole sentences. Build them with the verb, articles and prepositions, fix mistakes, write the question for an answer, put sentences in the plural.</p>` : ""}
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Numbers in words:</span>
       <button class="chip ${S.exNoNum ? "" : "on"}" data-exnum="1">Include</button><button class="chip ${S.exNoNum ? "on" : ""}" data-exnum="0">Skip</button></div>
     ${open ? `<button class="btn ghost" data-go="exame">Continue the unfinished sheet</button>` : ""}
     <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up: 32 questions with choices. 100 points, 50 to pass.</span></span></button>
@@ -2975,7 +3022,7 @@ function exame() {
   const tname = k => { const [lid, cid] = k.split("."); const l = lessonById(lid), c = l && l.chunks.find(c => c.id === cid); return c ? `${l.num ? "U" + l.num : l.title} · ${c.title}` : k; };
   const filled = E.sections.flatMap(s => s.items).filter(it => it.ans.trim()).length, total = E.sections.flatMap(s => s.items).length;
   return `${topbar("test", "Teste")}
-    <div><p class="eyebrow">Exame · ${E.units}</p><h1>${g ? "Resultado" : "Exame"}</h1>
+    <div><p class="eyebrow">Exame${E.hard ? " · harder" : ""} · ${E.units}</p><h1>${g ? "Resultado" : "Exame"}</h1>
       ${g ? "" : `<p class="muted">Write everything yourself. Start sentences with a capital letter if you like; the end mark (. ?) is optional. Answers are checked when you hand in. Tap EN under a task if you really can't read it.</p>`}</div>
     ${g ? `<div class="exsec"><div class="score">${sc}<span style="font-size:24px"> / 100</span></div>
       <p>${sc >= 85 ? "Excellent, you're ready." : sc >= 70 ? "Good. Look at the topics below once more." : sc >= 50 ? "Pass, but work on the topics below before the exam." : "Not yet. Go through the topics below, then take a new sheet in a few days."}</p>
@@ -3278,11 +3325,11 @@ $app.addEventListener("click", e => {
   if (t.dataset.vpick) { const n = t.dataset.vpick, p = S.verbPick || []; S.verbPick = p.includes(n) ? p.filter(x => x !== n) : [...p, n]; save(); const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if (t.dataset.verbs) {
     const k = t.dataset.verbs;
-    if (S.verbLvl === 2) {
+    if (S.verbLvl === 2 || S.verbLvl === 3) {
       const pick = (S.verbPick || []).filter(n => VERBS.some(v => v[0] === n && (v[8] || n === "chamar-se")));
       const ok = v => inUnits(v[7]) && (k === "all" || (k === "irr" && v[8]) || (k === "reg" && !v[8]) || (k === "pick" && pick.includes(v[0])));
-      const pool = verbSentences(ok); if (!pool.length) return;
-      return startQuiz("Verbos · sentences" + (k === "pick" ? " · " + pick.join(", ") : ""), shuffle(pool).slice(0, 10), { name: "verbs" }, null);
+      const pool = (S.verbLvl === 3 ? verbSentences3 : verbSentences)(ok); if (!pool.length) return;
+      return startQuiz("Verbos · " + (S.verbLvl === 3 ? "no verb" : "sentences") + (k === "pick" ? " · " + pick.join(", ") : ""), shuffle(pool).slice(0, 10), { name: "verbs" }, null);
     }
     if (k === "pick") {
       const pick = (S.verbPick || []).filter(n => VERBS.some(v => v[0] === n && (v[8] || n === "chamar-se"))), pool = generated().verbs.filter(q => pick.includes(q.id.split(".")[1]) && inUnits(q.unit));
@@ -3313,8 +3360,9 @@ $app.addEventListener("click", e => {
     startQuiz(`Workbook · Level ${L} · ${names[t.dataset.wb]}`, shuffle(pool).slice(0, 10), { name: "workbook" }, null);
     Q.src = L === 2 ? "wb" : "wb1"; return;
   }
+  if (t.dataset.exhard) { S.exHard = t.dataset.exhard === "1"; save(); return render(); }
   if (t.dataset.exnum) { S.exNoNum = t.dataset.exnum === "0"; save(); return render(); }
-  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: makeExam(S.units, { noNum: S.exNoNum }), graded: false }; save(); return go("exame"); }
+  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: (S.exHard ? makeExamHard : makeExam)(S.units, { noNum: S.exNoNum }), hard: !!S.exHard, graded: false }; save(); return go("exame"); }
   if (t.dataset.exen !== undefined) { const E = S.exam; E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
   if (t.hasAttribute("data-exsubmit")) {
     const all = S.exam.sections.flatMap(s => s.items), empty = all.filter(it => !it.ans.trim()).length;
@@ -3379,7 +3427,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "c3af1232ed";
+const BUILD = "c34e19ff8b";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set

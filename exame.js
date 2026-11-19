@@ -513,3 +513,21 @@ function makeExam(units, opt) {
   });
   return out;
 }
+
+// Harder sheet: the earlier, tougher mix (whole sentences: build with verb + articles, fix errors, write the question, plural)
+function makeExamHard(units, opt) {
+  const U = new Set(units.length ? units : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const ready = XSECTIONS.filter(([key]) => !(key === "numbers" && opt && opt.noNum)).map(([key, instr, en, f]) => {
+    const seen = new Set(), items = XS(f(U)).filter(it => !seen.has(it.p) && seen.add(it.p));
+    return { key, instr, en, items };
+  }).filter(s => s.items.length >= 3);
+  const MUST = ["build", "errors", "questions", "plural", "serestar", "bank"];
+  const first = ready.filter(s => MUST.includes(s.key));
+  const rest = XS(ready.filter(s => !MUST.includes(s.key))).slice(0, Math.max(0, 10 - first.length));
+  const keys = new Set([...first, ...rest].map(s => s.key));
+  return ready.filter(s => keys.has(s.key)).map((s, i) => ({
+    letter: String(i + 1), instr: s.instr, en: s.en, key: s.key,
+    items: s.items.slice(0, ["order", "build", "errors", "questions"].includes(s.key) ? 5 : 6).map(it => ({ ...it, ans: "", r: null })),
+    box: s.key === "bank" ? XS(s.items.slice(0, 6).map(it => XPROPER.has(it.bank) ? it.bank : it.bank.toLowerCase())) : null,
+  }));
+}
