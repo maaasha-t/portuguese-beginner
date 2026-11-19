@@ -40,6 +40,23 @@ const CARDS = [
   <div class="use"><div class="uh u-both">same word, new meaning</div>
     <div class="ur"><span class="uw">always / today</span><span><b>Ela é bonita</b> = she's pretty. <b>Ela está bonita</b> = she looks pretty today.</span></div></div>`,
   trap: "Cities never move → ser / ficar: <i>Lisboa fica em Portugal.</i> You now → estar: <i>Estou em Lisboa.</i>" },
+{ id: "preposicoes", title: "Prepositions", units: [2, 3, 5, 6, 7, 8], tags: "prepositions em de a para com sem por até perto longe ao à comigo where when from to with",
+  key: "em = where you are. de = from. a / para = where you go.",
+  body: `<div class="use"><div class="uh u-ser">em · in, on, at</div>
+    <div class="ur"><span class="uw">place</span><span><b>Estou no café.</b> I'm at the café.</span></div>
+    <div class="ur"><span class="uw">day</span><span><b>no sábado</b> on Saturday</span></div></div>
+  <div class="use"><div class="uh u-estar">de · from, of</div>
+    <div class="ur"><span class="uw">origin</span><span><b>Sou da Ucrânia.</b> I'm from Ukraine.</span></div>
+    <div class="ur"><span class="uw">whose</span><span><b>o carro do Rui</b> Rui's car</span></div>
+    <div class="ur"><span class="uw">transport</span><span><b>de carro</b> by car · <b>a pé</b> on foot</span></div></div>
+  <div class="use"><div class="uh u-pol">a, para · to, for</div>
+    <div class="ur"><span class="uw">go to</span><span><b>Vou ao Porto. Vou para casa.</b></span></div>
+    <div class="ur"><span class="uw">clock</span><span><b>às três</b> at three</span></div>
+    <div class="ur"><span class="uw">for</span><span><b>Isto é para ti.</b> It's for you.</span></div></div>
+  <div class="use"><div class="uh u-both">com · sem · por · até</div>
+    <div class="ur"><span class="uw">with, without</span><span><b>com leite, sem açúcar</b></span></div>
+    <div class="ur"><span class="uw">per, until</span><span><b>por semana · até amanhã</b></span></div></div>`,
+  trap: "a + o = <b>ao</b>, a + a = <b>à</b>. com + eu = <b>comigo</b>. Near / far: <i>perto <b>de</b>, longe <b>de</b></i>." },
 { id: "contracoes", title: "Little words that merge", units: [2, 5, 7, 8], tags: "contractions de em do da no na num numa disto nisto prepositions articles",
   key: "Preposition + o / a / os / as = one word. Always. Never “em o”.",
   body: tbl(["", "o", "a", "os", "as", "um / uma", "isto"], [

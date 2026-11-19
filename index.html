@@ -2757,13 +2757,13 @@ function lessons() {
 const CARD_CATS = [
   ["verbs", "Verbs", ["regular", "irregular", "chamarse", "serestar"]],
   ["agree", "Gender and number", ["artigos", "plural", "adjetivos", "muito"]],
-  ["little", "Little words", ["contracoes", "possessivos", "distancia", "perguntas"]],
+  ["little", "Little words", ["preposicoes", "contracoes", "possessivos", "distancia", "perguntas"]],
   ["numsound", "Numbers and sounds", ["numeros", "sons"]],
 ];
 const CARD_SEE = {
   regular: ["irregular", "chamarse"], irregular: ["regular", "serestar"], chamarse: ["regular", "perguntas"], serestar: ["irregular", "adjetivos"],
   artigos: ["plural", "adjetivos", "contracoes"], plural: ["artigos", "adjetivos"], adjetivos: ["artigos", "plural", "muito"], muito: ["adjetivos", "perguntas"],
-  contracoes: ["artigos", "distancia"], possessivos: ["artigos", "distancia"], distancia: ["possessivos", "contracoes"], perguntas: ["chamarse", "muito", "numeros"],
+  preposicoes: ["contracoes", "perguntas"], contracoes: ["preposicoes", "artigos"], possessivos: ["artigos", "distancia"], distancia: ["possessivos", "contracoes"], perguntas: ["chamarse", "muito", "numeros"],
   numeros: ["muito", "sons"], sons: ["numeros"],
 };
 const CARD_ORDER = CARD_CATS.flatMap(c => c[2]).filter(id => CARDS.some(x => x.id === id)).concat(CARDS.map(c => c.id).filter(id => !CARD_CATS.some(c => c[2].includes(id))));
