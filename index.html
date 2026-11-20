@@ -212,6 +212,9 @@ a { color: var(--accent); }
 .pracrow { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 10px; }
 .pracbtn { display: flex; flex-direction: column; align-items: flex-start; text-align: left; background: var(--accent-soft); border: 0; border-radius: 10px; padding: 8px 12px; }
 .pracbtn b { font-size: 15px; color: var(--accent); } .pracbtn span { font-size: 12.5px; color: var(--muted); }
+.exhist { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; }
+.exhist li { display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 3px 0; }
+.exhist .okc { color: var(--good); } .exhist .badc { color: var(--bad); }
 .hgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .htile { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
 .htile .ht span { white-space: normal; }
@@ -387,16 +390,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=6c8dd5ddac"></script>
-<script src="translations.js?v=6c8dd5ddac"></script>
-<script src="extras2.js?v=6c8dd5ddac"></script>
-<script src="cards.js?v=6c8dd5ddac"></script>
-<script src="formas.js?v=6c8dd5ddac"></script>
-<script src="exame.js?v=6c8dd5ddac"></script>
-<script src="rules.js?v=6c8dd5ddac"></script>
-<script src="palavras_data.js?v=6c8dd5ddac"></script>
-<script src="palavras.js?v=6c8dd5ddac"></script>
-<script src="listen.js?v=6c8dd5ddac"></script>
+<script src="extras.js?v=e3fd7850de"></script>
+<script src="translations.js?v=e3fd7850de"></script>
+<script src="extras2.js?v=e3fd7850de"></script>
+<script src="cards.js?v=e3fd7850de"></script>
+<script src="formas.js?v=e3fd7850de"></script>
+<script src="exame.js?v=e3fd7850de"></script>
+<script src="rules.js?v=e3fd7850de"></script>
+<script src="palavras_data.js?v=e3fd7850de"></script>
+<script src="palavras.js?v=e3fd7850de"></script>
+<script src="listen.js?v=e3fd7850de"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -3012,6 +3015,7 @@ function test() {
       ${open ? `<button class="btn ghost" data-exlast="0">Continue the unfinished sheet</button>` : ""}
       ${E && E.graded ? `<button class="btn ghost" data-exlast="0">Last checked sheet: ${exScore(E)}/100 · see answers</button>` : ""}
       ${S.examLast ? `<button class="btn ghost" data-exlast="1">The sheet before: ${exScore(S.examLast)}/100 · see answers</button>` : ""}</section>
+    ${exHistory()}
     <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up with choices: 32 questions, only the exam topics (me/te/se, de/em, ser/estar, family, work, possessives).</span></span></button>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
@@ -3042,6 +3046,22 @@ function exScore(E) {
   // like the real exam: every part is worth the same (10 parts × 10 points)
   const part = s => s.items.reduce((n, it) => n + (it.r === "ok" ? 1 : it.r === "near" ? 0.5 : 0), 0) / s.items.length;
   return Math.round(E.sections.reduce((n, s) => n + part(s), 0) / E.sections.length * 100);
+}
+// Past sheets: the answers of an old sheet are gone, but the check of every item is in the log (q = topic.EX.part)
+const EX_PART = { reflex: "me / te / se", paises: "de / em + countries", serestar: "ser / estar", family: "family", work: "work, routine", possbox: "possessives (box)",
+  whose: "De quem é? É ___", order: "word order", order2: "sentences from words", numbers: "numbers in words", build: "build sentences", plural: "plural",
+  errors: "fix mistakes", questions: "write the question", verb: "verb forms", prep: "prepositions", gender: "feminine / masculine", artpl: "article + plural",
+  muito: "muito / pouco", opp: "opposites", bank: "words from the box" };
+function exHistory() {
+  const T = (S.tests || []).filter(t => t.kind === "exame").slice().reverse().slice(0, 5);
+  if (!T.length) return "";
+  const rows = T.map(t => {
+    const L = (S.log || []).filter(e => e.t === t.id && /\.EX\./.test(e.q || "")), by = {};
+    L.forEach(e => { const k = e.q.split(".EX.")[1]; by[k] = by[k] || [0, 0]; by[k][1]++; if (e.ok) by[k][0]++; });
+    const parts = Object.entries(by).map(([k, [ok, n]]) => `<li><span>${EX_PART[k] || k}</span><b class="${ok === n ? "okc" : ok / n >= 0.5 ? "" : "badc"}">${ok}/${n}</b></li>`).join("");
+    return foldBox(`<span>${shortDay(t.d)} · <b>${t.score}/100</b></span>`, parts ? `<ul class="exhist">${parts}</ul>` : `<p class="small muted">No details for this sheet.</p>`);
+  }).join("");
+  return `<section class="exsec"><h2>Past sheets</h2><p class="small muted" style="margin:0">Right answers per part. Tap a sheet to open it.</p>${rows}</section>`;
 }
 const exCur = () => view.last && S.examLast ? S.examLast : S.exam;
 function exame() {
@@ -3464,7 +3484,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "6c8dd5ddac";
+const BUILD = "e3fd7850de";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
