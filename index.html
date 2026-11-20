@@ -384,16 +384,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=0838832994"></script>
-<script src="translations.js?v=0838832994"></script>
-<script src="extras2.js?v=0838832994"></script>
-<script src="cards.js?v=0838832994"></script>
-<script src="formas.js?v=0838832994"></script>
-<script src="exame.js?v=0838832994"></script>
-<script src="rules.js?v=0838832994"></script>
-<script src="palavras_data.js?v=0838832994"></script>
-<script src="palavras.js?v=0838832994"></script>
-<script src="listen.js?v=0838832994"></script>
+<script src="extras.js?v=d51ec1df65"></script>
+<script src="translations.js?v=d51ec1df65"></script>
+<script src="extras2.js?v=d51ec1df65"></script>
+<script src="cards.js?v=d51ec1df65"></script>
+<script src="formas.js?v=d51ec1df65"></script>
+<script src="exame.js?v=d51ec1df65"></script>
+<script src="rules.js?v=d51ec1df65"></script>
+<script src="palavras_data.js?v=d51ec1df65"></script>
+<script src="palavras.js?v=d51ec1df65"></script>
+<script src="listen.js?v=d51ec1df65"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2988,7 +2988,9 @@ function test() {
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Numbers in words:</span>
         <button class="chip ${S.exNoNum ? "" : "on"}" data-exnum="1">Include</button><button class="chip ${S.exNoNum ? "on" : ""}" data-exnum="0">Skip</button></div>
       <button class="btn" data-exnew>Start a new sheet${S.exHard ? " · harder" : ""}</button>
-      ${open ? `<button class="btn ghost" data-go="exame">Continue the unfinished sheet</button>` : ""}</section>
+      ${open ? `<button class="btn ghost" data-exlast="0">Continue the unfinished sheet</button>` : ""}
+      ${E && E.graded ? `<button class="btn ghost" data-exlast="0">Last checked sheet: ${exScore(E)}/100 · see answers</button>` : ""}
+      ${S.examLast ? `<button class="btn ghost" data-exlast="1">The sheet before: ${exScore(S.examLast)}/100 · see answers</button>` : ""}</section>
     <button class="tile-big wide" data-ticket>${ic("review")}<span><h3>Ticket with options</h3><span class="small muted">Warm-up with choices: 32 questions, only the exam topics (me/te/se, de/em, ser/estar, family, work, possessives).</span></span></button>
     <button class="unitchip" data-go="units">${unitLabel()} · change</button>`;
 }
@@ -3020,8 +3022,9 @@ function exScore(E) {
   const part = s => s.items.reduce((n, it) => n + (it.r === "ok" ? 1 : it.r === "near" ? 0.5 : 0), 0) / s.items.length;
   return Math.round(E.sections.reduce((n, s) => n + part(s), 0) / E.sections.length * 100);
 }
+const exCur = () => view.last && S.examLast ? S.examLast : S.exam;
 function exame() {
-  const E = S.exam; if (!E) return test();
+  const E = exCur(); if (!E) return test();
   const g = E.graded, sc = g ? exScore(E) : 0;
   const weak = g ? [...new Set(E.sections.flatMap(s => s.items.filter(it => it.r !== "ok").map(it => it.topic)))] : [];
   const tname = k => { const [lid, cid] = k.split("."); const l = lessonById(lid), c = l && l.chunks.find(c => c.id === cid); return c ? `${l.num ? "U" + l.num : l.title} · ${c.title}` : k; };
@@ -3367,15 +3370,20 @@ $app.addEventListener("click", e => {
   }
   if (t.dataset.exhard) { S.exHard = t.dataset.exhard === "1"; save(); return render(); }
   if (t.dataset.exnum) { S.exNoNum = t.dataset.exnum === "0"; save(); return render(); }
-  if (t.hasAttribute("data-exnew")) { S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: (S.exHard && typeof makeExamHard === "function" ? makeExamHard : makeExam)(S.units, { noNum: S.exNoNum }), hard: !!S.exHard, graded: false }; save(); return go("exame"); }
-  if (t.dataset.exen !== undefined) { const E = S.exam; E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
+  if (t.hasAttribute("data-exlast")) return go("exame", { last: t.dataset.exlast === "1" });
+  if (t.hasAttribute("data-exnew")) {
+    if (S.exam && S.exam.graded && Date.now() - (S.exam.gradedAt || 0) < 2000) return; // a double tap on "hand in" must not throw the result away
+    if (S.exam && S.exam.graded) S.examLast = S.exam; // keep the previous checked sheet
+    view.last = false;
+    S.exam = { id: Date.now(), units: unitLabel().toLowerCase(), sections: (S.exHard && typeof makeExamHard === "function" ? makeExamHard : makeExam)(S.units, { noNum: S.exNoNum }), hard: !!S.exHard, graded: false }; save(); return go("exame"); }
+  if (t.dataset.exen !== undefined) { const E = exCur(); E.en = E.en || {}; E.en[t.dataset.exen] = !E.en[t.dataset.exen]; save(); return render(); }
   if (t.hasAttribute("data-exsubmit")) {
     const all = S.exam.sections.flatMap(s => s.items), empty = all.filter(it => !it.ans.trim()).length;
     if (empty && !t.dataset.sure) { t.dataset.sure = 1; t.textContent = `${empty} empty. Tap again to hand in anyway`; return; }
-    exGrade(); return go("exame");
+    exGrade(); S.exam.gradedAt = Date.now(); save(); return go("exame", { last: false });
   }
   if (t.dataset.exok) {
-    const [si, ii] = t.dataset.exok.split(".").map(Number), E = S.exam, it = E.sections[si].items[ii];
+    const [si, ii] = t.dataset.exok.split(".").map(Number), E = exCur(), it = E.sections[si].items[ii];
     it.r = "ok"; it.ovr = true;
     const e2 = (S.log || []).filter(e => e.t === E.id && e.k === it.topic && !e.ok)[0]; if (e2) e2.ok = 1;
     const tt = (S.tests || []).find(x => x.id === E.id); if (tt) tt.score = exScore(E);
@@ -3435,7 +3443,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "0838832994";
+const BUILD = "d51ec1df65";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
