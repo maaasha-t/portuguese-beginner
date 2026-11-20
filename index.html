@@ -209,6 +209,9 @@ a { color: var(--accent); }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .hlist { grid-template-columns: 1fr; gap: 6px; }
 .hrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px 8px 8px; }
+.pracrow { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 10px; }
+.pracbtn { display: flex; flex-direction: column; align-items: flex-start; text-align: left; background: var(--accent-soft); border: 0; border-radius: 10px; padding: 8px 12px; }
+.pracbtn b { font-size: 15px; color: var(--accent); } .pracbtn span { font-size: 12.5px; color: var(--muted); }
 .hgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .htile { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
 .htile .ht span { white-space: normal; }
@@ -384,16 +387,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=d51ec1df65"></script>
-<script src="translations.js?v=d51ec1df65"></script>
-<script src="extras2.js?v=d51ec1df65"></script>
-<script src="cards.js?v=d51ec1df65"></script>
-<script src="formas.js?v=d51ec1df65"></script>
-<script src="exame.js?v=d51ec1df65"></script>
-<script src="rules.js?v=d51ec1df65"></script>
-<script src="palavras_data.js?v=d51ec1df65"></script>
-<script src="palavras.js?v=d51ec1df65"></script>
-<script src="listen.js?v=d51ec1df65"></script>
+<script src="extras.js?v=6c8dd5ddac"></script>
+<script src="translations.js?v=6c8dd5ddac"></script>
+<script src="extras2.js?v=6c8dd5ddac"></script>
+<script src="cards.js?v=6c8dd5ddac"></script>
+<script src="formas.js?v=6c8dd5ddac"></script>
+<script src="exame.js?v=6c8dd5ddac"></script>
+<script src="rules.js?v=6c8dd5ddac"></script>
+<script src="palavras_data.js?v=6c8dd5ddac"></script>
+<script src="palavras.js?v=6c8dd5ddac"></script>
+<script src="listen.js?v=6c8dd5ddac"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2772,11 +2775,29 @@ const CARD_SEE = {
 const CARD_ORDER = CARD_CATS.flatMap(c => c[2]).filter(id => CARDS.some(x => x.id === id)).concat(CARDS.map(c => c.id).filter(id => !CARD_CATS.some(c => c[2].includes(id))));
 const cardCat = id => (CARD_CATS.find(c => c[2].includes(id)) || ["verbs"])[0];
 const cardById = id => CARDS.find(c => c.id === id);
+// where to practise what a cheat sheet explains: lesson parts + trainers
+const CARD_PRACT = {
+  regular: ["u3.linguas", "u8.rotina", "u10.gostos", "verbs"], irregular: ["u1.apresentar", "u3.estar", "u5.ter", "verbs"], chamarse: ["u1.apresentar", "verbs"],
+  serestar: ["u3.estar", "u10.fome", "u1.apresentar"], preposicoes: ["u2.deonde", "u2.ondefica", "u5.ondeesta", "u8.locais"],
+  contracoes: ["u2.deonde", "u2.ondefica", "u7.contracoes"], artigos: ["u2.paises", "u4.objetos", "u4.artigos", "formas"], plural: ["u4.objetos", "u9.poss2", "formas"],
+  possessivos: ["u5.possessivos", "u9.poss2"], distancia: ["u4.isto", "u5.aqui", "u9.este"], perguntas: ["u6.dados", "u10.qual", "u1.apresentar"],
+  numeros: ["u1.numeros", "u2.num21", "u3.num1000"], adjetivos: ["u7.adjetivos", "u7.concordancia", "u10.aparencia", "formas"], muito: ["u8.muito"],
+  sons: ["alfabeto.s", "alfabeto.r", "u1.pronuncia"],
+};
+function cardPractice(c) {
+  const btns = (CARD_PRACT[c.id] || []).map(k => {
+    if (k === "verbs") return `<button class="pracbtn" data-go="verbs"><b>Verbos</b><span>verb trainer</span></button>`;
+    if (k === "formas") return `<button class="pracbtn" data-go="formas"><b>Formas</b><span>gender and number trainer</span></button>`;
+    const [lid, cid] = k.split("."), l = lessonById(lid), ch = l && l.chunks.find(x => x.id === cid); if (!ch) return "";
+    return `<button class="pracbtn" data-go="practice" data-lesson="${lid}" data-chunk="${cid}" data-level="1"><b>${ch.title}</b><span>${l.num ? "Unit " + l.num : l.title} · practise</span></button>`;
+  }).join("");
+  return btns ? `<div class="pracrow"><span class="small muted">Practise it:</span>${btns}</div>` : "";
+}
 function cardHtml(c, opts) {
   const see = (CARD_SEE[c.id] || []).map(cardById).filter(Boolean);
   return `<section class="cab cat-${cardCat(c.id)}"><h2>${c.title}</h2><div class="key">${c.key}</div>${c.body}${c.trap ? `<p class="trap"><b>Trap:</b> ${c.trap}</p>` : ""}
     ${see.length ? `<div class="seeal"><span class="small muted">Related:</span>${see.map(x => `<button class="seechip cat-${cardCat(x.id)}" data-go="card" data-card="${x.id}"${opts && opts.from ? ` data-from="${opts.from}"` : ""}>${x.title}</button>`).join("")}</div>` : ""}
-    ${opts && opts.page ? "" : `<p class="small muted">Units: ${c.units.map(u => u === 0 ? "Alphabet" : u).join(", ")}</p>`}</section>`;
+    ${opts && opts.page ? cardPractice(c) : `<p class="small muted">Units: ${c.units.map(u => u === 0 ? "Alphabet" : u).join(", ")}</p>`}</section>`;
 }
 const cardText = c => (c.title + " " + c.tags + " " + c.key + " " + c.body + " " + (c.trap || "")).replace(/<[^>]+>/g, " ");
 const fold = t => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -3443,7 +3464,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "d51ec1df65";
+const BUILD = "6c8dd5ddac";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
