@@ -227,12 +227,12 @@ const EXTRA = {
   { t: "order", q: "Put the words in order: “Where is my wallet?”", a: ["Onde", "está", "a", "minha", "carteira?"], why: "Onde está a minha carteira?" },
 ]},
 "u5.possessivos": { task: "Choose the right possessive.", hint: "Agrees with the thing: o meu / a minha, o teu / a tua, o seu / a sua, o nosso / a nossa. His/her/their after the noun: dele, dela, deles.", quiz2: [
-  { q: "Ana, ___ chave está aqui. (your, tu)", opts: ["a tua", "o teu", "tua"], why: "a chave → a tua." },
+  { q: "Ana, ___ chave está aqui. (your, tu)", opts: ["a tua", "o teu", "tua"], why: "Who owns it? tu → teu / tua. chave is feminine (a chave), so a tua." },
   { q: "O Pedro? O telemóvel ___ está no carro.", opts: ["dele", "dela", "seu"], why: "The owner is the Pedro (a man) → dele = de + ele. Telemóvel doesn’t matter." },
   { q: "A Rita? Os óculos ___ são caros.", opts: ["dela", "dele", "deles"], why: "The owner is the Rita (a woman) → dela = de + ela. Os óculos (masculine plural) doesn’t matter." },
-  { q: "Somos espanhóis. ___ cidade é Sevilha.", opts: ["A nossa", "O nosso", "Nossa"], why: "a cidade → a nossa." },
+  { q: "Somos espanhóis. ___ cidade é Sevilha.", opts: ["A nossa", "O nosso", "Nossa"], why: "Who? nós → nosso / nossa. cidade is feminine (a cidade), so a nossa. Sevilha doesn’t matter." },
   { q: "Find the mistake: “Meu carro é branco.”", opts: ["Needs the article: O meu carro", "It should be “Minha carro”", "No mistake"], why: "In Portugal: o meu carro." },
-  { q: "Senhor Costa, ___ passaporte, faz favor. (formal)", opts: ["o seu", "o teu", "a sua"], why: "Formal you → o seu." },
+  { q: "Senhor Costa, ___ passaporte, faz favor. (formal)", opts: ["o seu", "o teu", "a sua"], why: "Who? o senhor (formal you) → seu / sua. passaporte is masculine (o passaporte), so o seu." },
 ]},
 "u5.aqui": { task: "Choose aqui, aí or ali.", hint: "aqui = here, near me (isto) · aí = near you (isso) · ali = over there (aquilo).", quiz2: [
   { q: "On the phone: “Está calor ___ em Lisboa?”", opts: ["aí", "aqui", "ali"], why: "Where the listener is → aí." },
@@ -364,7 +364,7 @@ const EXTRA = {
   { q: "Plural: “Esta é a tua irmã.” →", opts: ["Estas são as tuas irmãs.", "Estes são os tuas irmãs.", "Estas são as tua irmãs."], why: "Everything goes plural." },
   { q: "Plural: “Esse é o nosso chefe.” →", opts: ["Esses são os nossos chefes.", "Esses são os nosso chefes.", "Essas são as nossas chefes."], why: "Caderno D, 4." },
   { q: "His parents:", opts: ["os pais dele", "os seus pais dele", "os dele pais"], why: "dele after the noun." },
-  { q: "___ avós moram em Faro. (our)", opts: ["Os nossos", "As nossas", "Os nosso"], why: "os avós → os nossos." },
+  { q: "___ avós moram em Faro. (our)", opts: ["Os nossos", "As nossas", "Os nosso"], why: "Who? nós → nosso. avós is masculine plural (os avós), so os nossos." },
   { t: "order", q: "Put the words in order: “Her cousins are very nice.”", a: ["As", "primas", "dela", "são", "muito", "simpáticas."], why: "dela after the noun." },
 ]},
 "u9.este": { task: "Choose este, esse or aquele (right form).", hint: "este/esta/estes/estas = near me · esse/essa/esses/essas = near you · aquele/aquela/aqueles/aquelas = far.", quiz2: [

@@ -390,16 +390,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=d2f88bfded"></script>
-<script src="translations.js?v=d2f88bfded"></script>
-<script src="extras2.js?v=d2f88bfded"></script>
-<script src="cards.js?v=d2f88bfded"></script>
-<script src="formas.js?v=d2f88bfded"></script>
-<script src="exame.js?v=d2f88bfded"></script>
-<script src="rules.js?v=d2f88bfded"></script>
-<script src="palavras_data.js?v=d2f88bfded"></script>
-<script src="palavras.js?v=d2f88bfded"></script>
-<script src="listen.js?v=d2f88bfded"></script>
+<script src="extras.js?v=5bfe405848"></script>
+<script src="translations.js?v=5bfe405848"></script>
+<script src="extras2.js?v=5bfe405848"></script>
+<script src="cards.js?v=5bfe405848"></script>
+<script src="formas.js?v=5bfe405848"></script>
+<script src="exame.js?v=5bfe405848"></script>
+<script src="rules.js?v=5bfe405848"></script>
+<script src="palavras_data.js?v=5bfe405848"></script>
+<script src="palavras.js?v=5bfe405848"></script>
+<script src="listen.js?v=5bfe405848"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -1388,13 +1388,13 @@ const LESSONS = [
       W("De quem é o carro branco?", "Whose is the white car?", ""), W("É meu.", "It's mine.", "")],
     links: [],
     quiz: [
-      { q: "Sou alemã. ___ país é a Alemanha.", opts: ["O meu", "A minha", "Meu"], why: "o país is masculine → o meu." },
-      { q: "Tu és italiano. ___ cidade é Roma.", opts: ["A tua", "O teu", "Tua"], why: "a cidade → a tua." },
+      { q: "Sou alemã. ___ país é a Alemanha.", opts: ["O meu", "A minha", "Meu"], why: "Who owns it? eu → meu / minha. Then look at the thing: país is masculine (o país), so o meu. Alemanha doesn’t matter." },
+      { q: "Tu és italiano. ___ cidade é Roma.", opts: ["A tua", "O teu", "Tua"], why: "Who owns it? tu → teu / tua. Then the thing: cidade is feminine (a cidade), so a tua. Roma doesn’t matter." },
       { q: "Ele é grego. A cidade ___ é Atenas.", opts: ["dele", "dela", "sua"], why: "Look at the owner, not the city. The owner is ele (a man) → dele = de + ele, “of him”. It doesn’t matter that cidade is feminine: dele / dela never agree with the thing." },
-      { q: "Vocês são chineses. ___ país é a China.", opts: ["O vosso", "O nosso", "A vossa"], why: "vocês → vosso, o país → o vosso." },
+      { q: "Vocês são chineses. ___ país é a China.", opts: ["O vosso", "O nosso", "A vossa"], why: "Who owns it? vocês → vosso / vossa. Then the thing: país is masculine (o país), so o vosso. A China is feminine, but the word in front of the gap is país, not China." },
       { q: "Eles são suecos. ___ país ___ é a Suécia.", opts: ["O … deles", "O … dele", "A … deles"], why: "The owners are eles → deles = de + eles, “of them”. It goes after the noun: o país deles." },
-      { q: "Onde tens a ___ caneta? (tu)", opts: ["tua", "teu", "sua"], why: "a caneta → a tua." },
-      { q: "“De quem é o carro branco?” — “É ___.” (mine)", opts: ["meu", "minha", "o meu"], why: "Isto é meu. o carro → meu." },
+      { q: "Onde tens a ___ caneta? (tu)", opts: ["tua", "teu", "sua"], why: "Who owns it? tu → teu / tua. caneta is feminine (a caneta), so a tua." },
+      { q: "“De quem é o carro branco?” — “É ___.” (mine)", opts: ["meu", "minha", "o meu"], why: "Who owns it? me → meu / minha. carro is masculine (o carro), so meu." },
     ]
   },
   {
@@ -1885,8 +1885,8 @@ const LESSONS = [
     quiz: [
       { q: "Plural: “o meu filho” →", opts: ["os meus filhos", "os meu filhos", "o meus filhos"], why: "Both article and possessive add -s." },
       { q: "Plural: “a tua irmã” →", opts: ["as tuas irmãs", "as tua irmãs", "os teus irmãs"], why: "a → as, tua → tuas." },
-      { q: "___ pais moram no Porto. (my)", opts: ["Os meus", "As minhas", "Os minhas"], why: "os pais → os meus." },
-      { q: "Rita: “___ filhos são o Bernardo e a Verónica.”", opts: ["Os nossos", "Os meus", "As nossas"], why: "Rita + Fernando = nós → os nossos." },
+      { q: "___ pais moram no Porto. (my)", opts: ["Os meus", "As minhas", "Os minhas"], why: "Who? eu → meu. pais is masculine plural (os pais), so os meus." },
+      { q: "Rita: “___ filhos são o Bernardo e a Verónica.”", opts: ["Os nossos", "Os meus", "As nossas"], why: "Who? Rita + Fernando = nós → nosso. filhos is masculine plural (os filhos), so os nossos." },
       { q: "His sisters:", opts: ["as irmãs dele", "as deles irmãs", "as dele irmãs"], why: "dele goes after the noun and never changes." },
     ]
   },
@@ -3484,7 +3484,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "d2f88bfded";
+const BUILD = "5bfe405848";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
