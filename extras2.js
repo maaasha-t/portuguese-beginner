@@ -249,7 +249,7 @@ const WRITE = {
 "u5.possessivos": [
   { t: "w", q: "O ___ lápis está na mala. (eu)", a: ["meu"], en: "My pencil is in the bag.", why: "o lápis → o meu (ex. E)." },
   { t: "w", q: "Onde tens a ___ caneta? (tu)", a: ["tua"], en: "Where's your pen?", why: "a caneta → a tua." },
-  { t: "w", q: "O relógio ___ está na secretária. (ele)", a: ["dele"], en: "His watch is on the desk.", why: "His → dele, after the noun." },
+  { t: "w", q: "O relógio ___ está na secretária. (ele)", a: ["dele"], en: "His watch is on the desk.", why: "The owner is ele → dele = de + ele, after the noun." },
   { t: "w", q: "O ___ país é Marrocos. (nós)", a: ["nosso"], en: "Our country is Morocco.", why: "o país → o nosso." },
   { t: "w", q: "Estou na ___ casa. (vocês)", a: ["vossa"], en: "I'm at your house.", why: "a casa → a vossa." },
   { t: "w", q: "O carro ___ está na rua. (elas)", a: ["delas"], en: "Their car is in the street.", why: "Their (f) → delas." },

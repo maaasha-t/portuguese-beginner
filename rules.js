@@ -53,7 +53,7 @@ const RULE = {
   "u5.ondeesta": R("Where something is now → estar:", [P("A chave está na mesa.", "The key is on the table."), P("Os óculos estão no carro.", "The glasses are in the car."), P("Estou em casa.", "I'm at home (casa has no article).")],
     "In questions you can add <span class=\"pt\">é que</span>: <span class=\"pt\">Onde é que está a chave?</span>"),
   "u5.possessivos": R("“My, your, our” agree with the thing, not with the owner:", [P("o meu livro", "my book"), P("a minha casa", "my house"), P("o teu carro, a tua mala", "your car, your bag"), P("o nosso amigo, a nossa amiga", "our friend")],
-    "His, her, their come after the thing: <span class=\"pt\">o carro dele</span> = his car, <span class=\"pt\">a casa dela</span> = her house."),
+    "His, her, their work the other way round: you look at the OWNER, not the thing. <span class=\"pt\">dele</span> = de + ele (of him), <span class=\"pt\">dela</span> = de + ela (of her). They go after the thing and never change: <span class=\"pt\">a cidade dele</span> = his city (cidade is feminine, but the owner is a man → dele)."),
   "u5.aqui": R("“Here / there” depends on distance:", [P("aqui", "here, near me"), P("aí", "there, near you"), P("ali", "over there, far from both")]),
   "u5.pron5": R("Two R sounds:", ["Strong R (like a French R): at the start of a word and with RR: <span class=\"pt\">rua</span>, <span class=\"pt\">carro</span>.", "Soft R (one tap): between vowels: <span class=\"pt\">caro</span>."]),
   "u6.profissoes": R("Jobs for a woman:", [P("médico → médica", "-o becomes -a"), P("professor → professora", "-or becomes -ora"), P("ator → atriz", "special")],

@@ -83,7 +83,7 @@ const CARDS = [
     ["my", "o meu", "a minha", "os meus / as minhas"], ["your (tu)", "o teu", "a tua", "os teus / as tuas"],
     ["your (você)", "o seu", "a sua", "os seus / as suas"], ["our", "o nosso", "a nossa", "os nossos / as nossas"],
     ["your (vocês)", "o vosso", "a vossa", "os vossos / as vossas"]]) +
-    `<p><b>his / her / their</b> go after the noun and never change: <i>o carro <b>dele</b>, a casa <b>dela</b>, os filhos <b>deles</b></i>.</p>`,
+    `<p><b>his / her / their</b> = de + ele / ela / eles. Pick it by the <b>owner</b>, not the thing. It goes after the noun and never changes: <i>a cidade <b>dele</b></i> (his city), <i>o carro <b>dela</b></i> (her car), <i>os filhos <b>deles</b></i>.</p>`,
   trap: "A man says “a minha mulher”: feminine because mulher is." },
 { id: "distancia", title: "This, that, that over there", units: [4, 5, 9], tags: "demonstratives isto isso aquilo este esse aquele aqui ai ali distance",
   key: "Three distances: near me · near you · far from both.",

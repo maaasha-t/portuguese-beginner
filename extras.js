@@ -228,8 +228,8 @@ const EXTRA = {
 ]},
 "u5.possessivos": { task: "Choose the right possessive.", hint: "Agrees with the thing: o meu / a minha, o teu / a tua, o seu / a sua, o nosso / a nossa. His/her/their after the noun: dele, dela, deles.", quiz2: [
   { q: "Ana, ___ chave está aqui. (your, tu)", opts: ["a tua", "o teu", "tua"], why: "a chave → a tua." },
-  { q: "O Pedro? O telemóvel ___ está no carro.", opts: ["dele", "dela", "seu"], why: "His → dele." },
-  { q: "A Rita? Os óculos ___ são caros.", opts: ["dela", "dele", "deles"], why: "Her → dela." },
+  { q: "O Pedro? O telemóvel ___ está no carro.", opts: ["dele", "dela", "seu"], why: "The owner is the Pedro (a man) → dele = de + ele. Telemóvel doesn’t matter." },
+  { q: "A Rita? Os óculos ___ são caros.", opts: ["dela", "dele", "deles"], why: "The owner is the Rita (a woman) → dela = de + ela. Os óculos (masculine plural) doesn’t matter." },
   { q: "Somos espanhóis. ___ cidade é Sevilha.", opts: ["A nossa", "O nosso", "Nossa"], why: "a cidade → a nossa." },
   { q: "Find the mistake: “Meu carro é branco.”", opts: ["Needs the article: O meu carro", "It should be “Minha carro”", "No mistake"], why: "In Portugal: o meu carro." },
   { q: "Senhor Costa, ___ passaporte, faz favor. (formal)", opts: ["o seu", "o teu", "a sua"], why: "Formal you → o seu." },

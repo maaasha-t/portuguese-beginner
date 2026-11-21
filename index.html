@@ -390,16 +390,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=134918a35b"></script>
-<script src="translations.js?v=134918a35b"></script>
-<script src="extras2.js?v=134918a35b"></script>
-<script src="cards.js?v=134918a35b"></script>
-<script src="formas.js?v=134918a35b"></script>
-<script src="exame.js?v=134918a35b"></script>
-<script src="rules.js?v=134918a35b"></script>
-<script src="palavras_data.js?v=134918a35b"></script>
-<script src="palavras.js?v=134918a35b"></script>
-<script src="listen.js?v=134918a35b"></script>
+<script src="extras.js?v=d2f88bfded"></script>
+<script src="translations.js?v=d2f88bfded"></script>
+<script src="extras2.js?v=d2f88bfded"></script>
+<script src="cards.js?v=d2f88bfded"></script>
+<script src="formas.js?v=d2f88bfded"></script>
+<script src="exame.js?v=d2f88bfded"></script>
+<script src="rules.js?v=d2f88bfded"></script>
+<script src="palavras_data.js?v=d2f88bfded"></script>
+<script src="palavras.js?v=d2f88bfded"></script>
+<script src="listen.js?v=d2f88bfded"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -1390,9 +1390,9 @@ const LESSONS = [
     quiz: [
       { q: "Sou alemã. ___ país é a Alemanha.", opts: ["O meu", "A minha", "Meu"], why: "o país is masculine → o meu." },
       { q: "Tu és italiano. ___ cidade é Roma.", opts: ["A tua", "O teu", "Tua"], why: "a cidade → a tua." },
-      { q: "Ele é grego. A cidade ___ é Atenas.", opts: ["dele", "dela", "sua"], why: "His → dele, after the noun." },
+      { q: "Ele é grego. A cidade ___ é Atenas.", opts: ["dele", "dela", "sua"], why: "Look at the owner, not the city. The owner is ele (a man) → dele = de + ele, “of him”. It doesn’t matter that cidade is feminine: dele / dela never agree with the thing." },
       { q: "Vocês são chineses. ___ país é a China.", opts: ["O vosso", "O nosso", "A vossa"], why: "vocês → vosso, o país → o vosso." },
-      { q: "Eles são suecos. ___ país ___ é a Suécia.", opts: ["O … deles", "O … dele", "A … deles"], why: "Their → deles, after the noun." },
+      { q: "Eles são suecos. ___ país ___ é a Suécia.", opts: ["O … deles", "O … dele", "A … deles"], why: "The owners are eles → deles = de + eles, “of them”. It goes after the noun: o país deles." },
       { q: "Onde tens a ___ caneta? (tu)", opts: ["tua", "teu", "sua"], why: "a caneta → a tua." },
       { q: "“De quem é o carro branco?” — “É ___.” (mine)", opts: ["meu", "minha", "o meu"], why: "Isto é meu. o carro → meu." },
     ]
@@ -3484,7 +3484,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "134918a35b";
+const BUILD = "d2f88bfded";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
