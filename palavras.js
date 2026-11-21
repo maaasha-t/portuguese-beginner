@@ -65,10 +65,12 @@ function pwPick(lvl, n) {
     return (g >= lvl ? 1000 : 0) + (g === lvl - 1 ? -20 : 0) + (s["s" + lvl] || 0) * 3 - (s["w" + lvl] || 0) * 4 + (s.d === dayKey() ? 6 : 0) + Math.random() * 4; };
   return pool.map(w => [score(w), w]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1]);
 }
-function pwStart(lvl) {
-  const n = lvl === 1 ? 10 : 20, cards = shuffle(pwPick(lvl, n));
+// words you have never met at all (no answer on any level, not marked as known)
+const pwNew = () => pwPool(1).filter(w => !pwMet(w.id, 1));
+function pwStart(lvl, onlyNew) {
+  const n = lvl === 1 ? 10 : 20, cards = onlyNew ? shuffle(pwNew()).slice(0, n) : shuffle(pwPick(lvl, n));
   if (!cards.length) return;
-  PW = { lvl, cards, i: 0, done: 0, total: cards.length, state: "ask", right: 0, again: new Set(), opts: null };
+  PW = { lvl, onlyNew: !!onlyNew, cards, i: 0, done: 0, total: cards.length, state: "ask", right: 0, again: new Set(), opts: null };
   go("palq");
 }
 // words that look alike in meaning: never offered as wrong options for each other (too confusing)
@@ -136,6 +138,7 @@ function palavras() {
       : "A sentence with a gap and no hints at all, like on the exam. Type the word. 20 per set."}</p>
     <div class="chips">${PW_TYPES.map(([k, t]) => `<button class="chip ${o.type === k ? "on" : ""}" data-pwtype="${k}">${t} · ${WORDS.filter(w => pwUnitOk(w.u, w) && (k === "all" || (k === "verb" ? pwIsVerb(w) : w.pos === k && !pwIsVerb(w)))).length}</button>`).join("")}</div>
     ${L > 1 ? `<p class="small muted">Only words you have already met on Level ${L - 1}: <b>${pwPool(L).length}</b>.</p>` : ""}
+    ${L === 1 && pwNew().length ? `<button class="btn ghost" data-pwgo="new">Only new words · ${pwNew().length} not seen yet</button>` : ""}
     ${pwPool(L).length ? `<button class="btn" data-pwgo>Start · ${Math.min(L === 1 ? 10 : 20, pwPool(L).length)} ${o.type === "verb" ? "verbs" : "words"}</button>`
       : `<p class="small">No words here yet. Words show up on this level after you meet them on Level ${L - 1}.</p>`}
     <div class="exsec"><h2>Settings</h2>
@@ -200,7 +203,7 @@ function pwResult() {
   return `${topbar("palavras", "Words")}
     <div class="exsec"><p class="eyebrow">Level ${PW.lvl} · done</p><div class="score">${r}<span style="font-size:24px"> / ${n}</span></div>
       <p>${r === n ? "Perfect!" : r >= n * 0.7 ? "Good. The missed words will come back first next time." : "The missed words will come back first next time."}</p>
-      <div class="row"><button class="btn" data-pwgo>Next set</button><button class="btn ghost" data-go="palstats">My words</button></div></div>`;
+      <div class="row"><button class="btn" data-pwgo="${PW.onlyNew ? "new" : ""}">Next set${PW.onlyNew ? " · new words" : ""}</button><button class="btn ghost" data-go="palstats">My words</button></div></div>`;
 }
 function pwCheck() {
   const w = PW.cards[PW.i], el = document.getElementById("pwa"); if (!el) return;
@@ -226,7 +229,7 @@ function pwClick(t) {
   if (t.dataset.pwstat) { S.pwStatF = t.dataset.pwstat; save(); return render(); }
   if (t.dataset.pwgeo) { S.wordOpts = Object.assign(pwOpts(), { geo: t.dataset.pwgeo === "1" }); save(); return render(); }
   if (t.dataset.pwp) { S.wordOpts = Object.assign(pwOpts(), { p: t.dataset.pwp === "1" }); save(); return render(); }
-  if (t.hasAttribute("data-pwgo")) return pwStart(S.wordLvl || 1);
+  if (t.hasAttribute("data-pwgo")) return t.dataset.pwgo === "new" ? pwStart(1, true) : pwStart(S.wordLvl || 1);
   if (!PW) return;
   const w = PW.cards[PW.i];
   if (t.dataset.pwopt !== undefined) {
