@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=cca5ae8234"></script>
-<script src="translations.js?v=cca5ae8234"></script>
-<script src="extras2.js?v=cca5ae8234"></script>
-<script src="cards.js?v=cca5ae8234"></script>
-<script src="formas.js?v=cca5ae8234"></script>
-<script src="exame.js?v=cca5ae8234"></script>
-<script src="rules.js?v=cca5ae8234"></script>
-<script src="palavras_data.js?v=cca5ae8234"></script>
-<script src="palavras.js?v=cca5ae8234"></script>
-<script src="listen.js?v=cca5ae8234"></script>
+<script src="extras.js?v=960dccd1c5"></script>
+<script src="translations.js?v=960dccd1c5"></script>
+<script src="extras2.js?v=960dccd1c5"></script>
+<script src="cards.js?v=960dccd1c5"></script>
+<script src="formas.js?v=960dccd1c5"></script>
+<script src="exame.js?v=960dccd1c5"></script>
+<script src="rules.js?v=960dccd1c5"></script>
+<script src="palavras_data.js?v=960dccd1c5"></script>
+<script src="palavras.js?v=960dccd1c5"></script>
+<script src="listen.js?v=960dccd1c5"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -1338,7 +1338,12 @@ const LESSONS = [
         <span class="pt">Tens uma caneta? — Sim, tenho. / Não, não tenho.</span><br>
         Same trick as “És o Hugo? — Sou.” in Unit 1.
       </div>
-      <p><b>de for “type of”:</b> <span class="pt">garrafa <b>de</b> água</span> (water bottle), <span class="pt">óculos <b>de</b> sol</span> (sunglasses), <span class="pt">carta <b>de</b> condução</span> (driving licence). No article. But for an owner: <span class="pt">o carro <b>do</b> João</span>.</p>
+      <div class="hook"><div class="eyebrow">Also on this page (exercise A): the things you have, with de</div>
+        Many things you <i>have</i> are two words joined by <b>de</b> (“of”). Two kinds:<br>
+        <b>What kind of thing → de</b>, no article: <span class="pt">Tenho uma garrafa <b>de</b> água.</span> = I have a bottle of water. Also <span class="pt">óculos <b>de</b> sol</span> (sunglasses), <span class="pt">carta <b>de</b> condução</span> (driving licence).<br>
+        <b>Whose thing → do / da</b> (de + o / a): <span class="pt">É o passaporte <b>do</b> Raul.</span> = It's Raul's passport. <span class="pt">a mala <b>da</b> Ana</span> = Ana's bag.<br>
+        Test: a person after the gap → do / da. A material or a kind (água, sol) → de.
+      </div>
       <p><b>1 and 2 agree:</b> <span class="pt">um lápis, uma caneta, dois livros, duas mesas</span>.</p>`,
     words: [W("Desculpe, tem uma caneta?", "Excuse me, do you have a pen?", ""), W("Sim, tenho. Faz favor.", "Yes, I do. Here you go.", ""),
       W("o telemóvel", "mobile phone", "tuh-luh-MO-vel"), W("a carteira", "wallet", ""), W("as chaves", "keys", "SHAHVSH"), W("a mochila", "backpack", "moo-SHEE-luh"),
@@ -1349,8 +1354,8 @@ const LESSONS = [
       { q: "Não ___ chaves. (nós)", opts: ["temos", "tenho", "têm"], why: "nós → temos." },
       { q: "Vocês ___ dinheiro?", opts: ["têm", "tem", "temos"], why: "vocês → têm (with the hat)." },
       { q: "“Tens uma caneta?” — short yes:", opts: ["Sim, tenho.", "Sim, tens.", "Sim, tem."], why: "Answer with the verb in the eu form." },
-      { q: "uma garrafa ___ água", opts: ["de", "da", "do"], why: "Type of bottle → de, no article." },
-      { q: "o passaporte ___ Raul", opts: ["do", "de", "da"], why: "Owner → do Raul." },
+      { q: "uma garrafa ___ água", opts: ["de", "da", "do"], why: "água is not a person, it says what kind of bottle (a water bottle) → just de, no article. Compare o passaporte do Raul: a person → do." },
+      { q: "o passaporte ___ Raul", opts: ["do", "de", "da"], why: "Raul is a person, the owner → de + o Raul = do Raul (names take o / a)." },
       { q: "___ chaves", opts: ["duas", "dois"], why: "a chave is feminine → duas." },
       { q: "“a carteira” is…", opts: ["wallet", "letter", "card"], why: "carteira = wallet. carta = letter / licence." },
     ]
@@ -3508,7 +3513,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "cca5ae8234";
+const BUILD = "960dccd1c5";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
