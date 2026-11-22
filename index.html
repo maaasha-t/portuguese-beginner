@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=52e4a313d3"></script>
-<script src="translations.js?v=52e4a313d3"></script>
-<script src="extras2.js?v=52e4a313d3"></script>
-<script src="cards.js?v=52e4a313d3"></script>
-<script src="formas.js?v=52e4a313d3"></script>
-<script src="exame.js?v=52e4a313d3"></script>
-<script src="rules.js?v=52e4a313d3"></script>
-<script src="palavras_data.js?v=52e4a313d3"></script>
-<script src="palavras.js?v=52e4a313d3"></script>
-<script src="listen.js?v=52e4a313d3"></script>
+<script src="extras.js?v=8ee4f7cac5"></script>
+<script src="translations.js?v=8ee4f7cac5"></script>
+<script src="extras2.js?v=8ee4f7cac5"></script>
+<script src="cards.js?v=8ee4f7cac5"></script>
+<script src="formas.js?v=8ee4f7cac5"></script>
+<script src="exame.js?v=8ee4f7cac5"></script>
+<script src="rules.js?v=8ee4f7cac5"></script>
+<script src="palavras_data.js?v=8ee4f7cac5"></script>
+<script src="palavras.js?v=8ee4f7cac5"></script>
+<script src="listen.js?v=8ee4f7cac5"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -714,6 +714,7 @@ const LESSONS = [
       <p><b>ser = to be</b> (who you are):</p>
       ${conj(["sou", "és", "é"], ["am", "are (informal)", "is / are"])}
       <p class="small muted">o senhor / a senhora (formal “you”) also take <b>é</b>. The plural comes in Unit 2.</p>
+      <p><b>me / te / se</b> in chamar-se: <b>eu → me</b>, <b>tu → te</b>, everyone else → <b>se</b>: <span class="pt">Chamo-me Ana. Chamas-te Pavlo? Ele chama-se Rui. Elas chamam-se Maria e Fátima. Como se chamam eles?</span> In a question with <i>Como</i> the little word goes before the verb: <span class="pt">Como te chamas?</span></p>
       <div class="hook"><div class="eyebrow">Important box, p. 10: the article trap</div>
         In Portugal people put “the” before names: <span class="pt">Sou <b>o</b> Paulo</span> (a man), <span class="pt">É <b>a</b> Rita</span> (a woman). Literally “I am the Paulo”. But after chamo-me there is no article: <span class="pt">Chamo-me Paulo.</span>
       </div>
@@ -904,12 +905,14 @@ const LESSONS = [
       </ul>
       <div class="hook"><div class="eyebrow">Exceptions to remember</div>
         <ul>
-          <li><b>No article:</b> Portugal, Marrocos, Angola, Moçambique, Cuba, Israel</li>
+          <li><b>No article:</b> Portugal, Angola, Moçambique, Cabo Verde, Timor-Leste, Marrocos, Cuba, Israel</li>
           <li><b>Optional:</b> (a) Espanha, (a) Itália, (a) França, (a) Inglaterra</li>
           <li><b>Cities have no article</b>, except <span class="pt">o Porto</span> and <span class="pt">o Rio de Janeiro</span>.</li>
         </ul>
       </div>
-      <p>Tip: most countries ending in <b>-a</b> are feminine, most others are masculine.</p>`,
+      <p>Tip: most countries ending in <b>-a</b> are feminine, most others are masculine.</p>
+      <p>Why these exceptions? Names that started as a city or a place work like a city: no article (<span class="pt">Portugal</span> comes from the city Portus Cale, <span class="pt">Marrocos</span> from Marrakesh). The Portuguese-speaking countries have no article either, except <span class="pt">o Brasil</span>. And <span class="pt">o Porto</span>, <span class="pt">o Rio</span> keep it because <i>porto</i> = port and <i>rio</i> = river are ordinary words.</p>
+      <p>In a sentence: <span class="pt">Sou <b>do</b> Brasil. Moro <b>em</b> Portugal. A Joana é <b>de</b> Timor-Leste.</span></p>`,
     words: [W("a Alemanha", "Germany", "uh ah-luh-MAH-nyuh"), W("o Japão", "Japan", "oo zhuh-POWNG"), W("os Estados Unidos", "the USA", ""),
       W("a Suécia", "Sweden", ""), W("a Polónia", "Poland", ""), W("a Ucrânia", "Ukraine", ""), W("Marrocos", "Morocco", "muh-RRO-koosh"), W("a Grécia", "Greece", "")],
     links: [],
@@ -1105,7 +1108,11 @@ const LESSONS = [
         <span class="pt">A Ana <b>é</b> de Portugal, mas <b>mora</b> em Espanha. Agora <b>está</b> na China.</span><br>
         born in (ser) · lives in (morar) · right now in (estar)
       </div>
-      <p>Same logic as Unit 1: <span class="pt">Como está?</span> asks how you are <i>today</i>, so it's estar.</p>`,
+      <p>Same logic as Unit 1: <span class="pt">Como está?</span> asks how you are <i>today</i>, so it's estar.</p>
+      <div class="hook"><div class="eyebrow">Clue words after the gap</div>
+        <b>ser</b>: de + place (<span class="pt">é de Lisboa</span>), a job, a nationality, looks or character (<span class="pt">é alta, simpático</span>), casado / solteiro.<br>
+        <b>estar</b>: agora, hoje, com fome / sede / frio / calor / sono, cansado, doente, feliz, de férias, where a person or thing is now (<span class="pt">está em casa</span>).
+      </div>`,
     words: [W("Onde estás agora?", "Where are you now?", ""), W("Sou de Londres.", "I'm from London.", ""), W("Estou em Londres.", "I'm in London (now).", "shTOH ayng"),
       W("Onde está a Francesca?", "Where is Francesca?", ""), W("Está em Paris.", "She's in Paris.", "")],
     links: [],
@@ -1223,7 +1230,7 @@ const LESSONS = [
         <li><b>aquilo</b> = that over there, far from both of us</li>
       </ul>
       <div class="hook"><div class="eyebrow">Memory hook</div>
-        is<b>t</b>o: <b>t</b>ouching it. is<b>s</b>o: <b>s</b>omeone else has it. a<b>qu</b>ilo: a<b>qu</b>ite far.
+        is<b>t</b>o: <b>t</b>ouching it. is<b>s</b>o: <b>s</b>omeone else has it. a<b>qu</b>ilo: <b>qu</b>ite far.
       </div>
       <p>They're used for things you don't name yet: <span class="pt">O que é isto?</span> What's this? <span class="pt">Como se diz aquilo em português?</span> How do you say that in Portuguese?</p>`,
     words: [W("O que é isto?", "What's this?", "oo kee eh EESH-too"), W("É um dicionário chinês-português.", "It's a Chinese–Portuguese dictionary.", ""),
@@ -1380,7 +1387,7 @@ const LESSONS = [
   {
     id: "possessivos", title: "My, your, his: possessives", sub: "Exercises I, J, K · Gramática E",
     explain: `
-      <p>The possessive agrees with the <b>thing</b>, not the owner. And it comes with the article:</p>
+      <p>Two steps. <b>1) Who owns it?</b> That picks the word. <b>2) The thing after it: o-word or a-word?</b> That picks the form. It comes with the article:</p>
       <ul>
         <li>eu: <span class="pt">o meu carro · a minha casa</span></li>
         <li>tu: <span class="pt">o teu · a tua</span></li>
@@ -1390,8 +1397,9 @@ const LESSONS = [
       </ul>
       <div class="hook"><div class="eyebrow">His / her / their go after the noun</div>
         <span class="pt">o carro <b>dele</b></span> (his car), <span class="pt">a casa <b>dela</b></span> (her house), <span class="pt">a cidade <b>deles</b></span> (their city).<br>
-        Literally “the car of him”. That's why it never confuses his/her: <b>dele</b> = his, <b>dela</b> = her.
+        Literally “the car of him”: <b>dele</b> = de + ele (his), <b>dela</b> = de + ela (her). Here you look <b>only at the owner</b>: <span class="pt">a cidade dele</span> = his city, even though <i>cidade</i> is feminine.
       </div>
+      <p><b>How to find the owner:</b> a word in brackets (tu), (ele)… is the owner. No brackets? Look at the sentence before: <span class="pt">Ela é de Angola. O nome <b>dela</b> é Graça.</span> · <span class="pt">Somos empregados. O <b>nosso</b> chefe…</span> (somos = nós). In a dialogue the question uses <b>teu / tua</b>, the answer <b>meu / minha</b>.</p>
       <p><b>Mine:</b> <span class="pt">Isto é meu.</span> This is mine. <span class="pt">É o meu carro.</span> It's my car.</p>
       <p>A man says <span class="pt">a minha mulher</span> (feminine, because <i>mulher</i> is), a woman says <span class="pt">o meu marido</span>.</p>`,
     words: [W("o meu carro", "my car", ""), W("a minha carteira", "my wallet", "uh MEE-nyuh"), W("a tua mala", "your bag", ""), W("o carro dele", "his car", ""),
@@ -1463,7 +1471,8 @@ const LESSONS = [
         <li><b>-o → -a</b>: médico / médica, advogado / advogada, engenheiro / engenheira, empregado / empregada</li>
         <li><b>-or → -ora</b>: professor / professora, cantor / cantora</li>
         <li><b>special</b>: ator / <b>atriz</b></li>
-        <li><b>same for both</b>: estudante, jornalista, agente da polícia</li>
+        <li><b>same for both</b>: estudante, jornalista, agente da polícia, chefe, colega</li>
+        <li><b>empregado de escritório</b> = office worker: <span class="pt">Um empregado de escritório trabalha num escritório.</span></li>
       </ul>
       <div class="hook"><div class="eyebrow">No article with jobs</div>
         <span class="pt">Sou médica.</span> I'm <i>a</i> doctor. English needs “a”, Portuguese doesn't.
@@ -1495,7 +1504,7 @@ const LESSONS = [
       <div class="hook"><div class="eyebrow">Practise with your own name</div>
         Spell your name out loud right now. Then try your surname. That's exactly what the front desk will ask you.
       </div>`,
-    words: [W("Como se escreve o teu nome?", "How do you spell your name?", ""), W("RTP", "", "erre tê pê"), W("CC", "Citizen Card (ID)", "cê cê"), W("TPC", "homework", "tê pê cê")],
+    words: [W("Como se escreve o teu nome?", "How do you spell your name?", ""), W("RTP", "Portuguese public TV", "erre tê pê"), W("CC", "Citizen Card (ID)", "cê cê"), W("TPC", "homework", "tê pê cê")],
     links: [],
     quiz: [
       { q: "Listen to the spelling. Which acronym?", say: "gê, ene, erre", opts: ["GNR", "JNR", "GMR"], why: "gê = G, ene = N, erre = R." },
@@ -1755,7 +1764,8 @@ const LESSONS = [
       <div class="hook"><div class="eyebrow">Important box: por = per</div>
         <span class="pt">Trabalho oito horas <b>por</b> dia.</span> 8 hours per day. Also <span class="pt">por semana</span>, <span class="pt">por ano</span>.
       </div>
-      <p>Phrases: <span class="pt">ganhar muito dinheiro</span>, <span class="pt">estudar na universidade</span>, <span class="pt">usar o computador</span>, <span class="pt">trabalhar em casa</span>, <span class="pt">falar ao telemóvel</span> (on the phone).</p>`,
+      <p>Phrases: <span class="pt">ganhar muito dinheiro</span>, <span class="pt">estudar na universidade</span>, <span class="pt">usar o computador</span>, <span class="pt">trabalhar em casa</span>, <span class="pt">falar ao telemóvel</span> (on the phone).</p>
+      <p><b>When:</b> <span class="pt">às vezes</span> (sometimes) · <span class="pt">ao fim de semana</span> (at the weekend: a + o = <b>ao</b>, not <i>no</i>) · <span class="pt">ao sábado</span> (on Saturdays) · <span class="pt">à noite</span> (at night). <span class="pt">Às vezes, trabalho ao fim de semana.</span> = Sometimes I work at the weekend.</p>`,
     words: [W("Quantas horas trabalha por dia?", "How many hours do you work a day?", ""), W("Trabalho oito horas por dia.", "I work 8 hours a day.", ""),
       W("ganhar muito dinheiro", "earn a lot of money", ""), W("falar ao telemóvel", "talk on the phone", ""), W("viajar muito", "travel a lot", "vyuh-ZHAR")],
     links: [],
@@ -1853,7 +1863,7 @@ const LESSONS = [
         <li><span class="pt">o irmão / a irmã</span> → <span class="pt">os irmãos</span> <b>siblings</b></li>
         <li><span class="pt">o avô / a avó</span> → <span class="pt">os avós</span> <b>grandparents</b></li>
         <li><span class="pt">o neto / a neta</span> grandson / granddaughter → <span class="pt">os netos</span></li>
-        <li><span class="pt">o tio / a tia</span> uncle / aunt · <span class="pt">o primo / a prima</span> cousin</li>
+        <li><span class="pt">o tio / a tia</span> uncle / aunt → <span class="pt">o sobrinho / a sobrinha</span> nephew / niece · <span class="pt">o primo / a prima</span> cousin</li>
         <li><span class="pt">o marido / a mulher</span> husband / wife · <span class="pt">o namorado / a namorada</span> boyfriend / girlfriend</li>
         <li><span class="pt">o rapaz / a rapariga</span> boy / girl · <span class="pt">o homem / a mulher</span> man / woman</li>
         <li><span class="pt">a sogra</span> mother-in-law · <span class="pt">filho único</span> only child</li>
@@ -1861,7 +1871,10 @@ const LESSONS = [
       <div class="hook"><div class="eyebrow">Masculine plural = the whole group</div>
         <span class="pt">os pais</span> = mum and dad. <span class="pt">Tenho dois irmãos</span> can mean two brothers, or a brother and a sister.
       </div>
-      <p>Careful: <b>avô</b> (grandpa, closed ô) vs <b>avó</b> (grandma, open ó). And <span class="pt">a mulher</span> means both “woman” and “wife”.</p>`,
+      <p>Careful: <b>avô</b> (grandpa, closed ô, a hat on top) vs <b>avó</b> (grandma, open ó). Never a tilde: not <i>avõ</i>. And <span class="pt">a mulher</span> means both “woman” and “wife”.</p>
+      <div class="hook"><div class="eyebrow">Exam task: flip the relation</div>
+        <span class="pt">O meu tio chama-se Paulo. Sou <b>a</b> ___ do Paulo.</span> → <b>sobrinha</b>. Ask: he is my uncle, so what am I to him? Then look at <b>o / a</b> before the gap: <b>a</b> = a woman speaks (sobrinha, filha, neta, avó), <b>o</b> = a man (sobrinho, filho, neto, avô).
+      </div>`,
     words: [W("Tens irmãos?", "Do you have siblings?", ""), W("Tenho. Um irmão e uma irmã.", "Yes. A brother and a sister.", ""), W("o avô", "grandfather", "uh-VOH"), W("a avó", "grandmother", "uh-VAW"),
       W("os pais", "parents", "PAISH"), W("a rapariga", "girl", "rruh-puh-REE-guh"), W("filho único", "only child", ""), W("Que pena!", "What a pity!", "")],
     links: [],
@@ -1886,8 +1899,8 @@ const LESSONS = [
         <li><span class="pt">os nossos / as nossas</span> · <span class="pt">os vossos / as vossas</span></li>
         <li><b>dele / dela / deles / delas</b> never change: <span class="pt">os filhos dele</span></li>
       </ul>
-      <div class="hook"><div class="eyebrow">Agree with the thing, not the owner</div>
-        A man says <span class="pt">as minhas filhas</span>. It's feminine because <i>filhas</i> is.
+      <div class="hook"><div class="eyebrow">meu / nosso agree with the thing · dele / dela with the owner</div>
+        A man says <span class="pt">as minhas filhas</span>: feminine because <i>filhas</i> is. But <span class="pt">as filhas dele</span>: <i>dele</i> because the father is a man.
       </div>
       <p><span class="pt">Os nossos filhos são o Bernardo e a Verónica.</span> (Rita, exercise A)</p>`,
     words: [W("os meus pais", "my parents", ""), W("as minhas primas", "my cousins (f)", ""), W("Os nossos filhos são o Bernardo e a Verónica.", "Our children are Bernardo and Verónica.", ""), W("os filhos dele", "his children", "")],
@@ -3495,7 +3508,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "52e4a313d3";
+const BUILD = "8ee4f7cac5";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
