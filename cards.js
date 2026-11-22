@@ -105,12 +105,20 @@ const CARDS = [
     ["em", "<b>no</b>", "<b>na</b>", "<b>nos</b>", "<b>nas</b>", "num / numa", "nisto"]]) +
     `<p>Also: <b>daqui, daí, dali</b> (de + aqui / aí / ali), <b>disso, daquilo, nisso, naquilo</b>.</p>`,
   trap: "No article, no merge: de Portugal, em Lisboa, em casa." },
-{ id: "artigos", title: "Articles and gender", units: [1, 2, 4], tags: "articles gender o a um uma masculine feminine dia mapa countries",
-  key: "o / a = the (you both know it). um / uma = a (first mention).",
+{ id: "artigos", title: "Articles and gender", units: [1, 2, 4], tags: "articles gender o a um uma masculine feminine dia mapa countries exceptions cidade mão país",
+  key: "o / a = the (you both know it). um / uma = a (first mention). -o is usually masculine, -a usually feminine.",
   body: tbl(["", "masculine", "feminine"], [["the", "o · os", "a · as"], ["a / some", "um · uns", "uma · umas"]]) +
-    `<ul><li>Usually masculine: <b>-o, -l, -r, -s, -ão</b> (o livro, o jornal)</li><li>Usually feminine: <b>-a</b> (a mesa)</li>
-    <li>Names take the article: <i>o Pedro, a Ana</i>. Most countries too: <i>a China, o Japão</i>.</li></ul>`,
-  trap: "o dia, o mapa (masculine with -a). No article: Portugal, Angola, Marrocos, cities (but o Porto)." },
+    `<div class="use"><div class="uh u-ser">exceptions: o, but ends in -a</div>
+    <div class="ur"><span class="uw">o …</span><span>o <b>dia</b>, o <b>mapa</b>, o <b>problema</b>, o <b>programa</b>, o <b>cinema</b>, o <b>sofá</b></span></div></div>
+  <div class="use"><div class="uh u-pol">exceptions: a, but not -a</div>
+    <div class="ur"><span class="uw">always a</span><span>-dade: a <b>cidade</b>, a idade · -ção: a <b>lição</b>, a <b>televisão</b> · -agem: a <b>viagem</b></span></div>
+    <div class="ur"><span class="uw">learn one by one</span><span>a <b>mão</b>, a <b>tarde</b>, a <b>noite</b>, a <b>chave</b>, a <b>parede</b>, a <b>cor</b>, a <b>mulher</b></span></div></div>
+  <div class="use"><div class="uh u-estar">masculine in Portuguese, feminine in Russian</div>
+    <div class="ur"><span class="uw">o …</span><span>o <b>país</b> (страна), o <b>café</b>, o <b>hotel</b>, o <b>jornal</b>, o <b>lápis</b>, o <b>nome</b></span></div></div>
+  <div class="use"><div class="uh u-both">no article</div>
+    <div class="ur"><span class="uw">countries</span><span>Portugal, Angola, Moçambique, Cabo Verde, Timor-Leste, Marrocos (but <b>o</b> Brasil)</span></div>
+    <div class="ur"><span class="uw">other</span><span>cities (but <b>o</b> Porto) · jobs: <i>Sou médica</i> · <i>em casa</i> · after chamar-se</span></div></div>`,
+  trap: "Names take o / a when you talk about someone: o Pedro, a casa da Ana. Same word for both: o / a estudante, chefe, colega, jornalista." },
 { id: "plural", title: "Making plurals", units: [4], tags: "plural nouns adjectives es is ns oes aes",
   key: "Vowel → add -s. Consonant → add -es. Then the special endings.",
   body: tbl(["ending", "singular", "plural"], [
