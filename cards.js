@@ -149,13 +149,17 @@ const CARDS = [
     ["quanto / -a / -os / -as", "how much / many", "Quantas línguas falas?"], ["que", "what (+ noun)", "Que idade tens?"],
     ["porque é que", "why", "Porque é que gostas?"], ["porquê?", "why? (alone)", "— Porquê?"]]),
   trap: "Answer “because” = porque (no accent). Asking “why?” on its own = porquê?" },
-{ id: "numeros", title: "Numbers: the traps", units: [1, 2, 3], tags: "numbers cardinal ordinal dezasseis sessenta setenta cem cento quinhentos primeiro",
-  key: "Tens + e + units: vinte e três. And e between every part: duzentos e trinta e quatro.",
+{ id: "numeros", title: "Numbers in words", units: [1, 2, 3], tags: "numbers cardinal dezasseis sessenta setenta cem cento quinhentos mil primeiro exam",
+  key: "Build it from parts and put e between them: 145 = cento e quarenta e cinco. After mil, e only before a number under 100 or round hundreds.",
   body: tbl(["", "", ""], [
-    ["11–15", "onze, doze, treze, catorze, quinze", "one-offs"], ["16–19", "dezasseis, dezassete, dezoito, dezanove", "dez + a + …"],
-    ["60 / 70", "sessenta / setenta", "from seis / sete"], ["100 / 101", "cem / cento e um", "cem alone"],
-    ["500", "quinhentos", "irregular"], ["1.º–5.º", "primeiro, segundo, terceiro, quarto, quinto", "ordinals"]]),
-  trap: "1 and 2 agree: um / uma, dois / duas (duas chaves). So do hundreds: duzentas pessoas." },
+    ["0–10", "zero, um, dois, três, quatro, cinco, seis, sete, oito, nove, dez", ""],
+    ["11–19", "onze, doze, treze, catorze, quinze · dezasseis, dezassete, dezoito, dezanove", "16–19 = dez + six…"],
+    ["20–90", "vinte, trinta, quarenta, cinquenta, <b>sessenta</b>, <b>setenta</b>, oitenta, noventa", "60 from seis, 70 from sete"],
+    ["100", "<b>cem</b> alone · 101–199: <b>cento</b> e …", "cem · cento e um"],
+    ["200–900", "duzentos, trezentos, quatrocentos, <b>quinhentos</b>, seiscentos, setecentos, oitocentos, novecentos", "500 is special"],
+    ["1000", "<b>mil</b> (never “um mil”)", ""]]) +
+    `<p><i>92 noventa e dois · 145 cento e quarenta e cinco · 632 seiscentos e trinta e dois · 777 setecentos e setenta e sete · <b>1015 mil e quinze</b> · 1234 mil duzentos e trinta e quatro</i></p>`,
+  trap: "1, 2 and hundreds agree with feminine nouns: uma casa, duas chaves, duzentas pessoas. For counting and phone numbers use um, dois." },
 { id: "adjetivos", title: "Adjectives", units: [4, 7, 10], tags: "adjectives agreement bom boa mau ma colours muito bastante word order",
   key: "Adjectives go AFTER the noun and agree with it: uma casa pequena.",
   body: tbl(["", "m", "f", "m pl", "f pl"], [
