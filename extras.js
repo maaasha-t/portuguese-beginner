@@ -226,7 +226,7 @@ const EXTRA = {
   { q: "Rewrite with é que: “Quem tem as chaves?”", opts: ["Quem é que tem as chaves?", "É que quem tem as chaves?", "Quem tem é que as chaves?"], why: "Question word + é que." },
   { t: "order", q: "Put the words in order: “Where is my wallet?”", a: ["Onde", "está", "a", "minha", "carteira?"], why: "Onde está a minha carteira?" },
 ]},
-"u5.possessivos": { task: "Choose the right possessive.", hint: "Agrees with the thing: o meu / a minha, o teu / a tua, o seu / a sua, o nosso / a nossa. His/her/their after the noun: dele, dela, deles.", quiz2: [
+"u5.possessivos": { task: "Choose the right possessive.", hint: "A word in brackets (eu), (tu), (ele)… is the owner. meu / minha agree with the thing: o meu / a minha. His / her / their look only at the owner: (ele) → dele, (ela) → dela, (eles) → deles.", quiz2: [
   { q: "Ana, ___ chave está aqui. (your, tu)", opts: ["a tua", "o teu", "tua"], why: "Who owns it? tu → teu / tua. chave is feminine (a chave), so a tua." },
   { q: "O Pedro? O telemóvel ___ está no carro.", opts: ["dele", "dela", "seu"], why: "The owner is the Pedro (a man) → dele = de + ele. Telemóvel doesn’t matter." },
   { q: "A Rita? Os óculos ___ são caros.", opts: ["dela", "dele", "deles"], why: "The owner is the Rita (a woman) → dela = de + ela. Os óculos (masculine plural) doesn’t matter." },
