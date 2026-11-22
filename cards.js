@@ -58,6 +58,46 @@ const CARDS = [
     <div class="ur"><span class="uw">with, without</span><span><b>com leite, sem açúcar</b></span></div>
     <div class="ur"><span class="uw">per, until</span><span><b>por semana · até amanhã</b></span></div></div>`,
   trap: "a + o = <b>ao</b>, a + a = <b>à</b>. com + eu = <b>comigo</b>. Near / far: <i>perto <b>de</b>, longe <b>de</b></i>." },
+{ id: "paises", title: "Countries: do, da, no, na", units: [2], tags: "countries países paises de em do da dos no na nos article Cabo Verde Timor exam",
+  key: "é / são de + country (from), fica em + country (in). de / em glue to the country's article.",
+  body: tbl(["country", "from (de)", "in (em)"], [
+    ["o Brasil, o Egito, o Japão, o Paquistão", "<b>do</b> Brasil", "<b>no</b> Brasil"],
+    ["a China, a Índia, a Polónia, a Nigéria", "<b>da</b> China", "<b>na</b> China"],
+    ["os Estados Unidos", "<b>dos</b> Estados Unidos", "<b>nos</b> Estados Unidos"],
+    ["as Filipinas", "<b>das</b> Filipinas", "<b>nas</b> Filipinas"],
+    ["Portugal, Angola, Moçambique, Cabo Verde, Timor-Leste, Marrocos", "<b>de</b> Angola", "<b>em</b> Angola"]]) +
+    `<p><i>O Kofi é <b>da</b> Nigéria. Xangai fica <b>na</b> China. Luanda fica <b>em</b> Angola. A Joana é <b>de</b> Timor-Leste.</i></p>`,
+  trap: "Cities: no article (de Lisboa, em Lisboa), except o Porto: do Porto, no Porto." },
+{ id: "familia", title: "Family", units: [9], tags: "family família familia avô avó neto tio sobrinho primo marido mulher sou a sou o exam",
+  key: "“O meu tio chama-se Paulo. Sou a ___ do Paulo.” Flip the relation, then look at o / a before the gap: a = a woman speaks.",
+  body: tbl(["they are my…", "so I am their… (o / a)"], [
+    ["avô / avó", "neto / neta"], ["pai / mãe", "filho / filha"], ["tio / tia", "<b>sobrinho / sobrinha</b>"],
+    ["primo / prima", "primo / prima"], ["irmão / irmã", "irmão / irmã"], ["marido", "mulher"], ["mulher", "marido"]]) +
+    `<p>Groups: <i>os pais</i> (parents), <i>os filhos</i> (children), <i>os irmãos</i> (siblings), <i>os avós</i> (grandparents).</p>`,
+  trap: "Grandpa has a hat: avô. Grandma: avó. Never a tilde (avõ). tio → sobrinha, not prima." },
+{ id: "trabalho", title: "Work words", units: [6, 8], tags: "work trabalho profissão profissao hospital escola escritório por dia ao fim de semana às vezes gostar de com num numa exam",
+  key: "Where people work, how often, and the little words around it.",
+  body: `<div class="use"><div class="uh u-ser">who works where · num / numa</div>
+    <div class="ur"><span class="uw">num (o-word)</span><span><b>num</b> hospital (enfermeira, médico) · escritório (empregado de escritório) · restaurante (cozinheiro)</span></div>
+    <div class="ur"><span class="uw">numa (a-word)</span><span><b>numa</b> escola (professor/a) · loja · empresa</span></div></div>
+  <div class="use"><div class="uh u-estar">how often, when</div>
+    <div class="ur"><span class="uw">per</span><span>oito horas <b>por</b> dia · cinco dias <b>por</b> semana</span></div>
+    <div class="ur"><span class="uw">when</span><span><b>Às</b> vezes · <b>ao</b> fim de semana · <b>ao</b> sábado · <b>à</b> noite</span></div></div>
+  <div class="use"><div class="uh u-pol">little words</div>
+    <div class="ur"><span class="uw">questions</span><span>Qual é a tua <b>profissão</b>? — Sou engenheiro. (no article with jobs)</span></div>
+    <div class="ur"><span class="uw">with verbs</span><span>gosta <b>de</b> ser cozinheira · trabalho <b>com</b> o Pedro</span></div></div>`,
+  trap: "ao fim de semana: a + o = ao, not no." },
+{ id: "ordem", title: "Word order", units: [1, 2, 3, 4, 7, 10], tags: "word order ordem frases sentence não question pergunta adjective um pouco de exam",
+  key: "Who → (não) → verb → the rest. A question word goes first.",
+  body: tbl(["pattern", "example"], [
+    ["who + verb + rest", "<i>Eles moram em Faro.</i>"],
+    ["não right before the verb", "<i>O Paulo <b>não</b> é alemão.</i>"],
+    ["question word first", "<i><b>Onde</b> mora a Rita agora?</i> · <i><b>Quantas</b> línguas fala a Marta?</i>"],
+    ["yes/no question = same order", "<i>Ele é de Londres?</i> (only the voice goes up)"],
+    ["adjective after the noun", "<i>a caneta <b>vermelha</b></i> · <i>uma cidade <b>bonita</b></i>"],
+    ["muito / bastante before the adjective", "<i>muito bonita</i> · after a verb: <i>falamos muito bem</i>"],
+    ["whose: thing + de + owner", "<i>o telemóvel <b>da</b> Ana</i>"]]),
+  trap: "Keep groups together: falo um pouco de espanhol · Como se diz aquilo em inglês?" },
 { id: "contracoes", title: "Little words that merge", units: [2, 5, 7, 8], tags: "contractions de em do da no na num numa disto nisto prepositions articles",
   key: "Preposition + o / a / os / as = one word. Always. Never “em o”.",
   body: tbl(["", "o", "a", "os", "as", "um / uma", "isto"], [
@@ -78,14 +118,14 @@ const CARDS = [
     ["-l", "jornal · azul · difícil", "jorna<b>is</b> · azu<b>is</b> · difíce<b>is</b>"], ["-m", "viagem", "viage<b>ns</b>"],
     ["-ão", "avião · cão · mão", "avi<b>ões</b> · c<b>ães</b> · m<b>ãos</b>"], ["no change", "lápis", "lápis"]]),
   trap: "-ão has three plurals. The most common is -ões. Learn cães and mãos as exceptions." },
-{ id: "possessivos", title: "My, your, his", units: [5, 9], tags: "possessives meu minha teu tua seu sua nosso dele dela deles",
-  key: "It agrees with the THING, not the owner. And it comes with the article: o meu carro.",
+{ id: "possessivos", title: "Possessives: my, your, his", units: [5, 9], tags: "possessives possessivos meu minha teu tua seu sua nosso vosso dele dela deles de quem",
+  key: "Two steps: 1) who owns it → meu / teu / nosso / vosso; 2) o or a before the gap → meu or minha. dele / dela look only at the owner.",
   body: tbl(["", "o … (m)", "a … (f)", "os / as …"], [
     ["my", "o meu", "a minha", "os meus / as minhas"], ["your (tu)", "o teu", "a tua", "os teus / as tuas"],
     ["your (você)", "o seu", "a sua", "os seus / as suas"], ["our", "o nosso", "a nossa", "os nossos / as nossas"],
     ["your (vocês)", "o vosso", "a vossa", "os vossos / as vossas"]]) +
     `<p><b>his / her / their</b> = de + ele / ela / eles. Pick it by the <b>owner</b>, not the thing. It goes after the noun and never changes: <i>a cidade <b>dele</b></i> (his city), <i>o carro <b>dela</b></i> (her car), <i>os filhos <b>deles</b></i>.</p>`,
-  trap: "A man says “a minha mulher”: feminine because mulher is." },
+  trap: "Owner in brackets (tu) → teu. No brackets → the person in the sentence before (Ela é de Angola → dela; Somos… → nosso). De quem é isto? É teu (tu) · É dela (ela) · É seu (o senhor)." },
 { id: "distancia", title: "This, that, that over there", units: [4, 5, 9], tags: "demonstratives isto isso aquilo este esse aquele aqui ai ali distance",
   key: "Three distances: near me · near you · far from both.",
   body: tbl(["", "near me", "near you", "far"], [

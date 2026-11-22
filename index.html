@@ -303,7 +303,7 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 .cube h3 { font-size: 16px; line-height: 1.25; }
 .cube .k { font-size: 12.5px; color: var(--muted); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .cgroup .eyebrow { color: var(--cc); }
-.cat-verbs { --cc: #3b6fe0; } .cat-agree { --cc: #1f9a6e; } .cat-little { --cc: #d9822b; } .cat-numsound { --cc: #8a5cd6; }
+.cat-verbs { --cc: #3b6fe0; } .cat-agree { --cc: #1f9a6e; } .cat-little { --cc: #d9822b; } .cat-numsound { --cc: #8a5cd6; } .cat-exam { --cc: #c2410c; }
 .cab { border-top: 4px solid var(--cc, var(--line)); }
 .cnav { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .cnav button { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; font-size: 13px; font-weight: 700; color: var(--accent); text-align: left; min-width: 0; }
@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=bc2b2bf411"></script>
-<script src="translations.js?v=bc2b2bf411"></script>
-<script src="extras2.js?v=bc2b2bf411"></script>
-<script src="cards.js?v=bc2b2bf411"></script>
-<script src="formas.js?v=bc2b2bf411"></script>
-<script src="exame.js?v=bc2b2bf411"></script>
-<script src="rules.js?v=bc2b2bf411"></script>
-<script src="palavras_data.js?v=bc2b2bf411"></script>
-<script src="palavras.js?v=bc2b2bf411"></script>
-<script src="listen.js?v=bc2b2bf411"></script>
+<script src="extras.js?v=b9171c7d00"></script>
+<script src="translations.js?v=b9171c7d00"></script>
+<script src="extras2.js?v=b9171c7d00"></script>
+<script src="cards.js?v=b9171c7d00"></script>
+<script src="formas.js?v=b9171c7d00"></script>
+<script src="exame.js?v=b9171c7d00"></script>
+<script src="rules.js?v=b9171c7d00"></script>
+<script src="palavras_data.js?v=b9171c7d00"></script>
+<script src="palavras.js?v=b9171c7d00"></script>
+<script src="listen.js?v=b9171c7d00"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2796,6 +2796,7 @@ const CARD_CATS = [
   ["verbs", "Verbs", ["regular", "irregular", "chamarse", "serestar"]],
   ["agree", "Gender and number", ["artigos", "plural", "adjetivos", "muito"]],
   ["little", "Little words", ["preposicoes", "contracoes", "possessivos", "distancia", "perguntas"]],
+  ["exam", "Exam topics", ["paises", "familia", "trabalho", "ordem"]],
   ["numsound", "Numbers and sounds", ["numeros", "sons"]],
 ];
 const CARD_SEE = {
@@ -2803,6 +2804,7 @@ const CARD_SEE = {
   artigos: ["plural", "adjetivos", "contracoes"], plural: ["artigos", "adjetivos"], adjetivos: ["artigos", "plural", "muito"], muito: ["adjetivos", "perguntas"],
   preposicoes: ["contracoes", "perguntas"], contracoes: ["preposicoes", "artigos"], possessivos: ["artigos", "distancia"], distancia: ["possessivos", "contracoes"], perguntas: ["chamarse", "muito", "numeros"],
   numeros: ["muito", "sons"], sons: ["numeros"],
+  paises: ["preposicoes", "contracoes"], familia: ["possessivos", "artigos"], trabalho: ["preposicoes", "contracoes"], ordem: ["perguntas", "adjetivos"],
 };
 const CARD_ORDER = CARD_CATS.flatMap(c => c[2]).filter(id => CARDS.some(x => x.id === id)).concat(CARDS.map(c => c.id).filter(id => !CARD_CATS.some(c => c[2].includes(id))));
 const cardCat = id => (CARD_CATS.find(c => c[2].includes(id)) || ["verbs"])[0];
@@ -2815,6 +2817,7 @@ const CARD_PRACT = {
   possessivos: ["u5.possessivos", "u9.poss2"], distancia: ["u4.isto", "u5.aqui", "u9.este"], perguntas: ["u6.dados", "u10.qual", "u1.apresentar"],
   numeros: ["u1.numeros", "u2.num21", "u3.num1000"], adjetivos: ["u7.adjetivos", "u7.concordancia", "u10.aparencia", "formas"], muito: ["u8.muito"],
   sons: ["alfabeto.s", "alfabeto.r", "u1.pronuncia"],
+  paises: ["u2.paises", "u2.deonde", "u2.ondefica"], familia: ["u9.familia", "u9.poss2"], trabalho: ["u6.profissoes", "u8.locais", "u8.rotina"], ordem: ["u4.pron4", "u7.concordancia", "u3.linguas"],
 };
 function cardPractice(c) {
   const btns = (CARD_PRACT[c.id] || []).map(k => {
@@ -3513,7 +3516,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "bc2b2bf411";
+const BUILD = "b9171c7d00";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
