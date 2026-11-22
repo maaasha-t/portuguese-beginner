@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=960dccd1c5"></script>
-<script src="translations.js?v=960dccd1c5"></script>
-<script src="extras2.js?v=960dccd1c5"></script>
-<script src="cards.js?v=960dccd1c5"></script>
-<script src="formas.js?v=960dccd1c5"></script>
-<script src="exame.js?v=960dccd1c5"></script>
-<script src="rules.js?v=960dccd1c5"></script>
-<script src="palavras_data.js?v=960dccd1c5"></script>
-<script src="palavras.js?v=960dccd1c5"></script>
-<script src="listen.js?v=960dccd1c5"></script>
+<script src="extras.js?v=70c8b268f5"></script>
+<script src="translations.js?v=70c8b268f5"></script>
+<script src="extras2.js?v=70c8b268f5"></script>
+<script src="cards.js?v=70c8b268f5"></script>
+<script src="formas.js?v=70c8b268f5"></script>
+<script src="exame.js?v=70c8b268f5"></script>
+<script src="rules.js?v=70c8b268f5"></script>
+<script src="palavras_data.js?v=70c8b268f5"></script>
+<script src="palavras.js?v=70c8b268f5"></script>
+<script src="listen.js?v=70c8b268f5"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -1355,7 +1355,7 @@ const LESSONS = [
       { q: "Vocês ___ dinheiro?", opts: ["têm", "tem", "temos"], why: "vocês → têm (with the hat)." },
       { q: "“Tens uma caneta?” — short yes:", opts: ["Sim, tenho.", "Sim, tens.", "Sim, tem."], why: "Answer with the verb in the eu form." },
       { q: "uma garrafa ___ água", opts: ["de", "da", "do"], why: "água is not a person, it says what kind of bottle (a water bottle) → just de, no article. Compare o passaporte do Raul: a person → do." },
-      { q: "o passaporte ___ Raul", opts: ["do", "de", "da"], why: "Raul is a person, the owner → de + o Raul = do Raul (names take o / a)." },
+      { q: "o passaporte ___ Raul", opts: ["do", "de", "da"], why: "The article is there, hidden inside do: names take o / a (o Raul), and de + o glue into one word → do Raul. Just de would lose the article." },
       { q: "___ chaves", opts: ["duas", "dois"], why: "a chave is feminine → duas." },
       { q: "“a carteira” is…", opts: ["wallet", "letter", "card"], why: "carteira = wallet. carta = letter / licence." },
     ]
@@ -3513,7 +3513,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "960dccd1c5";
+const BUILD = "70c8b268f5";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set

@@ -239,7 +239,7 @@ const WRITE = {
   { t: "w", q: "Vocês ___ dinheiro? (ter)", a: ["têm"], en: "Do you have money?", why: "vocês → têm (with the hat)." },
   { t: "w", q: "Não ___ carta de condução. (eu, ter)", a: ["tenho"], en: "I don't have a driving licence.", why: "eu → tenho." },
   { t: "w", q: "Write dois or duas: ___ chaves", a: ["duas"], en: "two keys", why: "a chave → duas (ex. D)." },
-  { t: "w", q: "o passaporte ___ Raul", a: ["do"], en: "Raul's passport", why: "Owner → do (ex. A)." },
+  { t: "w", q: "o passaporte ___ Raul", a: ["do"], en: "Raul's passport", why: "Names take o / a (o Raul), and de + o glue into one word → do Raul." },
 ],
 "u5.ondeesta": [
   { t: "w", q: "Add two words to the question: Onde ___ está o Pedro? (é + que)", a: ["é que"], en: "Where is Pedro?", why: "Question word + é que (ex. C)." },
