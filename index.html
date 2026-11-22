@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=ca7e432fb9"></script>
-<script src="translations.js?v=ca7e432fb9"></script>
-<script src="extras2.js?v=ca7e432fb9"></script>
-<script src="cards.js?v=ca7e432fb9"></script>
-<script src="formas.js?v=ca7e432fb9"></script>
-<script src="exame.js?v=ca7e432fb9"></script>
-<script src="rules.js?v=ca7e432fb9"></script>
-<script src="palavras_data.js?v=ca7e432fb9"></script>
-<script src="palavras.js?v=ca7e432fb9"></script>
-<script src="listen.js?v=ca7e432fb9"></script>
+<script src="extras.js?v=52e4a313d3"></script>
+<script src="translations.js?v=52e4a313d3"></script>
+<script src="extras2.js?v=52e4a313d3"></script>
+<script src="cards.js?v=52e4a313d3"></script>
+<script src="formas.js?v=52e4a313d3"></script>
+<script src="exame.js?v=52e4a313d3"></script>
+<script src="rules.js?v=52e4a313d3"></script>
+<script src="palavras_data.js?v=52e4a313d3"></script>
+<script src="palavras.js?v=52e4a313d3"></script>
+<script src="listen.js?v=52e4a313d3"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -1174,12 +1174,19 @@ const LESSONS = [
   {
     id: "objetos", title: "Classroom objects: um or uma?", sub: "Exercise A · Gramática A, B",
     explain: `
-      <p><b>um</b> = a (masculine), <b>uma</b> = a (feminine). Guess the gender from the ending:</p>
+      <p><b>um / uma</b> = <b>a / an</b> (also “one”). You use it when you name a thing for the first time, or count one:</p>
       <ul>
-        <li>masculine usually ends in <b>-o, -l, -s, -ão, -r, -e, -z, -m</b>: um livro, um jornal, um computador</li>
-        <li>feminine usually ends in <b>-a</b>: uma mesa, uma cadeira, uma janela</li>
-        <li>-e, -r, -ão, -z, -m can be either: <b>uma</b> parede, <b>um</b> relógio</li>
+        <li><span class="pt">Isto é <b>um</b> livro.</span> = This is a book.</li>
+        <li><span class="pt">Tenho <b>uma</b> caneta.</span> = I have a pen.</li>
+        <li><span class="pt">Há <b>um</b> relógio na parede.</span> = There's a clock on the wall.</li>
       </ul>
+      <p><b>o / a</b> = <b>the</b>: a thing you both already know: <span class="pt"><b>O</b> livro está na mesa.</span> = The book is on the table.</p>
+      <p>Which one, um or uma? It copies the gender of the word. In the word list below each word comes with <b>o</b> or <b>a</b>: that shows its gender. <b>o</b>-word → <b>um</b>, <b>a</b>-word → <b>uma</b>:</p>
+      <ul>
+        <li><span class="pt">o livro → <b>um</b> livro</span>, <span class="pt">o relógio → <b>um</b> relógio</span>, <span class="pt">o jornal → <b>um</b> jornal</span></li>
+        <li><span class="pt">a mesa → <b>uma</b> mesa</span>, <span class="pt">a cadeira → <b>uma</b> cadeira</span>, <span class="pt">a parede → <b>uma</b> parede</span></li>
+      </ul>
+      <p>No list at hand? Guess from the ending: <b>-o</b> is almost always masculine, <b>-a</b> almost always feminine. Other endings (-e, -l, -r, -ão…) can be either: learn the word with its o / a.</p>
       <div class="hook"><div class="eyebrow">Important box: trick words</div>
         <span class="pt"><b>o</b> dia</span> (day) and <span class="pt"><b>o</b> mapa</span> (map) end in -a but are masculine.
       </div>
@@ -1199,7 +1206,7 @@ const LESSONS = [
       { q: "___ janela", opts: ["uma", "um"], why: "-a → feminine." },
       { q: "___ mapa", opts: ["um", "uma"], why: "Trick word: o mapa is masculine." },
       { q: "___ relógio", opts: ["um", "uma"], why: "-o → masculine." },
-      { q: "___ parede", opts: ["uma", "um"], why: "-e can be either. a parede is feminine." },
+      { q: "___ parede", opts: ["uma", "um"], why: "The word list says a parede (feminine), so uma parede. -e words can be either: learn them with o / a." },
       { q: "Plural of “um jornal”:", opts: ["jornais", "jornals", "jornales"], why: "-l → -is." },
       { q: "Plural of “o computador”:", opts: ["os computadores", "os computadors", "as computadores"], why: "-r → -es." },
       { q: "Plural of “o país”:", opts: ["os países", "os paíss", "os país"], why: "-s → -es." },
@@ -3488,7 +3495,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "ca7e432fb9";
+const BUILD = "52e4a313d3";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
