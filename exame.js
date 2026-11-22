@@ -392,6 +392,21 @@ function xBank(U) {
 }
 
 
+// Places: em + o / a / um / uma (where someone is, where someone works)
+function xLugar(U) {
+  const out = [];
+  if (okU(U, 5) || okU(U, 3)) for (let k = 0; k < 6; k++) {
+    const pl = XR([["mesa", "na"], ["carro", "no"], ["mala", "na"], ["casa", "em"], ["escritório", "no"], ["quarto", "no"], ["escola", "na"], ["rua", "na"], ["Porto", "no"], ["Lisboa", "em"], ["praia", "na"], ["hotel", "no"]]);
+    if (Math.random() < 0.5) { const o = XR(XOBJ.slice(0, 11).filter(x => x[0] !== pl[0])); out.push({ p: `${XCAP(XART[XFI(o[2])])} ${o[0]} está ___ ${pl[0]}.`, a: [pl[1]], topic: "u5.ondeesta", unit: 5 }); }
+    else { const p = XNAME(); out.push({ p: `${XCAP(XART[XFI(p.g)])} ${p.n} está ___ ${pl[0]} agora.`, a: [pl[1]], topic: "u5.ondeesta", unit: 5 }); }
+  }
+  if (okU(U, 8)) for (let k = 0; k < 6; k++) {
+    const w = XR([["escritório", "m"], ["hospital", "m"], ["restaurante", "m"], ["escola", "f"], ["loja", "f"], ["universidade", "f"], ["banco", "m"], ["empresa", "f"], ["teatro", "m"]]), p = XNAME(), f = XFI(w[1]);
+    out.push({ p: `${XCAP(XART[XFI(p.g)])} ${p.n} trabalha ___ ${w[0]}.`, a: [XNUM[f], XEM[f]], topic: "u8.locais", unit: 8 });
+  }
+  return out;
+}
+
 /* ---------- Real exam (Exame #1, PLA A1, Nov 2026): 10 parts in this order ---------- */
 // 1. pronomes reflexos me / te / se
 function xReflex(U) {
@@ -493,8 +508,10 @@ const XREAL = [
   ["reflex", 9, "Complete as frases com os pronomes reflexos “me”, “te” e “se”.", "Complete with me, te or se.", xReflex],
   ["paises", 9, "Preencha os espaços em branco com as preposições DE (+artigo se necessário) e EM (+artigo definido se necessário).", "Fill in DE or EM (+ the article if needed).", xPaises],
   ["serestar", 12, "Complete com os verbos “ser” e “estar” na forma conjugada correta.", "Complete with ser or estar in the right form.", xSerEstar],
+  ["verb", 8, "Complete com o verbo na forma correta.", "Complete with the verb in the right form.", xVerb],
   ["family", 7, "Escreva as palavras que faltam.", "Write the missing words (family).", xFamily],
   ["work", 9, "Escreva as palavras que faltam.", "Write the missing words (work, routine).", xWork],
+  ["lugar", 8, "Complete com em, no, na, num ou numa.", "Complete with em, no, na, num or numa.", xLugar],
   ["possbox", 5, "Complete as frases com as palavras da caixa.", "Complete with the words from the box.", xPossBox],
   ["whose", 6, "Escreva as respostas corretas a estas perguntas usando os Pronomes Possessivos, seguindo o que diz entre parêntesis “()”.", "Answer with a possessive, for the person in brackets.", xWhoseShort],
   ["order", 8, "Coloque as palavras por ordem para formar uma frase correta.", "Put the words in order to make a correct sentence.", xOrder],

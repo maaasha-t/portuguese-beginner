@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=70c8b268f5"></script>
-<script src="translations.js?v=70c8b268f5"></script>
-<script src="extras2.js?v=70c8b268f5"></script>
-<script src="cards.js?v=70c8b268f5"></script>
-<script src="formas.js?v=70c8b268f5"></script>
-<script src="exame.js?v=70c8b268f5"></script>
-<script src="rules.js?v=70c8b268f5"></script>
-<script src="palavras_data.js?v=70c8b268f5"></script>
-<script src="palavras.js?v=70c8b268f5"></script>
-<script src="listen.js?v=70c8b268f5"></script>
+<script src="extras.js?v=e9af1614e2"></script>
+<script src="translations.js?v=e9af1614e2"></script>
+<script src="extras2.js?v=e9af1614e2"></script>
+<script src="cards.js?v=e9af1614e2"></script>
+<script src="formas.js?v=e9af1614e2"></script>
+<script src="exame.js?v=e9af1614e2"></script>
+<script src="rules.js?v=e9af1614e2"></script>
+<script src="palavras_data.js?v=e9af1614e2"></script>
+<script src="palavras.js?v=e9af1614e2"></script>
+<script src="listen.js?v=e9af1614e2"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -3077,7 +3077,7 @@ function exScore(E) {
   return Math.round(E.sections.reduce((n, s) => n + part(s), 0) / E.sections.length * 100);
 }
 // Past sheets: the answers of an old sheet are gone, but the check of every item is in the log (q = topic.EX.part)
-const EX_PART = { reflex: "me / te / se", paises: "de / em + countries", serestar: "ser / estar", family: "family", work: "work, routine", possbox: "possessives (box)",
+const EX_PART = { reflex: "me / te / se", paises: "de / em + countries", serestar: "ser / estar", family: "family", work: "work, routine", lugar: "em / no / na / num / numa", possbox: "possessives (box)",
   whose: "De quem é? É ___", order: "word order", order2: "sentences from words", numbers: "numbers in words", build: "build sentences", plural: "plural",
   errors: "fix mistakes", questions: "write the question", verb: "verb forms", prep: "prepositions", gender: "feminine / masculine", artpl: "article + plural",
   muito: "muito / pouco", opp: "opposites", bank: "words from the box" };
@@ -3513,7 +3513,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "70c8b268f5";
+const BUILD = "e9af1614e2";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
