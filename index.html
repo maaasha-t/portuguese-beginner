@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=33ac69a265"></script>
-<script src="translations.js?v=33ac69a265"></script>
-<script src="extras2.js?v=33ac69a265"></script>
-<script src="cards.js?v=33ac69a265"></script>
-<script src="formas.js?v=33ac69a265"></script>
-<script src="exame.js?v=33ac69a265"></script>
-<script src="rules.js?v=33ac69a265"></script>
-<script src="palavras_data.js?v=33ac69a265"></script>
-<script src="palavras.js?v=33ac69a265"></script>
-<script src="listen.js?v=33ac69a265"></script>
+<script src="extras.js?v=bc2b2bf411"></script>
+<script src="translations.js?v=bc2b2bf411"></script>
+<script src="extras2.js?v=bc2b2bf411"></script>
+<script src="cards.js?v=bc2b2bf411"></script>
+<script src="formas.js?v=bc2b2bf411"></script>
+<script src="exame.js?v=bc2b2bf411"></script>
+<script src="rules.js?v=bc2b2bf411"></script>
+<script src="palavras_data.js?v=bc2b2bf411"></script>
+<script src="palavras.js?v=bc2b2bf411"></script>
+<script src="listen.js?v=bc2b2bf411"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2890,7 +2890,7 @@ const VREST = {
   ter: ["dois irmãos", "um carro novo", "olhos azuis", "muito trabalho"], ler: ["o jornal", "muitos livros", "em português"], ver: ["televisão", "filmes à noite", "o mapa"],
 };
 const CHAMAR = [["Eu", 0, "eu", "Ana.", "My name is Ana."], ["Tu", 1, "tu", "Rita?", "Is your name Rita?"], ["A minha irmã", 2, "she → ela", "Sofia.", "My sister's name is Sofia."],
-  ["O meu pai", 2, "he → ele", "Rui.", "My father's name is Rui."], ["Você", 2, "você → like ele", "Pedro?", "Is your name Pedro?"], ["O professor", 2, "he → ele", "Tiago.", "The teacher's name is Tiago."]];
+  ["O meu pai", 2, "he → ele", "Rui.", "My father's name is Rui."], ["Você", 2, "você → like ele", "Pedro?", "Is your name Pedro?"], ["O professor", 2, "he → ele", "Tiago.", "The teacher's name is Tiago."], ["Elas", 4, "elas", "Maria e Fátima.", "Their names are Maria and Fátima."], ["Os meus pais", 4, "they → eles", "Rui e Ana.", "My parents' names are Rui and Ana."]];
 function verbSentences(ok) {
   const out = [];
   VERBS.filter(ok).forEach(v => {
@@ -2930,7 +2930,7 @@ const VCTX = {
   cozinhar: [["o jantar", "dinner"]],
   usar: [["óculos", "glasses"]],
 };
-const CHAMAR3 = [["Eu", 0, "Ana."], ["Tu", 1, "Rita?"], ["A minha irmã", 2, "Sofia."], ["O meu pai", 2, "Rui."], ["O senhor", 2, "Pedro?"]];
+const CHAMAR3 = [["Eu", 0, "Ana."], ["Tu", 1, "Rita?"], ["A minha irmã", 2, "Sofia."], ["O meu pai", 2, "Rui."], ["O senhor", 2, "Pedro?"], ["Elas", 4, "Maria e Fátima."], ["Os meus avós", 4, "José e Rosa."]];
 function verbSentences3(ok) {
   const out = [], fm = (name, pi) => { const v = VERBS.find(x => x[0] === name); return v && v[2 + pi]; };
   VERBS.filter(ok).forEach(v => {
@@ -3513,7 +3513,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "33ac69a265";
+const BUILD = "bc2b2bf411";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set

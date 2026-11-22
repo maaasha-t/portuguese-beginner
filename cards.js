@@ -21,9 +21,10 @@ const CARDS = [
 { id: "chamarse", title: "Chamar-se: my name is", units: [1], tags: "chamar-se chamo-me chamas-te chama-se reflexive name called me te se verbs",
   key: "A regular -ar verb + “self” after a hyphen. Both parts change with the person.",
   body: tbl(["", "chamar (regular)", "+ self", "meaning"], [
-    ["eu", "chamo", "<b>-me</b>", "my name is"], ["tu", "chamas", "<b>-te</b>", "your name is"], ["ele / ela / você", "chama", "<b>-se</b>", "his / her / your name is"]]) +
+    ["eu", "chamo", "<b>-me</b>", "my name is"], ["tu", "chamas", "<b>-te</b>", "your name is"], ["ele / ela / você", "chama", "<b>-se</b>", "his / her / your name is"],
+    ["nós", "chamamo(s)", "<b>-nos</b>", "our names are"], ["eles / elas / vocês", "chamam", "<b>-se</b>", "their / your names are"]]) +
     `<p>Questions: <i>Como te chamas?</i> (to a friend) · <i>Como se chama?</i> (polite). In a question the little word jumps before the verb.</p>`,
-  trap: "Don't mix the persons: tu → chamas-te, not chamas-se." },
+  trap: "eu → -me, tu → -te, nós → -nos, everyone else → -se: Elas chamam-se Maria e Fátima. Como se chamam eles? With nós the -s of chamamos drops: chamamo-nos." },
 { id: "serestar", title: "Ser or estar?", units: [3, 10], tags: "ser estar to be permanent temporary now how where polite formal você o senhor a senhora you",
   key: "ser = what it IS. estar = how or where it is NOW.",
   body: `<div class="use"><div class="uh u-ser">ser · always, who or what</div>
@@ -132,7 +133,7 @@ const CARDS = [
 // Verbs trainer: [infinitive, English, eu, tu, ele, nós, eles, unit, irregular?]
 const VERBS = [
   ["ser", "to be", "sou", "és", "é", "somos", "são", 1, true],
-  ["chamar-se", "to be called", "chamo-me", "chamas-te", "chama-se", null, null, 1, false],
+  ["chamar-se", "to be called", "chamo-me", "chamas-te", "chama-se", "chamamo-nos", "chamam-se", 1, false],
   ["morar", "to live", "moro", "moras", "mora", "moramos", "moram", 3, false],
   ["falar", "to speak", "falo", "falas", "fala", "falamos", "falam", 3, false],
   ["estar", "to be (now)", "estou", "estás", "está", "estamos", "estão", 3, true],
