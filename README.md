@@ -5,3 +5,5 @@
 Open on iPhone: https://maaasha-t.github.io/portuguese-beginner/ → Share → Add to Home Screen. After the first open it works without internet; progress stays on the phone.
 
 Built from `projects/portuguese-app/` in the second-brain vault with `build_pwa.py`. Don't edit files here by hand.
+
+What changed: see the changelog in `projects/portuguese-app/README.md` (vault). Latest: Exame with the 10 parts of the real PLA A1 exam, Palavras with 3 levels, Verbos Level 3, lessons reviewed.
