@@ -4,13 +4,13 @@ const tbl = (head, rows) => `<div class="tbl"><table><tr>${head.map(h => `<th>${
 
 const CARDS = [
 { id: "regular", title: "Regular verbs: present", units: [3, 8], tags: "verbs conjugation endings ar er ir falar comer partir presente",
-  key: "Drop -ar / -er / -ir and add the ending. The group's vowel comes back in every form except eu.",
+  key: "Drop -ar / -er / -ir and add the ending. eu is always -o. After that, -ar verbs use A, -er and -ir verbs use E.",
   body: tbl(["", "falar", "comer", "partir"], [
     ["eu", "fal<b>o</b>", "com<b>o</b>", "part<b>o</b>"], ["tu", "fal<b>as</b>", "com<b>es</b>", "part<b>es</b>"],
     ["ele / você", "fal<b>a</b>", "com<b>e</b>", "part<b>e</b>"], ["nós", "fal<b>amos</b>", "com<b>emos</b>", "part<b>imos</b>"],
     ["eles / vocês", "fal<b>am</b>", "com<b>em</b>", "part<b>em</b>"]]) +
     `<p>Same pattern: morar, ficar, trabalhar, estudar, viajar, ganhar, usar, gostar.</p>`,
-  trap: "-er and -ir differ only in nós: comemos / partimos." },
+  trap: "-ar is the odd one: falas, fala, falamos, falam (A). -er and -ir share the same E endings (comes / partes, come / parte, comem / partem), except nós: comemos / partimos." },
 { id: "irregular", title: "Irregular verbs you know", units: [1, 2, 3, 5, 10], tags: "verbs irregular ser estar ter ler ver conjugation",
   key: "Learn these five by heart. Everything else so far is regular.",
   body: tbl(["", "ser", "estar", "ter", "ler", "ver"], [
