@@ -393,16 +393,16 @@ mark { background: var(--tram); color: #16203a; border-radius: 3px; padding: 0 2
 
 <div class="wrap" id="app"></div>
 <div class="gltip" id="gl" hidden></div>
-<script src="extras.js?v=8ee4f7cac5"></script>
-<script src="translations.js?v=8ee4f7cac5"></script>
-<script src="extras2.js?v=8ee4f7cac5"></script>
-<script src="cards.js?v=8ee4f7cac5"></script>
-<script src="formas.js?v=8ee4f7cac5"></script>
-<script src="exame.js?v=8ee4f7cac5"></script>
-<script src="rules.js?v=8ee4f7cac5"></script>
-<script src="palavras_data.js?v=8ee4f7cac5"></script>
-<script src="palavras.js?v=8ee4f7cac5"></script>
-<script src="listen.js?v=8ee4f7cac5"></script>
+<script src="extras.js?v=cca5ae8234"></script>
+<script src="translations.js?v=cca5ae8234"></script>
+<script src="extras2.js?v=cca5ae8234"></script>
+<script src="cards.js?v=cca5ae8234"></script>
+<script src="formas.js?v=cca5ae8234"></script>
+<script src="exame.js?v=cca5ae8234"></script>
+<script src="rules.js?v=cca5ae8234"></script>
+<script src="palavras_data.js?v=cca5ae8234"></script>
+<script src="palavras.js?v=cca5ae8234"></script>
+<script src="listen.js?v=cca5ae8234"></script>
 
 <script>
 /* ---------- content ---------- */
@@ -2816,9 +2816,9 @@ function cardPractice(c) {
     if (k === "verbs") return `<button class="pracbtn" data-go="verbs"><b>Verbos</b><span>verb trainer</span></button>`;
     if (k === "formas") return `<button class="pracbtn" data-go="formas"><b>Formas</b><span>gender and number trainer</span></button>`;
     const [lid, cid] = k.split("."), l = lessonById(lid), ch = l && l.chunks.find(x => x.id === cid); if (!ch) return "";
-    return `<button class="pracbtn" data-go="practice" data-lesson="${lid}" data-chunk="${cid}" data-level="1"><b>${ch.title}</b><span>${l.num ? "Unit " + l.num : l.title} · practise</span></button>`;
+    return `<button class="pracbtn" data-go="chunk" data-lesson="${lid}" data-chunk="${cid}"><b>${ch.title}</b><span>${l.num ? "Unit " + l.num : l.title} · open the lesson</span></button>`;
   }).join("");
-  return btns ? `<div class="pracrow"><span class="small muted">Practise it:</span>${btns}</div>` : "";
+  return btns ? `<div class="pracrow"><span class="small muted">Learn and practise it:</span>${btns}</div>` : "";
 }
 function cardHtml(c, opts) {
   const see = (CARD_SEE[c.id] || []).map(cardById).filter(Boolean);
@@ -3508,7 +3508,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 <script>
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 // iPhone keeps the app alive in the background, so it may never reload: check for a new version when it comes back
-const BUILD = "8ee4f7cac5";
+const BUILD = "cca5ae8234";
 function checkUpdate() {
   if (document.hidden || !navigator.onLine) return;
   if (typeof view !== "undefined" && ["quiz", "palq", "exame"].includes(view.name)) return; // never in the middle of a set
