@@ -67,7 +67,7 @@ const CARDS = [
     ["as Filipinas", "<b>das</b> Filipinas", "<b>nas</b> Filipinas"],
     ["Portugal, Angola, Moçambique, Cabo Verde, Timor-Leste, Marrocos", "<b>de</b> Angola", "<b>em</b> Angola"]]) +
     `<p><i>O Kofi é <b>da</b> Nigéria. Xangai fica <b>na</b> China. Luanda fica <b>em</b> Angola. A Joana é <b>de</b> Timor-Leste.</i></p>`,
-  trap: "Cities: no article (de Lisboa, em Lisboa), except o Porto: do Porto, no Porto." },
+  trap: "Cities: no article (de Lisboa, em Lisboa), except o Porto: do Porto, no Porto. The question is always plain de: De onde é ela? — É da China." },
 { id: "familia", title: "Family", units: [9], tags: "family família familia avô avó neto tio sobrinho primo marido mulher sou a sou o exam",
   key: "“O meu tio chama-se Paulo. Sou a ___ do Paulo.” Flip the relation, then look at o / a before the gap: a = a woman speaks.",
   body: tbl(["they are my…", "so I am their… (o / a)"], [
@@ -104,7 +104,7 @@ const CARDS = [
     ["de", "<b>do</b>", "<b>da</b>", "<b>dos</b>", "<b>das</b>", "dum / duma", "disto"],
     ["em", "<b>no</b>", "<b>na</b>", "<b>nos</b>", "<b>nas</b>", "num / numa", "nisto"]]) +
     `<p>Also: <b>daqui, daí, dali</b> (de + aqui / aí / ali), <b>disso, daquilo, nisso, naquilo</b>.</p>`,
-  trap: "No article, no merge: de Portugal, em Lisboa, em casa." },
+  trap: "No article, no merge: de Portugal, em Lisboa, em casa. Question words have no article either: De onde é ela? De quem é isto? De que cor é? (never do onde / da onde)." },
 { id: "artigos", title: "Articles and gender", units: [1, 2, 4], tags: "articles gender o a um uma masculine feminine dia mapa countries exceptions cidade mão país",
   key: "o / a = the (you both know it). um / uma = a (first mention). -o is usually masculine, -a usually feminine.",
   body: tbl(["", "masculine", "feminine"], [["the", "o · os", "a · as"], ["a / some", "um · uns", "uma · umas"]]) +
